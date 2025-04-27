@@ -1,12 +1,14 @@
 import pandas as pd
 import numpy as np
-from math import isfinite
+from math import isfinite, ceil
 
 def compute_position_size(equity: float, atr: float, risk_frac: float = 0.02) -> int:
     """Risk a fraction of equity per trade, return share size (rounded down)."""
+    # 如果ATR为零，则无法建仓
     if atr == 0:
         return 0
-    return int((equity * risk_frac) // atr)
+    # 使用天花板函数确保至少建仓1手
+    return ceil((equity * risk_frac) / atr)
 
 
 def compute_stop_price(entry: float, atr: float, multiplier: float = 1.0) -> float:

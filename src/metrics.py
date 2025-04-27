@@ -20,10 +20,10 @@ def sharpe_ratio(equity: pd.Series, rf: float = 0.0) -> float:
     rets = equity.pct_change().dropna()
     excess = rets - rf / TRADING_DAYS
     std = excess.std(ddof=0)
-    # 处理标准差为零的情况 - 对于恒定序列返回NaN
+    # std为零 -> 恒定序列，返回NaN
     if std == 0:
         return np.nan
-    # 处理NaN的情况
+    # std为NaN -> 返回0.0
     if np.isnan(std):
         return 0.0
     return np.sqrt(TRADING_DAYS) * excess.mean() / std
