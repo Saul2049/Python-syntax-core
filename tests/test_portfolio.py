@@ -1,13 +1,18 @@
 import pytest
 import pandas as pd
 from src import portfolio_backtest, metrics
+from src.portfolio_backtest import run_portfolio
+
+def test_portfolio_runs():
+    """基本测试：确保投资组合回测可以运行"""
+    eq = run_portfolio()
+    assert eq.iloc[-1] > 0
 
 def test_portfolio_default():
     """测试默认配置下的投资组合回测"""
     eq = portfolio_backtest.run_portfolio()
     assert isinstance(eq, pd.Series)
     assert eq.name == "equity_total"
-    assert eq.iloc[-1] > 0
     
 def test_portfolio_custom_allocation():
     """测试自定义权重配置"""
