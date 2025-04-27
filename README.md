@@ -32,10 +32,20 @@ This repository contains a modular Python framework for backtesting algorithmic 
 
 ## Getting Started
 
+### Installation
+
 ```bash
-# Install dependencies
+# Option 1: Regular installation
 pip install -r requirements.txt
 
+# Option 2: Development installation (recommended for contributors)
+pip install -e .                 # Install the package in development mode
+pip install -r dev-requirements.txt  # Install development tools
+```
+
+### Running
+
+```bash
 # Run the backtest
 python -c "from src.backtest import run_backtest; print(run_backtest().iloc[-1])"
 
