@@ -1,9 +1,16 @@
+import pytest
 from is_prime import is_prime
 
-def test_small_primes():
-    assert is_prime(2) is True
-    assert is_prime(17) is True
+@pytest.mark.parametrize("n, expected", [
+    (-5, False),  # negative number edge-case
+    (0, False),   # zero edge-case
+    (2, True),    # small prime
+    (17, True),   # medium prime
+    (97, True),   # big prime edge-case
+])
+def test_edge_cases(n, expected):
+    assert is_prime(n) is expected
 
-def test_non_primes():
-    assert is_prime(1) is False
-    assert is_prime(20) is False
+@pytest.mark.parametrize("n", [1, 20, 100])  # composite values including larger
+def test_non_primes(n):
+    assert is_prime(n) is False
