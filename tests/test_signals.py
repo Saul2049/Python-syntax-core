@@ -3,8 +3,37 @@ import numpy as np
 from src import signals
 
 def test_moving_average():
+    """测试简单移动平均线 (SMA)"""
     s = pd.Series([1, 2, 3, 4])
     assert signals.moving_average(s, 2).iloc[-1] == 3.5
+    # 使用显式的kind参数
+    assert signals.moving_average(s, 2, kind="sma").iloc[-1] == 3.5
+
+def test_exponential_moving_average():
+    """测试指数移动平均线 (EMA)"""
+    s = pd.Series([1, 2, 3, 4])
+    ema = signals.moving_average(s, 2, kind="ema")
+    # EMA对最近的数据赋予更高权重
+    assert ema.iloc[-1] > 3.5
+    assert isinstance(ema, pd.Series)
+    assert len(ema) == len(s)
+
+def test_weighted_moving_average():
+    """测试加权移动平均线 (WMA)"""
+    s = pd.Series([1, 2, 3, 4])
+    wma = signals.moving_average(s, 2, kind="wma")
+    # 对于[3, 4]窗口，权重为[1, 2]，加权结果为(1*3+2*4)/(1+2) = 11/3
+    assert abs(wma.iloc[-1] - 11/3) < 1e-10
+    assert isinstance(wma, pd.Series)
+
+def test_invalid_ma_type():
+    """测试不支持的均线类型"""
+    s = pd.Series([1, 2, 3, 4])
+    try:
+        signals.moving_average(s, 2, kind="invalid")
+        assert False, "Should have raised ValueError"
+    except ValueError:
+        assert True
 
 def test_crosses():
     fast = pd.Series([1, 2, 3, 4])

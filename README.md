@@ -117,4 +117,37 @@ plt.title("Trading Strategy vs Buy & Hold")
 plt.xlabel("Date")
 plt.ylabel("Equity ($)")
 plt.show()
-``` 
+```
+
+### Moving Average Types Demo
+```python
+from src import data, signals
+import matplotlib.pyplot as plt
+
+# 加载价格数据
+price = data.load_csv()["btc"]
+
+# 计算不同类型的20日均线
+sma = signals.moving_average(price, 20, kind="sma")  # 简单移动平均线
+ema = signals.moving_average(price, 20, kind="ema")  # 指数移动平均线
+wma = signals.moving_average(price, 20, kind="wma")  # 加权移动平均线
+
+# 绘制价格和均线对比
+plt.figure(figsize=(12, 6))
+plt.plot(price, label='Price', alpha=0.7)
+plt.plot(sma, label='SMA(20)', linewidth=2)
+plt.plot(ema, label='EMA(20)', linewidth=2)
+plt.plot(wma, label='WMA(20)', linewidth=2)
+plt.legend()
+plt.title('BTC Price with Different Moving Averages')
+plt.xlabel('Date')
+plt.ylabel('Price ($)')
+plt.grid(True, alpha=0.3)
+plt.show()
+
+# 分析不同均线的特性
+print("均线响应速度比较 (最近日期的值):")
+print(f"价格: {price.iloc[-1]:.2f}")
+print(f"SMA: {sma.iloc[-1]:.2f}")
+print(f"EMA: {ema.iloc[-1]:.2f}")
+print(f"WMA: {wma.iloc[-1]:.2f}") 

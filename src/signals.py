@@ -2,9 +2,35 @@ import pandas as pd
 import numpy as np
 
 
-def moving_average(series: pd.Series, window: int) -> pd.Series:
-    """Compute the simple moving average over a specified window."""
-    return series.rolling(window).mean()
+def moving_average(series: pd.Series, window: int, kind: str = "sma") -> pd.Series:
+    """
+    计算移动平均线。
+    
+    参数:
+        series: 输入的时间序列数据
+        window: 窗口大小
+        kind: 均线类型，支持 'sma'(简单移动平均), 'ema'(指数移动平均), 
+              'wma'(加权移动平均)
+              
+    返回:
+        pd.Series: 计算后的均线序列
+    """
+    kind = kind.lower()
+    
+    if kind == "sma":
+        # 简单移动平均线 (Simple Moving Average)
+        return series.rolling(window).mean()
+    elif kind == "ema":
+        # 指数移动平均线 (Exponential Moving Average)
+        return series.ewm(span=window, adjust=False).mean()
+    elif kind == "wma":
+        # 加权移动平均线 (Weighted Moving Average)
+        weights = np.arange(1, window + 1)
+        return series.rolling(window).apply(
+            lambda x: np.sum(weights * x) / weights.sum(), raw=True
+        )
+    else:
+        raise ValueError(f"Unsupported moving average type: {kind}")
 
 
 def bullish_cross_indices(fast: pd.Series, slow: pd.Series) -> np.ndarray:
