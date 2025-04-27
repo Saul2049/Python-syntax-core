@@ -1,5 +1,6 @@
 import pytest
 import pandas as pd
+import numpy as np
 from src import data, broker, metrics
 
 def test_single_bt_runs():
@@ -38,4 +39,4 @@ def test_single_bt_metrics():
     # 验证指标计算
     assert metrics.cagr(eq) > -1 and metrics.cagr(eq) < 1  # 合理的CAGR范围
     assert metrics.max_drawdown(eq) <= 0  # 回撤应为负值或零
-    assert not pd.isna(metrics.sharpe_ratio(eq))  # 夏普比率不应为NaN 
+    assert pd.notna(metrics.sharpe_ratio(eq))  # 使用pd.notna替代not pd.isna 
