@@ -9,10 +9,10 @@ from math import isfinite
 
 
 def run_backtest(
-    fast_win: int = 5,
+    fast_win: int = 7,
     slow_win: int = 20,
     risk_frac: float = 0.02,
-    atr_win: int = 14,
+    atr_win: int = 20,
     stop_mult: float = 1.0,
 ) -> pd.Series:
     df = load_csv()
@@ -66,10 +66,10 @@ def run_backtest(
 
 if __name__ == '__main__':
     equity_series = run_backtest(
-        fast_win=3,
-        slow_win=7,
+        fast_win=7,
+        slow_win=20,
         risk_frac=0.02,
-        atr_win=14,
+        atr_win=20,
     )
     print(equity_series)
     equity_series.plot(title='Equity Curve')
