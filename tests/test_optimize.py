@@ -2,6 +2,7 @@ import pandas as pd
 import os
 import sys
 import pytest
+import numpy as np
 
 # Add project root to path if necessary  
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -19,8 +20,11 @@ def test_grid_structure():
     """确保结果包含必需的列和正确的排序"""
     required_columns = ["fast", "slow", "atr", "cagr", "sharpe", "mdd", "final"]
     assert all(col in df.columns for col in required_columns)
-    # 验证按Sharpe比率降序排列
-    assert df["sharpe"].iloc[0] >= df["sharpe"].iloc[-1]
+    
+    # 排除NaN值后验证按Sharpe比率降序排列
+    df_valid = df[~df["sharpe"].isna()]
+    if len(df_valid) > 1:
+        assert df_valid["sharpe"].iloc[0] >= df_valid["sharpe"].iloc[-1]
     
     
 @pytest.mark.skipif(not os.path.exists("grid_results.csv"), reason="CSV file not generated")

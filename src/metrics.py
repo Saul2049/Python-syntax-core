@@ -19,4 +19,11 @@ def sharpe_ratio(equity: pd.Series, rf: float = 0.0) -> float:
     """年化 Sharpe。rf 传年化无风险收益率。"""
     rets = equity.pct_change().dropna()
     excess = rets - rf / TRADING_DAYS
-    return np.sqrt(TRADING_DAYS) * excess.mean() / excess.std(ddof=0)
+    std = excess.std(ddof=0)
+    # 处理标准差为零的情况 - 对于恒定序列返回NaN
+    if std == 0:
+        return np.nan
+    # 处理NaN的情况
+    if np.isnan(std):
+        return 0.0
+    return np.sqrt(TRADING_DAYS) * excess.mean() / std
