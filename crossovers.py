@@ -11,6 +11,11 @@ def bullish_cross_indices(fast: pd.Series, slow: pd.Series) -> np.ndarray:
     crossover = (fast.shift(1) <= slow.shift(1)) & (fast > slow)
     return np.where(crossover)[0]
 
+def bearish_cross_indices(fast: pd.Series, slow: pd.Series) -> np.ndarray:
+    """Indices where fast crosses *down* below slow."""
+    crossover = (fast.shift(1) >= slow.shift(1)) & (fast < slow)
+    return np.where(crossover)[0]
+
 if __name__ == "__main__":
     # quick demo: compute bullish cross indices for BTC using 5- and 20-day SMAs
     df = pd.read_csv("btc_eth.csv", parse_dates=["date"], index_col="date")
@@ -19,3 +24,5 @@ if __name__ == "__main__":
     idx = bullish_cross_indices(fast, slow)
     print("Bullish crosses at positions:", idx)
     print("Dates:", fast.index[idx])
+
+
