@@ -26,8 +26,7 @@ jobs:
         pip install pytest pytest-cov
 
     - name: Run test suite
+      env:
+        PYTHONPATH: ${{ github.workspace }}
       run: |
-        # Set PYTHONPATH to include the current directory
-        export PYTHONPATH=$PYTHONPATH:$(pwd)
-        # Run pytest with explicit test file patterns to exclude problematic files
-        python -m pytest tests/test_broker.py tests/test_broker_single.py tests/test_metrics.py tests/test_optimize.py tests/test_portfolio.py tests/test_signals.py test_is_prime.py -v
+        python -m pytest --maxfail=1 --disable-warnings -v
