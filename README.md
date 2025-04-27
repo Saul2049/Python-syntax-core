@@ -64,6 +64,41 @@ sma_5 = signals.moving_average(df["btc"], 5)
 print(sma_5.tail())
 ```
 
+### Modern Signal Generation
+```python
+from src import data, signals
+import matplotlib.pyplot as plt
+
+# 加载价格数据
+price = data.load_csv()["btc"]
+
+# 计算快慢均线
+fast_ma = signals.moving_average(price, 5)
+slow_ma = signals.moving_average(price, 20)
+
+# 生成交叉信号Series
+buy_signals = signals.bullish_cross_series(fast_ma, slow_ma)
+sell_signals = signals.bearish_cross_series(fast_ma, slow_ma)
+
+# 仅提取有信号的点
+buy_points = price[buy_signals]
+sell_points = price[sell_signals]
+
+# 输出买卖点数量
+print(f"Buy signals: {len(buy_points)}, Sell signals: {len(sell_points)}")
+
+# 绘制价格和信号
+plt.figure(figsize=(12, 6))
+plt.plot(price, label='Price')
+plt.plot(fast_ma, label='Fast MA', alpha=0.7)
+plt.plot(slow_ma, label='Slow MA', alpha=0.7)
+plt.scatter(buy_points.index, buy_points, color='green', marker='^', label='Buy')
+plt.scatter(sell_points.index, sell_points, color='red', marker='v', label='Sell')
+plt.legend()
+plt.title('Price with MA Crossover Signals')
+plt.show()
+```
+
 ### Strategy vs Buy & Hold
 ```python
 import matplotlib.pyplot as plt
