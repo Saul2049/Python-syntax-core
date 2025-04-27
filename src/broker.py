@@ -3,17 +3,49 @@ import numpy as np
 from math import isfinite, ceil
 
 def compute_position_size(equity: float, atr: float, risk_frac: float = 0.02) -> int:
-    """Risk a fraction of equity per trade, return share size (rounded down)."""
-    # 如果ATR为零，则无法建仓
-    if atr == 0:
-        return 0
-    # 使用天花板函数确保至少建仓1手
-    return ceil((equity * risk_frac) / atr)
+    """
+    计算基于风险的仓位大小。
+    
+    根据账户权益、波动率(ATR)和风险系数计算适当的仓位大小，至少返回1手。
+    
+    参数:
+        equity: 当前账户权益
+        atr: 平均真实波幅，用于衡量价格波动
+        risk_frac: 风险系数，每笔交易愿意损失的资金比例(默认: 2%)
+        
+    返回:
+        int: 仓位大小，至少为1手
+    """
+    # 如果ATR为零或无效，返回最小单位1
+    if atr <= 0:
+        return 1
+    
+    # 计算理论上的仓位大小
+    position = (equity * risk_frac) / atr
+    
+    # 确保至少为1手
+    return max(1, int(position))
 
 
 def compute_stop_price(entry: float, atr: float, multiplier: float = 1.0) -> float:
-    """Calculate stop-loss price as entry minus ATR multiplied by multiplier."""
-    return entry - multiplier * atr 
+    """
+    计算止损价格。
+    
+    基于入场价格、ATR和乘数计算止损价格，通常用于为交易设置风险控制点。
+    
+    参数:
+        entry: 入场价格
+        atr: 平均真实波幅，用于度量价格波动
+        multiplier: ATR乘数，控制止损距离(默认: 1.0)
+        
+    返回:
+        float: 计算得到的止损价格
+    """
+    # 确保ATR为非负值
+    atr_value = max(0, atr)
+    
+    # 计算止损价格 (做多的情况下)
+    return entry - multiplier * atr_value
 
 from src import signals   # 避免循环引用
 
@@ -57,10 +89,9 @@ def backtest_single(price: pd.Series,
         # 买入信号
         if i in buy_i and position == 0 and isfinite(atr.iloc[i]):
             size = compute_position_size(equity, atr.iloc[i], risk_frac)
-            if size:
-                position = size
-                entry = p
-                stop = compute_stop_price(entry, atr.iloc[i])
+            position = size
+            entry = p
+            stop = compute_stop_price(entry, atr.iloc[i])
 
         equity_curve.append(equity + (p - entry) * position if position else equity)
 
