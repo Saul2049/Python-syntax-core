@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 # plot_equity.py
 import matplotlib.pyplot as plt
-from src import data, backtest, metrics
+
+from src import backtest, data, metrics
 
 df = data.load_csv()
 price = df["btc"]

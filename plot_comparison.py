@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
-from src import data, backtest, metrics
+
+from src import backtest, data, metrics
 
 # Load price data
 price = data.load_csv()["btc"]

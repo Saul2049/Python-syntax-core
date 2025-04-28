@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
+
 from src import data, metrics
-from src.broker import backtest_single, backtest_portfolio
+from src.broker import backtest_portfolio, backtest_single
 
 # 加载数据
 df = data.load_csv()

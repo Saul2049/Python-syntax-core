@@ -2,10 +2,10 @@
 """
 环境变量加载脚本 - 配置Telegram通知和API密钥
 """
-import os
-import sys
 import argparse
 import configparser
+import os
+import sys
 
 
 def setup_parser():

@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-from src.data import load_csv
-from src.signals import moving_average, bullish_cross_indices, bearish_cross_indices
-from src.broker import compute_position_size, compute_stop_price
 from math import isfinite
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+
+from src.broker import compute_position_size, compute_stop_price
+from src.data import load_csv
+from src.signals import (bearish_cross_indices, bullish_cross_indices,
+                         moving_average)
 
 
 def run_backtest(

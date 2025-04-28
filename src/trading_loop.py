@@ -1,13 +1,14 @@
 import os
 import time
-import pandas as pd
-import numpy as np
 from datetime import datetime, timedelta
-from typing import Dict, Any, Optional
+from typing import Any, Dict, Optional
 
+import numpy as np
+import pandas as pd
+
+from src import utils
 from src.broker import Broker
 from src.signals import moving_average
-from src import utils
 
 
 def fetch_price_data(symbol: str) -> pd.DataFrame:

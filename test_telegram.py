@@ -2,12 +2,13 @@
 """
 测试Telegram通知功能
 """
+import argparse
+import json
 import os
 import sys
-import requests
-import argparse
 import time
-import json
+
+import requests
 from dotenv import load_dotenv
 
 # 尝试加载.env文件中的环境变量

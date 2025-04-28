@@ -3,9 +3,13 @@
 """
 移动平均策略参数网格搜索优化
 """
-import itertools, json, pandas as pd
+import itertools
+import json
+
+import pandas as pd
 from tqdm import tqdm  # pip install tqdm
-from src import backtest, data, signals, metrics
+
+from src import backtest, data, metrics, signals
 
 # 搜索空间
 FAST = range(3, 11)  # 3…10

@@ -1,6 +1,7 @@
-import pandas as pd
+from typing import Literal, Optional, Union
+
 import numpy as np
-from typing import Union, Literal, Optional
+import pandas as pd
 
 
 def moving_average(

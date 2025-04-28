@@ -1,7 +1,8 @@
-import pytest
-import pandas as pd
 import numpy as np
-from src import data, broker, metrics
+import pandas as pd
+import pytest
+
+from src import broker, data, metrics
 
 
 def test_single_bt_runs():

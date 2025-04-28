@@ -2,10 +2,11 @@
 # fetch_binance.py
 # 获取更长期(2年)的BTC和ETH历史价格数据
 
-import requests
-import pandas as pd
 import time
 from datetime import datetime, timedelta
+
+import pandas as pd
+import requests
 
 
 def fetch_klines(

@@ -2,11 +2,13 @@
 # improved_strategy.py
 # 实现改进的交易策略并与买入持有策略对比
 
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-from src import signals, metrics, broker
 from math import isfinite
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+
+from src import broker, metrics, signals
 
 
 def buy_and_hold(price: pd.Series, init_equity: float = 100_000.0) -> pd.Series:

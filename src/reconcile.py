@@ -1,14 +1,15 @@
+import argparse
 import os
 import sys
-import pandas as pd
-import numpy as np
 from datetime import datetime, timedelta
-from typing import Dict, Any, List, Tuple, Optional
 from pathlib import Path
-import argparse
+from typing import Any, Dict, List, Optional, Tuple
 
-from src.broker import Broker
+import numpy as np
+import pandas as pd
+
 from src import utils
+from src.broker import Broker
 
 
 def get_exchange_trades(

@@ -1,8 +1,10 @@
-from src import broker
+from math import isfinite
+
 import numpy as np
 import pandas as pd
 import pytest
-from math import isfinite
+
+from src import broker
 
 
 def test_position_size():

@@ -1,6 +1,7 @@
 import os
-from typing import Optional
 from datetime import datetime
+from typing import Optional
+
 from src.telegram import TelegramBot
 
 

@@ -1,14 +1,15 @@
-import pandas as pd
-import numpy as np
-import pytest
 import sys
 from pathlib import Path
+
+import numpy as np
+import pandas as pd
+import pytest
 
 # 添加项目根目录到Python路径
 sys.path.append(str(Path(__file__).parent.parent))
 
-from src import broker
 from data import load_csv  # 导入根目录的data模块
+from src import broker
 
 
 def test_backtest_snapshot_btc():

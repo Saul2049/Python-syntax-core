@@ -1,6 +1,8 @@
-import pandas as pd
 from typing import Dict
-from src import data, broker
+
+import pandas as pd
+
+from src import broker, data
 
 
 def run_portfolio(alloc: Dict[str, float] = None) -> pd.Series:

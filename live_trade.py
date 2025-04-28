@@ -2,20 +2,21 @@
 """
 使用Binance Testnet执行实时交易
 """
-import os
-import time
-import pandas as pd
-import numpy as np
-from datetime import datetime
-import csv
-import configparser
 import argparse
-import sys
+import configparser
+import csv
 import json
-import requests
+import os
+import sys
+import time
+from datetime import datetime
 from math import isfinite
 
-from src import signals, broker
+import numpy as np
+import pandas as pd
+import requests
+
+from src import broker, signals
 from src.binance_client import BinanceClient
 
 # 持仓状态文件路径

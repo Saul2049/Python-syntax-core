@@ -1,10 +1,12 @@
-import pandas as pd
-import numpy as np
-from math import isfinite, ceil
-from typing import Optional, Dict, Any, Tuple, List
 from datetime import datetime, timedelta
-from src.notify import Notifier
+from math import ceil, isfinite
+from typing import Any, Dict, List, Optional, Tuple
+
+import numpy as np
+import pandas as pd
+
 from src import utils
+from src.notify import Notifier
 
 
 def compute_atr(series: pd.Series, window: int = 14) -> float:

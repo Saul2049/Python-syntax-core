@@ -8,11 +8,11 @@ Demonstrates how to use network retry decorator and state recovery to handle
 network interruptions and application restarts
 """
 
+import logging
 import os
+import random
 import sys
 import time
-import logging
-import random
 from datetime import datetime, timedelta
 from pathlib import Path
 

@@ -3,6 +3,7 @@
 直接运行Telegram完整通知测试
 """
 import os
+
 from test_telegram import test_trade_notifications
 
 # 设置Telegram凭据
