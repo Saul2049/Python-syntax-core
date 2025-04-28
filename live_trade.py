@@ -10,13 +10,10 @@ import os
 import sys
 import time
 from datetime import datetime
-from math import isfinite
 
-import numpy as np
-import pandas as pd
 import requests
 
-from src import broker, signals
+from src import signals
 from src.binance_client import BinanceClient
 
 # 持仓状态文件路径
@@ -243,6 +240,37 @@ def load_position_state():
     except Exception as e:
         print(f"加载持仓状态失败: {e}")
         return None
+
+
+def get_trading_params(config):
+    """
+    从配置文件中获取交易参数
+
+    参数:
+        config: 配置对象
+
+    返回:
+        dict: 交易参数字典
+    """
+    # 获取交易配置参数
+    return {
+        "symbol": config["TRADING"].get("SYMBOL", "BTCUSDT"),
+        "fast_window": int(config["TRADING"].get("FAST_WINDOW", "7")),
+        "slow_window": int(config["TRADING"].get("SLOW_WINDOW", "25")),
+        "atr_window": int(config["TRADING"].get("ATR_WINDOW", "14")),
+        "risk_percent": float(config["TRADING"].get("RISK_PERCENT", "1.0")),
+        "stop_atr_multiplier": float(
+            config["TRADING"].get("STOP_ATR_MULTIPLIER", "2.0")
+        ),
+        "atr_stop_percent": float(
+            config["TRADING"].get("ATR_STOP_PERCENT", "50.0")
+        ),
+        "breakeven_r": float(config["TRADING"].get("BREAKEVEN_R", "1.0")),
+        "trailing_r": float(config["TRADING"].get("TRAILING_R", "2.0")),
+        "use_trailing_stop": config["TRADING"].getboolean(
+            "USE_TRAILING_STOP", True
+        ),
+    }
 
 
 def run_strategy(

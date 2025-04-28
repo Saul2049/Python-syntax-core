@@ -1,8 +1,7 @@
 import logging
-import os
 import time
 from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional
 
 from src.network import NetworkClient, with_retry
 
@@ -84,9 +83,8 @@ class ExchangeClient(NetworkClient):
             Dict[str, Any]: 订单信息 (Order information)
         """
         # 保存订单状态 (Save order state)
-        operation = (
-            f"order_{symbol}_{side}_{datetime.now().strftime('%Y%m%d%H%M%S')}"
-        )
+        timestamp_str = datetime.now().strftime('%Y%m%d%H%M%S')
+        operation = f"order_{symbol}_{side}_{timestamp_str}"
         order_state = {
             "symbol": symbol,
             "side": side,
@@ -114,14 +112,16 @@ class ExchangeClient(NetworkClient):
         order_id = f"ORDER{int(datetime.now().timestamp())}"
 
         # 更新订单状态 (Update order state)
+        # 生成模拟成交价格
+        now = datetime.now()
+        fake_price = float(f"{now.second + 50000}.{now.microsecond}")
+        executed_price = price or fake_price
+        
         order_state.update(
             {
                 "status": "filled",
                 "order_id": order_id,
-                "executed_price": price
-                or float(
-                    f"{datetime.now().second + 50000}.{datetime.now().microsecond}"
-                ),
+                "executed_price": executed_price,
                 "executed_quantity": quantity,
                 "executed_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             }
@@ -171,14 +171,14 @@ class ExchangeClient(NetworkClient):
         end_ms = int(end_time.timestamp() * 1000)
 
         logger.info(
-            f"Fetching historical trades for {symbol} from {start_time} to {end_time}"
+            f"Fetching historical trades for {symbol} "
+            f"from {start_time} to {end_time}"
         )
 
         # 检查是否有已保存的进度 (Check for saved progress)
         operation = f"trades_{symbol}_{start_ms}_{end_ms}"
         state = self.load_operation_state(operation)
         trades = state.get("trades", [])
-        last_id = state.get("last_id")
 
         if trades:
             logger.info(
@@ -215,7 +215,6 @@ class ExchangeClient(NetworkClient):
         # 保存结果到状态文件 (Save result to state file)
         state_data = {
             "trades": result,
-            "last_id": result[-1]["id"] if result else None,
             "status": "completed",
             "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         }

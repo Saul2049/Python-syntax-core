@@ -1,12 +1,11 @@
 import os
 import time
 from datetime import datetime, timedelta
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
 import numpy as np
 import pandas as pd
 
-from src import utils
 from src.broker import Broker
 from src.signals import moving_average
 
@@ -164,7 +163,7 @@ def trading_loop(symbol: str = "BTCUSDT", interval_seconds: int = 60):
                 # 如果止损已触发，跳过信号处理 (Skip signal processing if stop loss triggered)
                 if stop_triggered:
                     print(
-                        f"止损已触发，跳过信号处理 (Stop loss triggered, skipping signal processing)"
+                        "止损已触发，跳过信号处理 (Stop loss triggered, skipping signal processing)"
                     )
                 else:
                     # 处理买入信号 (Process buy signals)
@@ -185,22 +184,30 @@ def trading_loop(symbol: str = "BTCUSDT", interval_seconds: int = 60):
                         )  # 假设最小单位是0.001 (Assume minimum unit is 0.001)
 
                         # 执行买入订单 (Execute buy order)
+                        reason = (
+                            f"MA交叉: 快线 {signals['fast_ma']:.2f} "
+                            f"上穿 慢线 {signals['slow_ma']:.2f}"
+                        )
                         broker.execute_order(
                             symbol=symbol,
                             side="BUY",
                             quantity=quantity,
-                            reason=f"MA交叉: 快线 {signals['fast_ma']:.2f} 上穿 慢线 {signals['slow_ma']:.2f}",
+                            reason=reason,
                         )
 
                     # 处理卖出信号 (Process sell signals)
                     elif signals["sell_signal"] and symbol in broker.positions:
                         # 执行卖出订单 (Execute sell order)
                         position = broker.positions[symbol]
+                        reason = (
+                            f"MA交叉: 快线 {signals['fast_ma']:.2f} "
+                            f"下穿 慢线 {signals['slow_ma']:.2f}"
+                        )
                         broker.execute_order(
                             symbol=symbol,
                             side="SELL",
                             quantity=position["quantity"],
-                            reason=f"MA交叉: 快线 {signals['fast_ma']:.2f} 下穿 慢线 {signals['slow_ma']:.2f}",
+                            reason=reason,
                         )
 
                 # 打印状态 (Print status)

@@ -5,7 +5,6 @@
 from math import isfinite
 
 import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
 
 from src import broker, metrics, signals
@@ -186,40 +185,47 @@ if __name__ == "__main__":
     print("\n策略绩效比较:")
     print("-" * 80)
     print(
-        f"简单买入持有:   CAGR: {metrics.cagr(bnh_equity):.2%}, MaxDD: {metrics.max_drawdown(bnh_equity):.2%}, Sharpe: {metrics.sharpe_ratio(bnh_equity):.2f}"
+        f"简单买入持有:   CAGR: {metrics.cagr(bnh_equity):.2%}, "
+        f"MaxDD: {metrics.max_drawdown(bnh_equity):.2%}, "
+        f"Sharpe: {metrics.sharpe_ratio(bnh_equity):.2f}"
     )
     print(
-        f"趋势跟踪策略:   CAGR: {metrics.cagr(tf_equity):.2%}, MaxDD: {metrics.max_drawdown(tf_equity):.2%}, Sharpe: {metrics.sharpe_ratio(tf_equity):.2f}"
+        f"趋势跟踪策略:   CAGR: {metrics.cagr(tf_equity):.2%}, "
+        f"MaxDD: {metrics.max_drawdown(tf_equity):.2%}, "
+        f"Sharpe: {metrics.sharpe_ratio(tf_equity):.2f}"
     )
     print(
-        f"改进MA交叉策略: CAGR: {metrics.cagr(improved_ma_equity):.2%}, MaxDD: {metrics.max_drawdown(improved_ma_equity):.2%}, Sharpe: {metrics.sharpe_ratio(improved_ma_equity):.2f}"
+        f"改进MA交叉策略: CAGR: {metrics.cagr(improved_ma_equity):.2%}, "
+        f"MaxDD: {metrics.max_drawdown(improved_ma_equity):.2%}, "
+        f"Sharpe: {metrics.sharpe_ratio(improved_ma_equity):.2f}"
     )
     print(
-        f"原始MA交叉策略: CAGR: {metrics.cagr(original_ma_equity):.2%}, MaxDD: {metrics.max_drawdown(original_ma_equity):.2%}, Sharpe: {metrics.sharpe_ratio(original_ma_equity):.2f}"
+        f"原始MA交叉策略: CAGR: {metrics.cagr(original_ma_equity):.2%}, "
+        f"MaxDD: {metrics.max_drawdown(original_ma_equity):.2%}, "
+        f"Sharpe: {metrics.sharpe_ratio(original_ma_equity):.2f}"
     )
     print("-" * 80)
-
-    # 绘制对比图表
-    plt.figure(figsize=(12, 6))
-    plt.plot(bnh_equity / bnh_equity.iloc[0], label="买入持有", linewidth=2)
-    plt.plot(tf_equity / tf_equity.iloc[0], label="趋势跟踪", linewidth=2)
+    
+    # 绘制权益曲线
+    plt.figure(figsize=(12, 8))
+    plt.plot(bnh_equity.index, bnh_equity / init_equity, label="买入持有")
+    plt.plot(tf_equity.index, tf_equity / init_equity, label="趋势跟踪")
     plt.plot(
-        improved_ma_equity / improved_ma_equity.iloc[0],
-        label="改进MA交叉(50/200)",
-        linewidth=2,
+        improved_ma_equity.index,
+        improved_ma_equity / init_equity,
+        label="改进MA交叉",
     )
     plt.plot(
-        original_ma_equity / original_ma_equity.iloc[0],
-        label="原始MA交叉(7/20)",
-        linewidth=2,
+        original_ma_equity.index,
+        original_ma_equity / init_equity,
+        label="原始MA交叉",
     )
-    plt.title("BTC不同策略表现对比 (归一化)")
-    plt.xlabel("日期")
-    plt.ylabel("归一化权益")
-    plt.grid(alpha=0.3)
     plt.legend()
-    plt.tight_layout()
-    plt.savefig("strategy_improvement.png")
+    plt.grid(True)
+    plt.title("各策略权益曲线比较 (初始资金=100%)")
+    plt.ylabel("权益 (%)")
+    plt.savefig("strategy_comparison.png", dpi=100)
+    plt.show()
 
     # 输出交易统计数据
     # 原始MA策略
