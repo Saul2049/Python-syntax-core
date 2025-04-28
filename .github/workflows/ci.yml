@@ -22,8 +22,8 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        # 安装运行依赖
-        pip install -r requirements.txt
+        # 安装运行依赖和项目本身（开发模式）
+        pip install -e .
         # 安装开发依赖（测试、代码质量工具等）
         pip install -r dev-requirements.txt
 
@@ -35,7 +35,6 @@ jobs:
         flake8 .
 
     - name: Run test suite
-      env:
-        PYTHONPATH: ${{ github.workspace }}
       run: |
+        # 使用pip install -e .后不需要设置PYTHONPATH
         python -m pytest --maxfail=1 --disable-warnings -v
