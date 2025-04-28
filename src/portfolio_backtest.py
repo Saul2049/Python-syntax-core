@@ -17,7 +17,11 @@ def run_portfolio(alloc: Dict[str, float] = None) -> pd.Series:
     curves = []
     for sym, w in alloc.items():
         curve = broker.backtest_single(
-            df[sym], fast_win=7, slow_win=20, atr_win=20, init_equity=100_000 * w
+            df[sym],
+            fast_win=7,
+            slow_win=20,
+            atr_win=20,
+            init_equity=100_000 * w,
         )
         curves.append(curve)
 

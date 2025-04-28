@@ -11,7 +11,9 @@ import pandas as pd
 from src import broker, metrics, signals
 
 
-def buy_and_hold(price: pd.Series, init_equity: float = 100_000.0) -> pd.Series:
+def buy_and_hold(
+    price: pd.Series, init_equity: float = 100_000.0
+) -> pd.Series:
     """
     简单的买入持有策略
 
@@ -81,7 +83,12 @@ def trend_following(
                 atr.iloc[i] if i < len(atr) and isfinite(atr.iloc[i]) else None
             )
             new_stop = broker.compute_trailing_stop(
-                entry, p, initial_stop, breakeven_r=1.0, trail_r=2.0, atr=current_atr
+                entry,
+                p,
+                initial_stop,
+                breakeven_r=1.0,
+                trail_r=2.0,
+                atr=current_atr,
             )
             # 止损只能上移不能下移
             stop = max(stop, new_stop) if stop is not None else new_stop
@@ -115,7 +122,9 @@ def trend_following(
             stop = broker.compute_stop_price(entry, atr.iloc[i])
             initial_stop = stop
 
-        equity_curve.append(equity + (p - entry) * position if position else equity)
+        equity_curve.append(
+            equity + (p - entry) * position if position else equity
+        )
 
     return pd.Series(equity_curve, index=price.index[: len(equity_curve)])
 
@@ -166,7 +175,9 @@ if __name__ == "__main__":
     # 运行各种策略
     bnh_equity = buy_and_hold(btc)
     tf_equity = trend_following(btc, long_win=200, atr_win=20)
-    improved_ma_equity = improved_ma_cross(btc, fast_win=50, slow_win=200, atr_win=20)
+    improved_ma_equity = improved_ma_cross(
+        btc, fast_win=50, slow_win=200, atr_win=20
+    )
     original_ma_equity = broker.backtest_single(
         btc, fast_win=7, slow_win=20, atr_win=20
     )
@@ -225,9 +236,7 @@ if __name__ == "__main__":
 
     print("\n交易统计:")
     print("-" * 80)
-    print(
-        f"原始MA策略 (7/20):  买入信号 {len(buy_orig)} 次, 卖出信号 {len(sell_orig)} 次"
-    )
+    print(f"原始MA策略 (7/20):  买入信号 {len(buy_orig)} 次, 卖出信号 {len(sell_orig)} 次")
     print(
         f"改进MA策略 (50/200): 买入信号 {len(buy_improved)} 次, 卖出信号 {len(sell_improved)} 次"
     )

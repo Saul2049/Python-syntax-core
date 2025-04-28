@@ -27,7 +27,9 @@ def fetch_price_data(symbol: str) -> pd.DataFrame:
     # 示例数据结构 (Example data structure)
     return pd.DataFrame(
         {
-            "timestamp": pd.date_range(start="2023-01-01", periods=100, freq="1h"),
+            "timestamp": pd.date_range(
+                start="2023-01-01", periods=100, freq="1h"
+            ),
             "open": np.random.normal(50000, 1000, 100),
             "high": np.random.normal(50500, 1000, 100),
             "low": np.random.normal(49500, 1000, 100),
@@ -88,10 +90,14 @@ def get_trading_signals(
     df["prev_slow"] = df["slow_ma"].shift(1)
 
     # 金叉信号 (Golden cross signal)
-    buy_signal = (df["prev_fast"] <= df["prev_slow"]) & (df["fast_ma"] > df["slow_ma"])
+    buy_signal = (df["prev_fast"] <= df["prev_slow"]) & (
+        df["fast_ma"] > df["slow_ma"]
+    )
 
     # 死叉信号 (Death cross signal)
-    sell_signal = (df["prev_fast"] >= df["prev_slow"]) & (df["fast_ma"] < df["slow_ma"])
+    sell_signal = (df["prev_fast"] >= df["prev_slow"]) & (
+        df["fast_ma"] < df["slow_ma"]
+    )
 
     # 当前价格 (Current price)
     current_price = df["close"].iloc[-1]
@@ -161,7 +167,10 @@ def trading_loop(symbol: str = "BTCUSDT", interval_seconds: int = 60):
                     )
                 else:
                     # 处理买入信号 (Process buy signals)
-                    if signals["buy_signal"] and symbol not in broker.positions:
+                    if (
+                        signals["buy_signal"]
+                        and symbol not in broker.positions
+                    ):
                         # 计算仓位大小 - 假设 1% 风险 (Calculate position size - assume 1% risk)
                         equity = 10000.0  # 示例权益 (Example equity)
                         risk_amount = equity * 0.01
@@ -214,9 +223,15 @@ def trading_loop(symbol: str = "BTCUSDT", interval_seconds: int = 60):
 
                     if symbol in broker.positions:
                         position = broker.positions[symbol]
-                        status_msg += f"\n入场价 (Entry): {position['entry_price']:.8f}"
-                        status_msg += f"\n止损价 (Stop): {position['stop_price']:.8f}"
-                        status_msg += f"\n数量 (Quantity): {position['quantity']:.8f}"
+                        status_msg += (
+                            f"\n入场价 (Entry): {position['entry_price']:.8f}"
+                        )
+                        status_msg += (
+                            f"\n止损价 (Stop): {position['stop_price']:.8f}"
+                        )
+                        status_msg += (
+                            f"\n数量 (Quantity): {position['quantity']:.8f}"
+                        )
                         status_msg += f"\n盈亏 (P/L): {(current_price - position['entry_price']) * position['quantity']:.8f} USDT"
                         status_msg += f"\n盈亏% (P/L%): {((current_price - position['entry_price'])/position['entry_price'])*100:.2f}%"
 

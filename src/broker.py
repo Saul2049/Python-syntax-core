@@ -49,7 +49,9 @@ def trailing_stop(entry: float, atr: float, factor: float = 2.0) -> float:
     return entry - (factor * atr_value)
 
 
-def compute_position_size(equity: float, atr: float, risk_frac: float = 0.02) -> int:
+def compute_position_size(
+    equity: float, atr: float, risk_frac: float = 0.02
+) -> int:
     """
     计算基于风险的仓位大小。
 
@@ -74,7 +76,9 @@ def compute_position_size(equity: float, atr: float, risk_frac: float = 0.02) ->
     return max(1, int(position))
 
 
-def compute_stop_price(entry: float, atr: float, multiplier: float = 1.0) -> float:
+def compute_stop_price(
+    entry: float, atr: float, multiplier: float = 1.0
+) -> float:
     """
     计算止损价格。
 
@@ -339,7 +343,9 @@ def backtest_single(
                     f"[{price.index[i]}] 买入信号: 价格 {p:.2f}, 仓位 {position:.3f}, 止损 {stop:.2f}"
                 )
 
-        equity_curve.append(equity + (p - entry) * position if position else equity)
+        equity_curve.append(
+            equity + (p - entry) * position if position else equity
+        )
 
     return pd.Series(equity_curve, index=price.index[: len(equity_curve)])
 
@@ -447,7 +453,9 @@ def backtest_portfolio(
         performance_df[asset] = returns.rolling(lookback).mean().fillna(0)
 
         # 计算波动率
-        volatility_df[asset] = returns.rolling(lookback).std().fillna(0.001)  # 防止除零
+        volatility_df[asset] = (
+            returns.rolling(lookback).std().fillna(0.001)
+        )  # 防止除零
 
         # 计算夏普比率
         sharpe_df[asset] = performance_df[asset] / volatility_df[asset]
@@ -539,9 +547,9 @@ def backtest_portfolio(
 
             # 应用加权后的资金计算新权益
             target_allocation = prev_total_equity * weights_df.iloc[i][asset]
-            adjusted_equity_df.iloc[i, adjusted_equity_df.columns.get_loc(asset)] = (
-                target_allocation * day_return
-            )
+            adjusted_equity_df.iloc[
+                i, adjusted_equity_df.columns.get_loc(asset)
+            ] = (target_allocation * day_return)
 
     # 计算总投资组合价值
     adjusted_equity_df["Portfolio"] = adjusted_equity_df.sum(axis=1)
@@ -658,7 +666,9 @@ class Broker:
         """
         try:
             # 执行订单逻辑 (Order execution logic)
-            order_result = self._execute_order_internal(symbol, side, quantity, price)
+            order_result = self._execute_order_internal(
+                symbol, side, quantity, price
+            )
 
             # 记录交易到CSV (Log trade to CSV)
             trade_data = {
@@ -729,7 +739,9 @@ class Broker:
 
             # 写入CSV，如果文件已存在则追加 (Write to CSV, append if file exists)
             if file_exists:
-                trade_df.to_csv(trades_file, mode="a", header=False, index=False)
+                trade_df.to_csv(
+                    trades_file, mode="a", header=False, index=False
+                )
             else:
                 # 确保目录存在 (Ensure directory exists)
                 trades_file.parent.mkdir(parents=True, exist_ok=True)
@@ -762,7 +774,9 @@ class Broker:
         """
         try:
             # 获取交易文件路径 (Get trade file path)
-            trades_file = utils.get_trades_file(symbol.lower(), self.trades_dir)
+            trades_file = utils.get_trades_file(
+                symbol.lower(), self.trades_dir
+            )
 
             # 检查文件是否存在 (Check if file exists)
             if not trades_file.exists():
@@ -877,7 +891,10 @@ class Broker:
             position = self.positions[symbol]
 
             # 检查是否触发止损
-            if position["stop_price"] > 0 and current_price <= position["stop_price"]:
+            if (
+                position["stop_price"] > 0
+                and current_price <= position["stop_price"]
+            ):
                 # 发送止损触发通知
                 stop_msg = (
                     f"⚠️ 止损触发 (Stop Loss Triggered)\n"
@@ -908,7 +925,11 @@ class Broker:
             return False
 
     def _execute_order_internal(
-        self, symbol: str, side: str, quantity: float, price: Optional[float] = None
+        self,
+        symbol: str,
+        side: str,
+        quantity: float,
+        price: Optional[float] = None,
     ) -> Dict[str, Any]:
         """
         内部订单执行逻辑。

@@ -72,7 +72,9 @@ def save_state(state_path: Path, state_data: Dict[str, Any]) -> bool:
         state_path.parent.mkdir(parents=True, exist_ok=True)
 
         # 添加时间戳 (Add timestamp)
-        state_data["last_updated"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        state_data["last_updated"] = datetime.now().strftime(
+            "%Y-%m-%d %H:%M:%S"
+        )
 
         # 写入JSON文件 (Write to JSON file)
         with open(state_path, "w") as f:
@@ -170,7 +172,9 @@ def with_retry(
                     # 可以选择性地恢复参数 (Optionally restore parameters)
                     # 此处是一个简化示例，实际应用可能需要更复杂的处理
                     # This is a simplified example, actual applications may need more complex handling
-                    if "resume_params" in kwargs and kwargs.get("resume_params", False):
+                    if "resume_params" in kwargs and kwargs.get(
+                        "resume_params", False
+                    ):
                         # 仅在显式要求时恢复参数 (Only restore parameters when explicitly requested)
                         saved_kwargs = state_data["saved_kwargs"]
                         for key, value in saved_kwargs.items():
@@ -200,9 +204,13 @@ def with_retry(
                                 str(arg) for arg in args
                             ],  # 简化，实际应用可能需要更复杂的序列化
                             "saved_kwargs": {
-                                k: str(v) for k, v in kwargs.items() if k != "password"
+                                k: str(v)
+                                for k, v in kwargs.items()
+                                if k != "password"
                             },
-                            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                            "timestamp": datetime.now().strftime(
+                                "%Y-%m-%d %H:%M:%S"
+                            ),
                         }
                         save_state(state_path, current_state)
 
@@ -215,7 +223,9 @@ def with_retry(
                         completed_state = {
                             "function": func.__name__,
                             "status": "completed",
-                            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                            "timestamp": datetime.now().strftime(
+                                "%Y-%m-%d %H:%M:%S"
+                            ),
                         }
                         save_state(state_path, completed_state)
 
@@ -227,11 +237,14 @@ def with_retry(
 
                     # 检查是否是需要重试的异常 (Check if exception is in retry list)
                     should_retry = any(
-                        isinstance(e, exc_type) for exc_type in retry_on_exceptions
+                        isinstance(e, exc_type)
+                        for exc_type in retry_on_exceptions
                     )
 
                     if should_retry and attempt <= max_retries:
-                        logger.warning(f"Attempt {attempt}/{max_retries} failed: {e}")
+                        logger.warning(
+                            f"Attempt {attempt}/{max_retries} failed: {e}"
+                        )
                     else:
                         # 达到最大重试次数或不需要重试的异常 (Max retries reached or exception not in retry list)
                         if state_path:
@@ -248,7 +261,9 @@ def with_retry(
                             save_state(state_path, failure_state)
 
                         # 重新抛出最后一个异常 (Re-raise the last exception)
-                        logger.error(f"All {attempt} attempts failed, last error: {e}")
+                        logger.error(
+                            f"All {attempt} attempts failed, last error: {e}"
+                        )
                         raise
 
             # 不应该到达这里，但为了完整性 (Should not reach here, but for completeness)
@@ -295,7 +310,9 @@ class NetworkClient:
         """
         return Path(self.state_dir) / f"{operation}_state.json"
 
-    def save_operation_state(self, operation: str, state_data: Dict[str, Any]) -> bool:
+    def save_operation_state(
+        self, operation: str, state_data: Dict[str, Any]
+    ) -> bool:
         """
         保存操作状态。
         Save operation state.
@@ -347,7 +364,9 @@ class NetworkClient:
             return False
 
     @with_retry(state_file="example_request")
-    def example_request(self, url: str, params: Dict[str, Any]) -> Dict[str, Any]:
+    def example_request(
+        self, url: str, params: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """
         示例请求方法，展示如何使用重试装饰器。
         Example request method demonstrating how to use the retry decorator.

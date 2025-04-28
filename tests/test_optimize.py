@@ -6,7 +6,9 @@ import pandas as pd
 import pytest
 
 # Add project root to path if necessary
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+sys.path.insert(
+    0, os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+)
 
 # Import the module to execute grid search on import
 from optimize_ma import df  # 执行后 df 在模块级
@@ -19,7 +21,15 @@ def test_grid_non_empty():
 
 def test_grid_structure():
     """确保结果包含必需的列和正确的排序"""
-    required_columns = ["fast", "slow", "atr", "cagr", "sharpe", "mdd", "final"]
+    required_columns = [
+        "fast",
+        "slow",
+        "atr",
+        "cagr",
+        "sharpe",
+        "mdd",
+        "final",
+    ]
     assert all(col in df.columns for col in required_columns)
 
     # 排除NaN值后验证按Sharpe比率降序排列

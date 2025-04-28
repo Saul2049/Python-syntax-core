@@ -41,9 +41,7 @@ def setup_parser():
         help="K线周期，如1m, 5m, 15m, 1h, 4h, 1d (默认: 1d)",
     )
 
-    parser.add_argument(
-        "--test", action="store_true", help="仅运行测试模式，不执行实际交易"
-    )
+    parser.add_argument("--test", action="store_true", help="仅运行测试模式，不执行实际交易")
 
     return parser
 
@@ -65,7 +63,10 @@ def load_config(config_file):
             sys.exit(1)
 
     # 验证API凭据
-    if "API_KEY" not in config["BINANCE"] or "API_SECRET" not in config["BINANCE"]:
+    if (
+        "API_KEY" not in config["BINANCE"]
+        or "API_SECRET" not in config["BINANCE"]
+    ):
         print("错误: 配置文件缺少API_KEY或API_SECRET")
         sys.exit(1)
 
@@ -226,7 +227,12 @@ def load_position_state():
             state = json.load(f)
 
         # 验证状态数据的完整性
-        required_fields = ["symbol", "has_position", "position_size", "entry_price"]
+        required_fields = [
+            "symbol",
+            "has_position",
+            "position_size",
+            "entry_price",
+        ]
         if not all(field in state for field in required_fields):
             print("警告: 持仓状态文件数据不完整")
             return None
@@ -237,7 +243,9 @@ def load_position_state():
         return None
 
 
-def run_strategy(client, params, interval, log_path, test_mode=False, state=None):
+def run_strategy(
+    client, params, interval, log_path, test_mode=False, state=None
+):
     """
     运行交易策略
 
@@ -271,7 +279,9 @@ def run_strategy(client, params, interval, log_path, test_mode=False, state=None
             equity = balance + (position * current_price)
 
             # 计算手续费
-            commission = calculate_commission(position, current_price, client.testnet)
+            commission = calculate_commission(
+                position, current_price, client.testnet
+            )
             equity -= commission
 
             # 生成交易信号
@@ -294,7 +304,9 @@ def run_strategy(client, params, interval, log_path, test_mode=False, state=None
                     stop_price = entry_price * (1 - float(params["stop_loss"]))
 
                     # 保存状态
-                    save_position_state(symbol, True, position, entry_price, stop_price)
+                    save_position_state(
+                        symbol, True, position, entry_price, stop_price
+                    )
 
                     # 发送通知
                     tg_notify(

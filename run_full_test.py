@@ -7,7 +7,9 @@ import os
 from test_telegram import test_trade_notifications
 
 # 设置Telegram凭据
-TOKEN = os.getenv("TG_TOKEN") or "7599104627:AAEu3qFQjJvnjiodNjR1MOgp4pX0VVxU2Hk"
+TOKEN = (
+    os.getenv("TG_TOKEN") or "7599104627:AAEu3qFQjJvnjiodNjR1MOgp4pX0VVxU2Hk"
+)
 CHAT_ID = os.getenv("TG_CHAT") or "269242161"
 
 # 测试参数

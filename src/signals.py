@@ -83,9 +83,13 @@ def vectorized_cross(
           * threshold < 0: 允许更小的价格差触发交叉
     """
     if direction == "above":
-        cross = (fast.shift(1) <= slow.shift(1) + threshold) & (fast > slow + threshold)
+        cross = (fast.shift(1) <= slow.shift(1) + threshold) & (
+            fast > slow + threshold
+        )
     else:
-        cross = (fast.shift(1) >= slow.shift(1) - threshold) & (fast < slow - threshold)
+        cross = (fast.shift(1) >= slow.shift(1) - threshold) & (
+            fast < slow - threshold
+        )
 
     return cross if return_series else np.where(cross)[0]
 

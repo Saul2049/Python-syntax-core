@@ -48,7 +48,10 @@ def get_exchange_trades(
 
 
 def get_local_trades(
-    symbol: str, start_date: str, end_date: str, trades_dir: Optional[str] = None
+    symbol: str,
+    start_date: str,
+    end_date: str,
+    trades_dir: Optional[str] = None,
 ) -> pd.DataFrame:
     """
     从本地CSV获取交易历史。
@@ -105,20 +108,23 @@ def compare_trades(
     if "order_id" in exchange_df and "order_id" in local_df:
         # 匹配交易 (Match trades)
         matched = pd.merge(
-            exchange_df, local_df, on="order_id", suffixes=("_exchange", "_local")
+            exchange_df,
+            local_df,
+            on="order_id",
+            suffixes=("_exchange", "_local"),
         )
 
         # 仅交易所有的交易 (Exchange-only trades)
-        exchange_only = exchange_df[~exchange_df["order_id"].isin(matched["order_id"])]
+        exchange_only = exchange_df[
+            ~exchange_df["order_id"].isin(matched["order_id"])
+        ]
 
         # 仅本地有的交易 (Local-only trades)
         local_only = local_df[~local_df["order_id"].isin(matched["order_id"])]
 
     else:
         # 如果没有order_id，尝试使用其他字段匹配 (If no order_id, try matching with other fields)
-        print(
-            "警告: 未找到order_id列，使用timestamp、symbol、side、price和quantity匹配"
-        )
+        print("警告: 未找到order_id列，使用timestamp、symbol、side、price和quantity匹配")
         match_cols = ["timestamp", "symbol", "side", "price", "quantity"]
 
         # 确保所有匹配列都存在 (Ensure all matching columns exist)
@@ -129,12 +135,17 @@ def compare_trades(
 
         # 匹配交易 (Match trades)
         matched = pd.merge(
-            exchange_df, local_df, on=match_cols, suffixes=("_exchange", "_local")
+            exchange_df,
+            local_df,
+            on=match_cols,
+            suffixes=("_exchange", "_local"),
         )
 
         # 创建用于比较的组合键 (Create composite key for comparison)
         def create_key(df, cols):
-            return df.apply(lambda row: "_".join([str(row[c]) for c in cols]), axis=1)
+            return df.apply(
+                lambda row: "_".join([str(row[c]) for c in cols]), axis=1
+            )
 
         exchange_keys = create_key(exchange_df, match_cols)
         local_keys = create_key(local_df, match_cols)
@@ -153,7 +164,9 @@ def compare_trades(
     return matched, exchange_only, local_only
 
 
-def verify_balances(symbol: str, api_key: str, api_secret: str) -> Dict[str, Any]:
+def verify_balances(
+    symbol: str, api_key: str, api_secret: str
+) -> Dict[str, Any]:
     """
     验证账户余额。
     Verify account balances.
@@ -290,13 +303,17 @@ def daily_reconciliation(
     print(f"开始对账: {symbol} ({date})")
 
     # 获取交易所交易 (Get exchange trades)
-    exchange_trades = get_exchange_trades(symbol, date, date, api_key, api_secret)
+    exchange_trades = get_exchange_trades(
+        symbol, date, date, api_key, api_secret
+    )
 
     # 获取本地交易 (Get local trades)
     local_trades = get_local_trades(symbol, date, date, trades_dir)
 
     # 比较交易 (Compare trades)
-    matched, exchange_only, local_only = compare_trades(exchange_trades, local_trades)
+    matched, exchange_only, local_only = compare_trades(
+        exchange_trades, local_trades
+    )
 
     # 验证余额 (Verify balances)
     balances = verify_balances(symbol, api_key, api_secret)
@@ -335,13 +352,19 @@ if __name__ == "__main__":
     parser.add_argument(
         "--symbol", type=str, required=True, help="交易对 (Trading pair)"
     )
-    parser.add_argument("--date", type=str, help="日期 (Date) 'YYYY-MM-DD'，默认为昨天")
+    parser.add_argument(
+        "--date", type=str, help="日期 (Date) 'YYYY-MM-DD'，默认为昨天"
+    )
     parser.add_argument(
         "--trades-dir", type=str, help="交易数据目录 (Trades data directory)"
     )
-    parser.add_argument("--output-dir", type=str, help="输出目录 (Output directory)")
     parser.add_argument(
-        "--no-notify", action="store_true", help="不发送通知 (Don't send notification)"
+        "--output-dir", type=str, help="输出目录 (Output directory)"
+    )
+    parser.add_argument(
+        "--no-notify",
+        action="store_true",
+        help="不发送通知 (Don't send notification)",
     )
     args = parser.parse_args()
 

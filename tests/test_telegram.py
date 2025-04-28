@@ -7,7 +7,8 @@ from src.telegram import TelegramBot
 
 
 @pytest.mark.skipif(
-    "TG_TOKEN" not in os.environ, reason="Telegram token not available in environment"
+    "TG_TOKEN" not in os.environ,
+    reason="Telegram token not available in environment",
 )
 class TestTelegramBot:
     """Telegram bot tests that require a valid token."""

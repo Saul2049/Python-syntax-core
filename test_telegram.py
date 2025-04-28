@@ -39,9 +39,7 @@ def setup_parser():
     parser.add_argument(
         "--full-test", action="store_true", help="直接运行完整通知测试，无需交互确认"
     )
-    parser.add_argument(
-        "--debug", action="store_true", help="显示详细的调试信息和API响应"
-    )
+    parser.add_argument("--debug", action="store_true", help="显示详细的调试信息和API响应")
     parser.add_argument(
         "--format",
         choices=["text", "html", "markdown"],
@@ -61,7 +59,9 @@ def check_network_connection(url="https://api.telegram.org"):
         return False
 
 
-def send_telegram(token, chat_id, message, parse_mode="HTML", debug=False, retry=0):
+def send_telegram(
+    token, chat_id, message, parse_mode="HTML", debug=False, retry=0
+):
     """发送Telegram消息"""
     if not token or not chat_id:
         print("错误: 未提供Telegram Token或Chat ID")
@@ -99,7 +99,9 @@ def send_telegram(token, chat_id, message, parse_mode="HTML", debug=False, retry
             # 处理API速率限制
             print(f"警告: API速率限制，等待{RETRY_DELAY}秒后重试...")
             time.sleep(RETRY_DELAY)
-            return send_telegram(token, chat_id, message, parse_mode, debug, retry + 1)
+            return send_telegram(
+                token, chat_id, message, parse_mode, debug, retry + 1
+            )
         else:
             print(f"Telegram通知发送失败: HTTP {response.status_code}")
             print(f"错误详情: {response.text}")
@@ -117,14 +119,18 @@ def send_telegram(token, chat_id, message, parse_mode="HTML", debug=False, retry
         if retry < MAX_RETRIES:
             print(f"尝试重试 ({retry+1}/{MAX_RETRIES})...")
             time.sleep(RETRY_DELAY)
-            return send_telegram(token, chat_id, message, parse_mode, debug, retry + 1)
+            return send_telegram(
+                token, chat_id, message, parse_mode, debug, retry + 1
+            )
         return False
     except Exception as e:
         print(f"Telegram通知错误: {e}")
         if retry < MAX_RETRIES:
             print(f"尝试重试 ({retry+1}/{MAX_RETRIES})...")
             time.sleep(RETRY_DELAY)
-            return send_telegram(token, chat_id, message, parse_mode, debug, retry + 1)
+            return send_telegram(
+                token, chat_id, message, parse_mode, debug, retry + 1
+            )
         return False
 
 
@@ -243,7 +249,9 @@ def main():
         )
     ):
         print("\n测试交易通知序列...")
-        test_success = test_trade_notifications(token, chat_id, format_type, debug)
+        test_success = test_trade_notifications(
+            token, chat_id, format_type, debug
+        )
         if test_success:
             print("完整通知测试成功完成!")
         else:

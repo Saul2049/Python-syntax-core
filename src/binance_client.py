@@ -86,7 +86,9 @@ class BinanceClient:
                 "BINANCE_TESTNET_API_KEY" if testnet else "BINANCE_API_KEY"
             )
             api_secret = os.environ.get(
-                "BINANCE_TESTNET_API_SECRET" if testnet else "BINANCE_API_SECRET"
+                "BINANCE_TESTNET_API_SECRET"
+                if testnet
+                else "BINANCE_API_SECRET"
             )
 
         # 从配置文件加载
@@ -286,7 +288,9 @@ class BinanceClient:
             float或dict: 如果提供asset，返回该资产余额，否则返回所有资产余额字典
         """
         account_info = self.get_account_info()
-        balances = {b["asset"]: float(b["free"]) for b in account_info["balances"]}
+        balances = {
+            b["asset"]: float(b["free"]) for b in account_info["balances"]
+        }
 
         if asset:
             return balances.get(asset, 0.0)

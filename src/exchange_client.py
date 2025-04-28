@@ -16,7 +16,9 @@ class ExchangeClient(NetworkClient):
     Exchange API client with retry and state recovery functionality.
     """
 
-    def __init__(self, api_key: str, api_secret: str, state_dir: Optional[str] = None):
+    def __init__(
+        self, api_key: str, api_secret: str, state_dir: Optional[str] = None
+    ):
         """
         初始化交易所客户端。
         Initialize exchange client.
@@ -48,13 +50,16 @@ class ExchangeClient(NetworkClient):
 
         # 模拟网络错误 (Simulate network error)
         if datetime.now().second % 10 < 3:  # 30% 失败率 (30% failure rate)
-            raise ConnectionError("Simulated network error in get_account_balance")
+            raise ConnectionError(
+                "Simulated network error in get_account_balance"
+            )
 
         # 模拟成功响应 (Simulate successful response)
         return {"BTC": 0.5, "ETH": 5.0, "USDT": 10000.0}
 
     @with_retry(
-        state_file="place_order", retry_config={"max_retries": 10, "base_delay": 2.0}
+        state_file="place_order",
+        retry_config={"max_retries": 10, "base_delay": 2.0},
     )
     def place_order(
         self,
@@ -79,7 +84,9 @@ class ExchangeClient(NetworkClient):
             Dict[str, Any]: 订单信息 (Order information)
         """
         # 保存订单状态 (Save order state)
-        operation = f"order_{symbol}_{side}_{datetime.now().strftime('%Y%m%d%H%M%S')}"
+        operation = (
+            f"order_{symbol}_{side}_{datetime.now().strftime('%Y%m%d%H%M%S')}"
+        )
         order_state = {
             "symbol": symbol,
             "side": side,
@@ -91,7 +98,9 @@ class ExchangeClient(NetworkClient):
         }
         self.save_operation_state(operation, order_state)
 
-        logger.info(f"Placing {side} order for {quantity} {symbol} at price {price}")
+        logger.info(
+            f"Placing {side} order for {quantity} {symbol} at price {price}"
+        )
 
         # 这里应该是实际的API调用代码 (Actual API call code would go here)
         # 示例代码 (Example code)
@@ -172,7 +181,9 @@ class ExchangeClient(NetworkClient):
         last_id = state.get("last_id")
 
         if trades:
-            logger.info(f"Resuming from {len(trades)} previously fetched trades")
+            logger.info(
+                f"Resuming from {len(trades)} previously fetched trades"
+            )
             return (
                 trades  # 如果已经完成，直接返回 (If already completed, return directly)
             )
@@ -183,7 +194,9 @@ class ExchangeClient(NetworkClient):
 
         # 模拟网络错误 (Simulate network error)
         if datetime.now().second % 10 < 3:  # 30% 失败率 (30% failure rate)
-            raise ConnectionError("Simulated network error in get_historical_trades")
+            raise ConnectionError(
+                "Simulated network error in get_historical_trades"
+            )
 
         # 模拟交易记录 (Simulate trade records)
         result = []
@@ -213,7 +226,9 @@ class ExchangeClient(NetworkClient):
         return result
 
     @with_retry(state_file="market_data_sync")
-    def sync_market_data(self, symbols: List[str], days: int = 7) -> Dict[str, Any]:
+    def sync_market_data(
+        self, symbols: List[str], days: int = 7
+    ) -> Dict[str, Any]:
         """
         同步市场数据，带重试和状态恢复功能。
         Sync market data with retry and state recovery.
@@ -255,8 +270,12 @@ class ExchangeClient(NetworkClient):
                 time.sleep(0.5)  # 模拟处理时间 (Simulate processing time)
 
                 # 模拟网络错误 (Simulate network error)
-                if datetime.now().second % 10 < 2:  # 20% 失败率 (20% failure rate)
-                    raise ConnectionError(f"Simulated network error syncing {symbol}")
+                if (
+                    datetime.now().second % 10 < 2
+                ):  # 20% 失败率 (20% failure rate)
+                    raise ConnectionError(
+                        f"Simulated network error syncing {symbol}"
+                    )
 
                 # 模拟成功结果 (Simulate successful result)
                 result["data"][symbol] = {
@@ -271,7 +290,9 @@ class ExchangeClient(NetworkClient):
                 state_data = {
                     "completed_symbols": completed_symbols,
                     "total_symbols": len(symbols),
-                    "last_updated": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                    "last_updated": datetime.now().strftime(
+                        "%Y-%m-%d %H:%M:%S"
+                    ),
                 }
                 self.save_operation_state(operation, state_data)
 
@@ -283,7 +304,9 @@ class ExchangeClient(NetworkClient):
         # 更新结果 (Update result)
         result["completed_symbols"] = len(completed_symbols)
         result["status"] = (
-            "completed" if len(completed_symbols) == len(symbols) else "partial"
+            "completed"
+            if len(completed_symbols) == len(symbols)
+            else "partial"
         )
 
         return result

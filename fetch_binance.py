@@ -87,7 +87,9 @@ def fetch_historical_data(
     """
     # 计算开始和结束时间
     end_time = int(datetime.now().timestamp() * 1000)
-    start_time = int((datetime.now() - timedelta(days=365 * years)).timestamp() * 1000)
+    start_time = int(
+        (datetime.now() - timedelta(days=365 * years)).timestamp() * 1000
+    )
 
     # 存储所有数据的列表
     all_data = []
@@ -100,7 +102,11 @@ def fetch_historical_data(
     while current_start < end_time:
         # 获取当前批次的数据
         df = fetch_klines(
-            symbol, interval, limit=1000, start_time=current_start, end_time=end_time
+            symbol,
+            interval,
+            limit=1000,
+            start_time=current_start,
+            end_time=end_time,
         )
 
         # 如果没有获取到数据，退出循环
