@@ -1,6 +1,16 @@
 # Python Algorithmic Trading Framework
 
 ```mermaid
+graph LR
+    数据(数据/Data) --> 信号(信号/Signals) --> 风控(风控/Risk) --> 回测(回测/Backtest) --> 指标(指标/Metrics)
+    style 数据 fill:#f9f9f9,stroke:#333,stroke-width:2px
+    style 信号 fill:#f9f9f9,stroke:#333,stroke-width:2px
+    style 风控 fill:#f9f9f9,stroke:#333,stroke-width:2px
+    style 回测 fill:#f9f9f9,stroke:#333,stroke-width:2px
+    style 指标 fill:#f9f9f9,stroke:#333,stroke-width:2px
+```
+
+```mermaid
 graph TD
     A[数据层/Data Layer] -->|提供价格数据| B[信号层/Signals Layer]
     A -->|提供价格数据| D[回测引擎/Backtest Engine]

@@ -5,15 +5,18 @@ import numpy as np
 def moving_average(series: pd.Series, window: int, kind: str = "sma") -> pd.Series:
     """
     计算移动平均线。
+    Calculate moving average.
     
-    参数:
-        series: 输入的时间序列数据
-        window: 窗口大小
-        kind: 均线类型，支持 'sma'(简单移动平均), 'ema'(指数移动平均), 
-              'wma'(加权移动平均)
+    参数 (Parameters):
+        series: 输入的时间序列数据 (Input time series data)
+        window: 窗口大小 (Window size)
+        kind: 均线类型 (Moving average type)
+              'sma': 简单移动平均 (Simple Moving Average)
+              'ema': 指数移动平均 (Exponential Moving Average)
+              'wma': 加权移动平均 (Weighted Moving Average)
               
-    返回:
-        pd.Series: 计算后的均线序列
+    返回 (Returns):
+        pd.Series: 计算后的均线序列 (Resulting moving average series)
     """
     kind = kind.lower()
     
@@ -22,7 +25,9 @@ def moving_average(series: pd.Series, window: int, kind: str = "sma") -> pd.Seri
         return series.rolling(window).mean()
     elif kind == "ema":
         # 指数移动平均线 (Exponential Moving Average)
-        return series.ewm(span=window, adjust=False).mean()
+        # 使用span参数: span = 2/(alpha) - 1, 确保与传统EMA计算一致
+        # span参数确保与技术分析软件的EMA计算方法一致
+        return series.ewm(span=window, adjust=False, min_periods=1).mean()
     elif kind == "wma":
         # 加权移动平均线 (Weighted Moving Average)
         weights = np.arange(1, window + 1)
@@ -30,7 +35,7 @@ def moving_average(series: pd.Series, window: int, kind: str = "sma") -> pd.Seri
             lambda x: np.sum(weights * x) / weights.sum(), raw=True
         )
     else:
-        raise ValueError(f"Unsupported moving average type: {kind}")
+        raise ValueError(f"不支持的移动平均类型 (Unsupported moving average type): {kind}")
 
 
 def bullish_cross_indices(fast: pd.Series, slow: pd.Series) -> np.ndarray:

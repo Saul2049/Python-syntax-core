@@ -12,6 +12,8 @@ setup(
         "numpy>=1.26.3",
         "matplotlib>=3.8.2",
         "tqdm>=4.66.1",
+        "requests>=2.32.0",
+        "python-dateutil>=2.9.0",
     ],
     classifiers=[
         "Development Status :: 4 - Beta",
