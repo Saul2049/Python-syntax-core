@@ -24,8 +24,7 @@ from src.utils import get_trades_dir
 
 # 配置日志 (Configure logging)
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -59,10 +58,7 @@ def run_order_example(client):
         # 下单接口会自动重试，状态保存在指定的状态文件中
         # Place order with automatic retries, state saved in specified state file
         order = client.place_order(
-            symbol="BTCUSDT",
-            side="BUY",
-            quantity=0.001,
-            price=50000.0
+            symbol="BTCUSDT", side="BUY", quantity=0.001, price=50000.0
         )
         logger.info(f"订单已提交 (Order submitted): {order}")
         return order
@@ -95,11 +91,11 @@ def run_historical_trades_example(client):
         end_time = datetime.now()
         start_time = end_time - timedelta(days=1)
         trades = client.get_historical_trades(
-            symbol="BTCUSDT",
-            start_time=start_time,
-            end_time=end_time
+            symbol="BTCUSDT", start_time=start_time, end_time=end_time
         )
-        logger.info(f"获取到 {len(trades)} 条交易记录 (Got {len(trades)} trade records)")
+        logger.info(
+            f"获取到 {len(trades)} 条交易记录 (Got {len(trades)} trade records)"
+        )
         return trades
     except Exception as e:
         logger.error(f"查询历史交易失败 (Historical trades query failed): {e}")
@@ -108,36 +104,48 @@ def run_historical_trades_example(client):
 
 def main():
     """主函数 (Main function)"""
-    logger.info("====== 开始网络重试和状态恢复演示 (Starting network retry and state recovery demo) ======")
-    
+    logger.info(
+        "====== 开始网络重试和状态恢复演示 (Starting network retry and state recovery demo) ======"
+    )
+
     # 创建交易所客户端 (Create exchange client)
     client = ExchangeClient(
         api_key="demo_key",  # 示例密钥 (Example key)
         api_secret="demo_secret",  # 示例密钥 (Example secret)
-        state_dir=str(get_trades_dir() / "states")  # 状态文件目录 (State file directory)
+        state_dir=str(
+            get_trades_dir() / "states"
+        ),  # 状态文件目录 (State file directory)
     )
-    
+
     # 运行余额检查 (Run balance check)
     balance = run_balance_check(client)
-    
+
     # 运行订单示例 (Run order example)
     order = run_order_example(client)
-    
+
     # 运行历史交易查询示例 (Run historical trades example)
     trades = run_historical_trades_example(client)
-    
+
     # 运行数据同步示例 (Run data sync example)
     sync_result = run_sync_example(client)
-    
+
     logger.info("====== 演示完成 (Demo completed) ======")
-    
+
     # 打印结果摘要 (Print result summary)
     logger.info("\n\n====== 结果摘要 (Result summary) ======")
-    logger.info(f"余额检查 (Balance check): {'成功 (Success)' if balance else '失败 (Failed)'}")
-    logger.info(f"订单示例 (Order example): {'成功 (Success)' if order else '失败 (Failed)'}")
-    logger.info(f"历史交易查询 (Historical trades): {'成功 (Success) - ' + str(len(trades)) + ' 条记录 (records)' if trades else '失败 (Failed)'}")
-    logger.info(f"数据同步 (Data sync): {'成功 (Success)' if sync_result else '失败 (Failed)'}")
+    logger.info(
+        f"余额检查 (Balance check): {'成功 (Success)' if balance else '失败 (Failed)'}"
+    )
+    logger.info(
+        f"订单示例 (Order example): {'成功 (Success)' if order else '失败 (Failed)'}"
+    )
+    logger.info(
+        f"历史交易查询 (Historical trades): {'成功 (Success) - ' + str(len(trades)) + ' 条记录 (records)' if trades else '失败 (Failed)'}"
+    )
+    logger.info(
+        f"数据同步 (Data sync): {'成功 (Success)' if sync_result else '失败 (Failed)'}"
+    )
 
 
 if __name__ == "__main__":
-    main() 
+    main()

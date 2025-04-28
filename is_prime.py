@@ -6,6 +6,7 @@
 
 from math import isqrt
 
+
 def is_prime(n: int) -> bool:
     """
     Check whether `n` is a prime number.
@@ -18,7 +19,7 @@ def is_prime(n: int) -> bool:
     Returns
     -------
     bool
-        True  → n is prime  
+        True  → n is prime
         False → n is composite or < 2
     """
     # handle small and even/3 divisibility edge-cases

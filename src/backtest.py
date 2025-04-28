@@ -64,7 +64,7 @@ def run_backtest(
     return pd.Series(equity_curve, index=price.index)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     equity_series = run_backtest(
         fast_win=7,
         slow_win=20,
@@ -72,7 +72,7 @@ if __name__ == '__main__':
         atr_win=20,
     )
     print(equity_series)
-    equity_series.plot(title='Equity Curve')
-    plt.xlabel('Date')
-    plt.ylabel('Equity (USD)')
-    plt.show() 
+    equity_series.plot(title="Equity Curve")
+    plt.xlabel("Date")
+    plt.ylabel("Equity (USD)")
+    plt.show()

@@ -23,7 +23,7 @@ if trades_df.empty:
 trades_df["pnl"] = np.where(
     trades_df["action"] == "SELL",
     trades_df["quantity"] * trades_df["price"],
-    -trades_df["quantity"] * trades_df["price"]
+    -trades_df["quantity"] * trades_df["price"],
 )
 
 # 累计实盘权益曲线
@@ -44,7 +44,9 @@ price_data = load_csv()["btc"]
 valid_price_data = price_data[price_data.index >= pd.Timestamp(start_date)]
 if valid_price_data.empty:
     print("价格数据不包含交易日期范围，无法进行对比")
-    print(f"价格数据范围: {price_data.index.min().date()} 至 {price_data.index.max().date()}")
+    print(
+        f"价格数据范围: {price_data.index.min().date()} 至 {price_data.index.max().date()}"
+    )
     exit(0)
 
 # 运行回测
@@ -55,7 +57,7 @@ bt_equity = broker.backtest_single(
     slow_win=20,
     atr_win=14,
     risk_frac=0.02,
-    init_equity=initial_equity
+    init_equity=initial_equity,
 )
 
 # 获取相同日期范围的回测结果
@@ -70,12 +72,12 @@ print(f"实盘最终资金: {real_equity.iloc[-1]:.2f} USDT")
 if not bt_filtered.empty:
     bt_final = bt_filtered.iloc[-1]
     print(f"回测同期资金: {bt_final:.2f} USDT")
-    
+
     # 计算差异
     diff_amount = real_equity.iloc[-1] - bt_final
     diff_pct = (diff_amount / bt_final) * 100
     print(f"差异金额: {diff_amount:.2f} USDT ({diff_pct:.2f}%)")
-    
+
     # 分析可能的原因
     if abs(diff_pct) > 5:
         print("\n差异分析:")
@@ -89,4 +91,4 @@ else:
 # 保存分析结果
 output_file = "reconciliation_report.csv"
 trades_df.to_csv(output_file, index=False)
-print(f"\n详细分析已保存至 {output_file}") 
+print(f"\n详细分析已保存至 {output_file}")
