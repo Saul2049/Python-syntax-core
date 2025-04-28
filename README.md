@@ -1,5 +1,35 @@
 # 加密货币交易系统
 
+```mermaid
+graph TD
+    A[市场数据源] -->|实时价格数据| B[数据处理器]
+    B -->|清洗和格式化| C[策略引擎]
+    C -->|生成交易信号| D[信号处理器]
+    D -->|验证信号| E[订单管理器]
+    E -->|执行交易| F[交易所API]
+    F -->|交易结果| G[Telegram通知]
+    G -->|发送通知| H[用户]
+    
+    subgraph 数据处理
+    B
+    end
+    
+    subgraph 信号生成
+    C
+    D
+    end
+    
+    subgraph 交易执行
+    E
+    F
+    end
+    
+    subgraph 通知系统
+    G
+    H
+    end
+```
+
 这是一个自动化的加密货币交易系统，具有实时交易和Telegram通知功能。
 
 ## 主要功能

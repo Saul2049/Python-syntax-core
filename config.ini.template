@@ -1,0 +1,23 @@
+[telegram]
+# Get your token from @BotFather on Telegram
+# Store the actual token in environment variable TG_TOKEN
+token = ${TG_TOKEN}
+
+# Get your chat ID by sending a message to @userinfobot
+# Store the actual chat ID in environment variable TG_CHAT_ID
+chat_id = ${TG_CHAT_ID}
+
+[trading]
+# Trading configuration
+# Store API keys in environment variables
+api_key = ${API_KEY}
+api_secret = ${API_SECRET}
+
+# Trading data storage
+# For production, use ~/trades/YYYY/
+trades_dir = ${TRADES_DIR:-./trades}
+
+[logging]
+# Logging configuration
+log_level = INFO
+log_file = trading.log 

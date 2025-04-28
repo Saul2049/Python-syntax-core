@@ -74,7 +74,8 @@ def initialize_trade_log(log_path='trades.csv'):
             writer = csv.writer(f)
             writer.writerow([
                 'timestamp', 'action', 'symbol', 'price', 
-                'quantity', 'stop_price', 'equity', 'atr'
+                'quantity', 'stop_price', 'equity', 'atr',
+                'commission'
             ])
     return log_path
 
@@ -97,193 +98,100 @@ def tg_notify(text: str):
                 "parse_mode": "HTML"
             }
         )
-        
-        if response.status_code == 200:
-            print(f"Telegram通知发送成功")
-        else:
-            print(f"Telegram通知发送失败: {response.status_code} - {response.text}")
+        response.raise_for_status()
     except Exception as e:
-        print(f"Telegram通知错误: {e}")
+        print(f"Telegram通知发送失败: {e}")
 
-def log_trade(log_path, action, symbol, price, quantity, stop_price=None, equity=None, atr=None):
-    """记录交易到日志文件并发送Telegram通知"""
+def calculate_commission(quantity, price, is_testnet=True):
+    """
+    计算交易手续费
+    
+    参数:
+        quantity: 交易数量
+        price: 交易价格
+        is_testnet: 是否为测试网
+        
+    返回:
+        float: 手续费金额
+    """
+    if is_testnet:
+        return 0.0  # 测试网不收取手续费
+    return quantity * price * 0.001  # 主网手续费率0.1%
+
+def log_trade(log_path, action, symbol, price, quantity, stop_price=None, equity=None, atr=None, commission=0.0):
+    """
+    记录交易日志
+    
+    参数:
+        log_path: 日志文件路径
+        action: 交易动作 (BUY/SELL)
+        symbol: 交易对
+        price: 交易价格
+        quantity: 交易数量
+        stop_price: 止损价
+        equity: 账户权益
+        atr: ATR值
+        commission: 手续费
+    """
     timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     
-    # 构建日志条目
-    log_entry = [
-        timestamp,
-        action,
-        symbol,
-        price,
-        quantity,
-        stop_price or '',
-        equity or '',
-        atr or ''
-    ]
-    
-    # 写入CSV文件
     with open(log_path, 'a', newline='') as f:
         writer = csv.writer(f)
-        writer.writerow(log_entry)
-    
-    # 格式化控制台输出
-    price_str = f"{price:.2f}" if price else "N/A"
-    qty_str = f"{quantity:.3f}" if quantity else "N/A"
-    stop_str = f"{stop_price:.2f}" if stop_price else "N/A"
-    equity_str = f"{equity:.2f}" if equity else "N/A"
-    
-    # 打印到控制台
-    print(f"[{timestamp}] {'='*50}")
-    print(f"交易: {action} {symbol}")
-    print(f"价格: {price_str} USDT")
-    print(f"数量: {qty_str} {symbol.replace('USDT', '')}")
-    if stop_price:
-        print(f"止损: {stop_str} USDT")
-    if equity:
-        print(f"资金: {equity_str} USDT")
-    if atr:
-        print(f"ATR: {atr:.2f}")
-    print(f"{'='*50}")
-    
-    # 发送Telegram通知
-    base_asset = symbol.replace('USDT', '')
-    
-    # 根据交易类型构建通知内容
-    if action == "BUY":
-        notify_text = f"🟢 <b>买入信号</b>\n{qty_str} {base_asset} @ {price_str} USDT"
-        if stop_price:
-            notify_text += f"\n止损价: {stop_str} USDT"
-        if equity:
-            notify_text += f"\n账户余额: {equity_str} USDT"
-    elif action == "SELL":
-        notify_text = f"🔴 <b>卖出信号</b>\n{qty_str} {base_asset} @ {price_str} USDT"
-        if equity:
-            notify_text += f"\n账户余额: {equity_str} USDT"
-    elif action == "更新止损":
-        notify_text = f"🔶 <b>止损更新</b>\n{qty_str} {base_asset} 持仓\n新止损价: {stop_str} USDT"
-        if equity:
-            notify_text += f"\n账户余额: {equity_str} USDT"
-    else:
-        notify_text = f"ℹ️ <b>{action}</b>\n{symbol}: {qty_str} @ {price_str} USDT"
-    
-    # 发送通知
-    tg_notify(notify_text)
-
-def get_trading_params(config):
-    """从配置文件获取交易参数"""
-    params = {
-        'symbol': config['TRADING'].get('SYMBOL', 'BTCUSDT'),
-        'risk_fraction': float(config['TRADING'].get('RISK_FRACTION', '0.02')),
-        'fast_window': int(config['TRADING'].get('FAST_WINDOW', '7')),
-        'slow_window': int(config['TRADING'].get('SLOW_WINDOW', '20')),
-        'atr_window': int(config['TRADING'].get('ATR_WINDOW', '14'))
-    }
-    return params
+        writer.writerow([
+            timestamp, action, symbol, price, 
+            quantity, stop_price, equity, atr,
+            commission
+        ])
 
 def save_position_state(symbol, has_position, position_size=0, entry_price=0, stop_price=None):
-    """保存持仓状态到文件"""
+    """
+    保存持仓状态到文件
+    
+    参数:
+        symbol: 交易对
+        has_position: 是否有持仓
+        position_size: 持仓数量
+        entry_price: 入场价格
+        stop_price: 止损价格
+    """
     state = {
         'symbol': symbol,
         'has_position': has_position,
         'position_size': position_size,
         'entry_price': entry_price,
         'stop_price': stop_price,
-        'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        'last_updated': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     }
     
-    with open(POSITION_STATE_FILE, 'w') as f:
-        json.dump(state, f, indent=4)
-    
-    print(f"持仓状态已保存: {'有持仓' if has_position else '无持仓'}")
+    try:
+        with open(POSITION_STATE_FILE, 'w') as f:
+            json.dump(state, f, indent=4)
+    except Exception as e:
+        print(f"保存持仓状态失败: {e}")
 
 def load_position_state():
-    """从文件加载持仓状态"""
+    """
+    从文件加载持仓状态
+    
+    返回:
+        dict: 持仓状态，如果文件不存在或加载失败则返回None
+    """
     if not os.path.exists(POSITION_STATE_FILE):
         return None
         
     try:
         with open(POSITION_STATE_FILE, 'r') as f:
             state = json.load(f)
-        print(f"已加载持仓状态: {'有持仓' if state.get('has_position') else '无持仓'}")
+            
+        # 验证状态数据的完整性
+        required_fields = ['symbol', 'has_position', 'position_size', 'entry_price']
+        if not all(field in state for field in required_fields):
+            print("警告: 持仓状态文件数据不完整")
+            return None
+            
         return state
     except Exception as e:
         print(f"加载持仓状态失败: {e}")
-        return None
-
-def infer_position_state(client, symbol):
-    """从账户信息推断持仓状态"""
-    try:
-        # 获取账户余额
-        balances = client.get_balance()
-        base_asset = symbol.replace('USDT', '')
-        base_balance = balances.get(base_asset, 0.0)
-        
-        # 获取当前价格
-        klines = client.get_klines(symbol, interval='1h', limit=1)
-        current_price = klines['close'].iloc[0]
-        
-        # 获取历史交易记录
-        trades = []
-        if os.path.exists('trades.csv'):
-            trades_df = pd.read_csv('trades.csv')
-            if not trades_df.empty:
-                trades = trades_df.to_dict('records')
-        
-        # 检查是否有持仓
-        has_position = base_balance > 0.001  # 小于0.001视为无仓位
-        
-        if has_position:
-            # 尝试从交易日志中获取最近的买入记录
-            entry_price = None
-            position_size = base_balance
-            
-            # 从交易日志中查找最近的买入记录
-            buy_trades = [t for t in trades if t.get('action') == 'BUY' and t.get('symbol') == symbol]
-            if buy_trades:
-                # 按时间戳排序找到最近的买入
-                latest_buy = sorted(buy_trades, key=lambda x: x.get('timestamp', ''), reverse=True)[0]
-                entry_price = float(latest_buy.get('price', current_price))
-                
-                # 如果有止损价记录，也获取它
-                stop_price = latest_buy.get('stop_price')
-                if stop_price and stop_price != '':
-                    stop_price = float(stop_price)
-                else:
-                    stop_price = None
-            else:
-                # 如果找不到买入记录，假设以当前价格的95%买入
-                entry_price = current_price * 0.95
-                stop_price = None
-                
-            # 获取当前止损单
-            open_orders = client.get_open_orders(symbol)
-            for order in open_orders:
-                if order['type'] == 'STOP_LOSS' and order['side'] == 'SELL':
-                    stop_price = float(order['stopPrice'])
-                    break
-                    
-            return {
-                'symbol': symbol,
-                'has_position': True,
-                'position_size': position_size,
-                'entry_price': entry_price,
-                'stop_price': stop_price,
-                'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-                'inferred': True
-            }
-        
-        return {
-            'symbol': symbol,
-            'has_position': False,
-            'position_size': 0,
-            'entry_price': 0,
-            'stop_price': None,
-            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-            'inferred': True
-        }
-            
-    except Exception as e:
-        print(f"推断持仓状态失败: {e}")
         return None
 
 def run_strategy(client, params, interval, log_path, test_mode=False, state=None):
@@ -292,221 +200,106 @@ def run_strategy(client, params, interval, log_path, test_mode=False, state=None
     
     参数:
         client: Binance客户端实例
-        params: 交易参数字典
+        params: 交易参数
         interval: K线周期
-        log_path: 交易日志路径
+        log_path: 日志文件路径
         test_mode: 是否为测试模式
-        state: 持仓状态（如果有）
+        state: 初始持仓状态
     """
-    # 获取交易参数
     symbol = params['symbol']
-    risk_fraction = params['risk_fraction']
-    fast_window = params['fast_window']
-    slow_window = params['slow_window']
-    atr_window = params['atr_window']
+    position = state['position_size'] if state else 0
+    entry_price = state['entry_price'] if state else 0
+    stop_price = state['stop_price'] if state else None
     
-    # 使用缓存的持仓状态，如果有的话
-    entry_price_from_state = state.get('entry_price', 0) if state else 0
-    
-    # 获取账户余额和当前仓位
-    try:
-        # 获取USDT余额作为权益
-        balances = client.get_balance()
-        equity = balances.get('USDT', 0.0)
-        btc_balance = balances.get('BTC', 0.0)
-        
-        print(f"当前账户余额: USDT={equity}, BTC={btc_balance}")
-        
-        # 检查是否有仓位
-        position = btc_balance
-        has_position = position > 0.001  # 小于0.001视为无仓位
-        
-        # 获取当前持仓订单
-        open_orders = client.get_open_orders(symbol)
-        stop_order = None
-        for order in open_orders:
-            if order['type'] == 'STOP_LOSS' and order['side'] == 'SELL':
-                stop_order = order
-                break
-                
-        # 获取K线数据
-        klines = client.get_klines(symbol, interval=interval, limit=max(slow_window, atr_window) + 10)
-        
-        # 确保数据类型为float
-        price_series = klines['close']
-        high_series = klines['high']
-        low_series = klines['low']
-        
-        current_price = price_series.iloc[-1]
-        print(f"当前价格: {current_price}")
-        
-        # 计算指标
-        fast_ma = signals.moving_average(price_series, fast_window)
-        slow_ma = signals.moving_average(price_series, slow_window)
-        
-        # 计算ATR - 改用传统OHLC计算方法
-        tr = pd.concat(
-            {
-                "hl": high_series - low_series,  # 当日最高价与最低价差
-                "hc": (high_series - price_series.shift(1)).abs(),  # 当日最高价与前日收盘价差
-                "lc": (low_series - price_series.shift(1)).abs(),  # 当日最低价与前日收盘价差
-            }, axis=1
-        ).max(axis=1)
-        
-        # 计算ATR
-        atr = tr.rolling(atr_window).mean().iloc[-1]
-        
-        # 限制异常值
-        if atr > current_price * 0.05:
-            atr = current_price * 0.02
-        
-        # 生成信号
-        buy_signal = fast_ma.iloc[-2] <= slow_ma.iloc[-2] and fast_ma.iloc[-1] > slow_ma.iloc[-1]
-        sell_signal = fast_ma.iloc[-2] >= slow_ma.iloc[-2] and fast_ma.iloc[-1] < slow_ma.iloc[-1]
-        
-        print(f"技术指标: Fast MA={fast_ma.iloc[-1]:.2f}, Slow MA={slow_ma.iloc[-1]:.2f}, ATR={atr:.2f}")
-        print(f"信号: Buy={buy_signal}, Sell={sell_signal}")
-        
-        # 执行策略
-        if has_position:
-            # 如果有仓位，检查卖出信号
-            if sell_signal:
-                print(f"卖出信号触发: 当前价格={current_price}, 持仓={position}")
+    while True:
+        try:
+            # 获取K线数据
+            klines = client.get_klines(symbol, interval, limit=100)
+            
+            # 计算技术指标
+            signals_df = signals.calculate_signals(klines)
+            latest_signal = signals_df.iloc[-1]
+            
+            # 获取当前价格
+            current_price = float(latest_signal['close'])
+            
+            # 计算账户权益
+            balance = client.get_balance('USDT')
+            equity = balance + (position * current_price)
+            
+            # 计算手续费
+            commission = calculate_commission(position, current_price, client.testnet)
+            equity -= commission
+            
+            # 生成交易信号
+            if position == 0 and latest_signal['buy_signal']:
+                # 计算交易数量
+                quantity = float(params['position_size'])
                 
                 if not test_mode:
-                    # 执行市价卖出
-                    sell_order = client.place_order(
+                    # 执行买入
+                    order = client.place_order(
                         symbol=symbol,
-                        side="SELL",
-                        order_type="MARKET",
+                        side='BUY',
+                        order_type='MARKET',
+                        quantity=quantity
+                    )
+                    
+                    # 更新持仓状态
+                    position = float(order['executedQty'])
+                    entry_price = float(order['fills'][0]['price'])
+                    stop_price = entry_price * (1 - float(params['stop_loss']))
+                    
+                    # 保存状态
+                    save_position_state(symbol, True, position, entry_price, stop_price)
+                    
+                    # 发送通知
+                    tg_notify(f"🟢 买入 {symbol}\n"
+                            f"价格: {entry_price}\n"
+                            f"数量: {position}\n"
+                            f"止损: {stop_price}")
+                
+                # 记录交易
+                log_trade(log_path, 'BUY', symbol, entry_price, position, 
+                         stop_price, equity, latest_signal['atr'], commission)
+                
+            elif position > 0 and (latest_signal['sell_signal'] or current_price <= stop_price):
+                if not test_mode:
+                    # 执行卖出
+                    order = client.place_order(
+                        symbol=symbol,
+                        side='SELL',
+                        order_type='MARKET',
                         quantity=position
                     )
                     
-                    # 检查订单是否成功
-                    if 'orderId' in sell_order:
-                        # 尝试取消现有止损单
-                        if stop_order:
-                            client.cancel_order(symbol=symbol, order_id=stop_order['orderId'])
-                            
-                        # 记录交易
-                        log_trade(
-                            log_path=log_path,
-                            action="SELL",
-                            symbol=symbol,
-                            price=current_price,
-                            quantity=position,
-                            equity=equity
-                        )
-                        
-                        # 更新持仓状态
-                        save_position_state(symbol, False)
-                    else:
-                        print(f"卖出订单失败: {sell_order}")
-                else:
-                    print("[测试模式] 模拟卖出操作")
+                    # 更新持仓状态
+                    position = 0
+                    entry_price = 0
+                    stop_price = None
                     
-        else:
-            # 如果没有仓位，检查买入信号
-            if buy_signal:
-                # 计算仓位大小
-                size = broker.compute_position_size(equity, atr, risk_fraction)
-                # 将仓位舍入到小数点后3位，与Binance最小交易单位对齐
-                size = round(size, 3)
-                max_size = equity / current_price * 0.95  # 最大可用95%的资金
-                size = min(size, max_size)
-                
-                # 计算止损
-                stop = broker.compute_stop_price(current_price, atr)
-                
-                print(f"买入信号触发: 价格={current_price}, 仓位大小={size}, 止损={stop}")
-                
-                if not test_mode:
-                    # 执行市价买入
-                    buy_order = client.place_order(
-                        symbol=symbol,
-                        side="BUY",
-                        order_type="MARKET",
-                        quantity=size
-                    )
+                    # 保存状态
+                    save_position_state(symbol, False)
                     
-                    # 检查买入订单是否成功
-                    if 'orderId' in buy_order:
-                        # 设置止损单
-                        stop_order = client.place_order(
-                            symbol=symbol,
-                            side="SELL",
-                            order_type="STOP_LOSS",
-                            quantity=size,
-                            stop_price=stop
-                        )
-                        
-                        # 检查止损订单是否成功
-                        if 'orderId' in stop_order:
-                            # 记录交易
-                            log_trade(
-                                log_path=log_path,
-                                action="BUY",
-                                symbol=symbol,
-                                price=current_price,
-                                quantity=size,
-                                stop_price=stop,
-                                equity=equity,
-                                atr=atr
-                            )
-                            
-                            # 更新持仓状态
-                            save_position_state(symbol, True, size, current_price, stop)
-                        else:
-                            print(f"止损订单失败: {stop_order}")
-                    else:
-                        print(f"买入订单失败: {buy_order}")
-                else:
-                    print("[测试模式] 模拟买入操作")
-        
-        # 在每次策略执行完成后，不论是否有信号触发，都更新状态
-        if has_position and not test_mode:
-            # 如果之前没有保存开仓价但现在有持仓，推断开仓价
-            saved_state = load_position_state()
-            if not saved_state or not saved_state.get('has_position'):
-                # 使用状态中的持仓价或从当前价推断
-                entry = entry_price_from_state if entry_price_from_state > 0 else current_price * 0.95
-                stop_price = stop_order['stopPrice'] if stop_order else None
-                save_position_state(symbol, True, position, entry, stop_price)
+                    # 发送通知
+                    tg_notify(f"🔴 卖出 {symbol}\n"
+                            f"价格: {current_price}\n"
+                            f"数量: {position}\n"
+                            f"盈亏: {(current_price - entry_price) * position}")
+                
+                # 记录交易
+                log_trade(log_path, 'SELL', symbol, current_price, position, 
+                         stop_price, equity, latest_signal['atr'], commission)
             
-            # 检查是否需要更新止损
-            elif stop_order and saved_state.get('stop_price') != float(stop_order['stopPrice']):
-                old_stop = saved_state.get('stop_price')
-                new_stop = float(stop_order['stopPrice'])
-                
-                # 记录止损更新
-                log_trade(
-                    log_path=log_path,
-                    action="更新止损",
-                    symbol=symbol,
-                    price=current_price,
-                    quantity=position,
-                    stop_price=new_stop,
-                    equity=equity
-                )
-                
-                # 更新状态文件中的止损价格
-                save_position_state(
-                    symbol, 
-                    True, 
-                    position, 
-                    saved_state.get('entry_price'), 
-                    new_stop
-                )
-        
-        return True
-        
-    except Exception as e:
-        print(f"策略执行错误: {e}")
-        return False
+            # 等待下一个周期
+            time.sleep(60)  # 每分钟检查一次
+            
+        except Exception as e:
+            print(f"策略执行错误: {e}")
+            time.sleep(60)  # 发生错误时等待一分钟后重试
 
 def main():
     """主函数"""
-    # 解析命令行参数
     parser = setup_parser()
     args = parser.parse_args()
     
@@ -522,81 +315,11 @@ def main():
     # 获取交易参数
     params = get_trading_params(config)
     
-    # 尝试加载持仓状态
+    # 加载持仓状态
     state = load_position_state()
     
-    # 如果状态文件不存在但账户中有BTC，尝试推断状态
-    if not state:
-        state = infer_position_state(client, params['symbol'])
-        if state and state.get('has_position'):
-            # 保存推断的状态
-            save_position_state(
-                state['symbol'], 
-                state['has_position'], 
-                state['position_size'], 
-                state['entry_price'], 
-                state['stop_price']
-            )
-    
-    # 执行模式提示
-    mode = "测试模式" if args.test else "实盘模式"
-    print(f"启动{mode}...")
-    print(f"交易对: {params['symbol']}")
-    print(f"K线周期: {args.interval}")
-    print(f"风险系数: {params['risk_fraction']}")
-    print(f"均线参数: 快线={params['fast_window']}, 慢线={params['slow_window']}")
-    print(f"ATR窗口: {params['atr_window']}")
-    
-    if state:
-        status = "有持仓" if state.get('has_position') else "无持仓"
-        source = "推断" if state.get('inferred') else "缓存"
-        print(f"持仓状态({source}): {status}")
-        if state.get('has_position'):
-            print(f"持仓量: {state.get('position_size')}")
-            print(f"入场价: {state.get('entry_price')}")
-            if state.get('stop_price'):
-                print(f"止损价: {state.get('stop_price')}")
-    
-    try:
-        # 测试连接
-        server_time = client.get_server_time()
-        print(f"服务器时间: {datetime.fromtimestamp(server_time['serverTime']/1000)}")
-        
-        # 检查账户状态
-        account = client.get_account_info()
-        print(f"账户状态: {'正常' if account.get('canTrade', False) else '异常'}")
-        
-        # 单次执行或定时执行
-        if len(sys.argv) > 1 and sys.argv[1] == 'run_once':
-            # 单次执行
-            run_strategy(client, params, args.interval, log_path, args.test, state)
-        else:
-            # 定时执行
-            while True:
-                print(f"\n[{datetime.now()}] 执行策略检查")
-                success = run_strategy(client, params, args.interval, log_path, args.test, state)
-                
-                # 确定下次执行时间
-                if args.interval == '1d':
-                    # 日线策略，每天执行一次
-                    sleep_time = 86400  # 24小时
-                elif args.interval == '1h':
-                    # 小时线策略，每小时执行一次
-                    sleep_time = 3600  # 1小时
-                elif args.interval == '15m':
-                    # 15分钟线策略
-                    sleep_time = 900  # 15分钟
-                else:
-                    # 默认10分钟检查一次
-                    sleep_time = 600
-                
-                print(f"等待{sleep_time}秒后再次执行...")
-                time.sleep(sleep_time)
-    
-    except KeyboardInterrupt:
-        print("用户中断，程序退出")
-    except Exception as e:
-        print(f"程序错误: {e}")
+    # 运行策略
+    run_strategy(client, params, args.interval, log_path, args.test, state)
 
 if __name__ == "__main__":
     main() 

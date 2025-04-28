@@ -27,3 +27,14 @@ htmlcov/
 grid_results.csv
 *.png .env
 position_state.json
+
+# Configuration and secrets
+config.ini
+*.env
+.env.*
+
+# Trading data
+trades.csv
+~/trades/
+trades/
+*.csv

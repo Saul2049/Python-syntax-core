@@ -1,6 +1,48 @@
 import pandas as pd
 import numpy as np
 from math import isfinite, ceil
+from typing import Optional, Dict, Any, Tuple, List
+from datetime import datetime, timedelta
+from src.notify import Notifier
+from src import utils
+
+def compute_atr(series: pd.Series, window: int = 14) -> float:
+    """
+    计算平均真实波幅(ATR)。
+    
+    参数:
+        series: 价格序列，可以是收盘价、最高价或最低价
+        window: 计算窗口大小，默认为14
+        
+    返回:
+        float: 计算得到的ATR值
+    """
+    # 计算价格变化
+    price_diff = series.diff().abs()
+    
+    # 计算ATR
+    atr = price_diff.rolling(window=window).mean()
+    
+    # 返回最新的ATR值
+    return atr.iloc[-1] if not atr.empty else 0.0
+
+def trailing_stop(entry: float, atr: float, factor: float = 2.0) -> float:
+    """
+    计算基于ATR的跟踪止损价格。
+    
+    参数:
+        entry: 入场价格
+        atr: 平均真实波幅
+        factor: ATR乘数，控制止损距离(默认: 2.0)
+        
+    返回:
+        float: 计算得到的跟踪止损价格
+    """
+    # 确保ATR为非负值
+    atr_value = max(0, atr)
+    
+    # 计算跟踪止损价格
+    return entry - (factor * atr_value)
 
 def compute_position_size(equity: float, atr: float, risk_frac: float = 0.02) -> int:
     """
@@ -456,3 +498,340 @@ portfolio_config = {
     "weights": [1.0],       # 100%权重
     "risk_frac": 0.02       # 维持2%的风险系数
 } 
+
+def update_trailing_stop_atr(
+    position: Dict[str, Any], 
+    current_price: float, 
+    atr: float, 
+    multiplier: float = 1.0,
+    notifier: Optional[Notifier] = None
+) -> Tuple[float, bool]:
+    """
+    使用ATR更新移动止损价格。
+    Update trailing stop price using ATR.
+    
+    参数 (Parameters):
+        position: 持仓信息字典 (Position information dictionary)
+                 包含 'entry_price', 'stop_price' 等字段
+        current_price: 当前价格 (Current price)
+        atr: 当前ATR值 (Current ATR value)
+        multiplier: ATR乘数 (ATR multiplier)
+        notifier: 可选的通知处理器 (Optional notifier)
+        
+    返回 (Returns):
+        Tuple[float, bool]: (新止损价, 是否更新)
+    """
+    if not position or 'stop_price' not in position:
+        return 0.0, False
+        
+    old_stop = position['stop_price']
+    
+    # 使用ATR计算新的止损位置
+    new_stop_candidate = current_price - (atr * multiplier)
+    
+    # 止损只能上移不能下移
+    should_update = new_stop_candidate > old_stop
+    new_stop = max(old_stop, new_stop_candidate) if should_update else old_stop
+    
+    # 发送止损更新通知
+    if should_update and notifier:
+        update_msg = (
+            f"📊 止损更新 (Stop Updated)\n"
+            f"品种 (Symbol): {position.get('symbol', 'Unknown')}\n"
+            f"当前价 (Price): {current_price:.8f}\n"
+            f"ATR: {atr:.8f}\n"
+            f"旧止损 (Old): {old_stop:.8f}\n"
+            f"新止损 (New): {new_stop:.8f}\n"
+            f"止损距离 (Distance): {(current_price - new_stop):.8f} ({((current_price - new_stop)/current_price)*100:.2f}%)"
+        )
+        notifier.notify(update_msg, "INFO")
+    
+    return new_stop, should_update
+
+class Broker:
+    """Trading broker with Telegram notifications."""
+    
+    def __init__(self, api_key: str, api_secret: str, telegram_token: Optional[str] = None, trades_dir: Optional[str] = None):
+        """
+        初始化交易经纪商。
+        Initialize trading broker.
+        
+        参数 (Parameters):
+            api_key: API密钥 (API key)
+            api_secret: API密钥 (API secret)
+            telegram_token: Telegram机器人令牌 (Telegram bot token)
+            trades_dir: 交易数据存储目录 (Trades data directory)
+        """
+        self.api_key = api_key
+        self.api_secret = api_secret
+        self.notifier = Notifier(telegram_token)
+        self.positions = {}  # 当前持仓 (Current positions)
+        self.last_stop_update = {}  # 上次止损更新时间 (Last stop update time)
+        self.trades_dir = trades_dir  # 交易数据目录 (Trades data directory)
+        
+    def execute_order(self, symbol: str, side: str, quantity: float, 
+                     price: Optional[float] = None, reason: Optional[str] = None) -> Dict[str, Any]:
+        """
+        执行订单并发送通知。
+        Execute order and send notification.
+        
+        参数 (Parameters):
+            symbol: 交易对 (Trading pair)
+            side: 交易方向 (Trade side) - BUY/SELL
+            quantity: 交易数量 (Trade quantity)
+            price: 限价单价格 (Limit price)
+            reason: 交易原因 (Trade reason)
+            
+        返回 (Returns):
+            Dict[str, Any]: 订单执行结果 (Order execution result)
+        """
+        try:
+            # 执行订单逻辑 (Order execution logic)
+            order_result = self._execute_order_internal(symbol, side, quantity, price)
+            
+            # 记录交易到CSV (Log trade to CSV)
+            trade_data = {
+                "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "symbol": symbol,
+                "side": side,
+                "price": order_result["price"],
+                "quantity": order_result["quantity"],
+                "amount": order_result["price"] * order_result["quantity"],
+                "fee": order_result.get("fee", 0.0),
+                "order_id": order_result.get("order_id", ""),
+                "reason": reason or ""
+            }
+            self._log_trade_to_csv(trade_data)
+            
+            # 更新持仓信息 (Update position information)
+            if side.upper() == "BUY":
+                self.positions[symbol] = {
+                    "symbol": symbol,
+                    "entry_price": order_result["price"],
+                    "quantity": order_result["quantity"],
+                    "side": "LONG",
+                    "entry_time": datetime.now(),
+                    "stop_price": 0.0  # 将在首次ATR更新时设置
+                }
+                self.last_stop_update[symbol] = datetime.now()
+            else:
+                # 清除持仓信息 (Clear position)
+                if symbol in self.positions:
+                    del self.positions[symbol]
+                if symbol in self.last_stop_update:
+                    del self.last_stop_update[symbol]
+            
+            # 发送交易通知 (Send trade notification)
+            self.notifier.notify_trade(
+                action=side,
+                symbol=symbol,
+                price=order_result["price"],
+                quantity=order_result["quantity"],
+                reason=reason
+            )
+            
+            return order_result
+            
+        except Exception as e:
+            # 发送错误通知 (Send error notification)
+            self.notifier.notify_error(e, f"Order execution for {symbol}")
+            raise
+    
+    def _log_trade_to_csv(self, trade_data: Dict[str, Any]) -> None:
+        """
+        记录交易到CSV文件。
+        Log trade to CSV file.
+        
+        参数 (Parameters):
+            trade_data: 交易数据 (Trade data)
+        """
+        try:
+            # 获取交易文件路径 (Get trade file path)
+            symbol = trade_data["symbol"].lower()
+            trades_file = utils.get_trades_file(symbol, self.trades_dir)
+            
+            # 准备数据帧 (Prepare dataframe)
+            trade_df = pd.DataFrame([trade_data])
+            
+            # 检查文件是否已存在 (Check if file exists)
+            file_exists = trades_file.exists()
+            
+            # 写入CSV，如果文件已存在则追加 (Write to CSV, append if file exists)
+            if file_exists:
+                trade_df.to_csv(trades_file, mode='a', header=False, index=False)
+            else:
+                # 确保目录存在 (Ensure directory exists)
+                trades_file.parent.mkdir(parents=True, exist_ok=True)
+                trade_df.to_csv(trades_file, index=False)
+                
+            print(f"Trade logged to {trades_file}")
+            
+        except Exception as e:
+            print(f"Error logging trade to CSV: {e}")
+            # 通知但不中断程序 (Notify but don't interrupt program)
+            self.notifier.notify_error(e, "Trade logging")
+    
+    def get_all_trades(self, symbol: str, start_date: Optional[str] = None, 
+                      end_date: Optional[str] = None) -> pd.DataFrame:
+        """
+        获取指定交易对的所有交易记录。
+        Get all trades for specified symbol.
+        
+        参数 (Parameters):
+            symbol: 交易对 (Trading pair)
+            start_date: 开始日期 (Start date) 'YYYY-MM-DD'
+            end_date: 结束日期 (End date) 'YYYY-MM-DD'
+            
+        返回 (Returns):
+            pd.DataFrame: 交易记录 (Trade records)
+        """
+        try:
+            # 获取交易文件路径 (Get trade file path)
+            trades_file = utils.get_trades_file(symbol.lower(), self.trades_dir)
+            
+            # 检查文件是否存在 (Check if file exists)
+            if not trades_file.exists():
+                print(f"No trades found for {symbol}")
+                return pd.DataFrame()
+                
+            # 读取CSV (Read CSV)
+            trades_df = pd.read_csv(trades_file)
+            
+            # 确保时间戳列是日期时间类型 (Ensure timestamp column is datetime)
+            trades_df['timestamp'] = pd.to_datetime(trades_df['timestamp'])
+            
+            # 过滤日期范围 (Filter date range)
+            if start_date:
+                start_dt = pd.to_datetime(start_date)
+                trades_df = trades_df[trades_df['timestamp'] >= start_dt]
+                
+            if end_date:
+                end_dt = pd.to_datetime(end_date)
+                trades_df = trades_df[trades_df['timestamp'] <= end_dt]
+                
+            return trades_df
+            
+        except Exception as e:
+            print(f"Error getting trades: {e}")
+            return pd.DataFrame()
+    
+    def update_position_stops(self, symbol: str, current_price: float, atr: float) -> None:
+        """
+        更新指定交易对的移动止损。
+        Update trailing stop for specified symbol.
+        
+        参数 (Parameters):
+            symbol: 交易对 (Trading pair)
+            current_price: 当前价格 (Current price)
+            atr: 当前ATR值 (Current ATR value)
+        """
+        try:
+            # 检查是否持有该交易对头寸
+            if symbol not in self.positions:
+                return
+                
+            # 检查是否需要更新止损 (每小时一次)
+            now = datetime.now()
+            last_update = self.last_stop_update.get(symbol, datetime.min)
+            time_since_update = now - last_update
+            
+            # 初始止损设置或每小时更新一次
+            if self.positions[symbol]["stop_price"] == 0.0 or time_since_update >= timedelta(hours=1):
+                # 使用ATR更新止损
+                position = self.positions[symbol]
+                
+                # 初始止损设置 (如果尚未设置)
+                if position["stop_price"] == 0.0:
+                    initial_stop = position["entry_price"] - (atr * 2.0)  # 使用2倍ATR作为初始止损
+                    position["stop_price"] = initial_stop
+                    
+                    # 发送初始止损通知
+                    stop_msg = (
+                        f"🔒 初始止损设置 (Initial Stop Set)\n"
+                        f"品种 (Symbol): {symbol}\n"
+                        f"入场价 (Entry): {position['entry_price']:.8f}\n"
+                        f"止损价 (Stop): {initial_stop:.8f}\n"
+                        f"ATR: {atr:.8f}\n"
+                        f"止损距离 (Distance): {(position['entry_price'] - initial_stop):.8f} ({((position['entry_price'] - initial_stop)/position['entry_price'])*100:.2f}%)"
+                    )
+                    self.notifier.notify(stop_msg, "INFO")
+                else:
+                    # 更新移动止损
+                    new_stop, updated = update_trailing_stop_atr(
+                        position, 
+                        current_price, 
+                        atr, 
+                        multiplier=1.0,  # 使用1倍ATR作为跟踪距离
+                        notifier=self.notifier
+                    )
+                    
+                    if updated:
+                        # 更新止损价格
+                        self.positions[symbol]["stop_price"] = new_stop
+                
+                # 更新最后更新时间
+                self.last_stop_update[symbol] = now
+                
+        except Exception as e:
+            # 发送错误通知
+            self.notifier.notify_error(e, f"Stop update for {symbol}")
+    
+    def check_stop_loss(self, symbol: str, current_price: float) -> bool:
+        """
+        检查是否触发止损。
+        Check if stop loss is triggered.
+        
+        参数 (Parameters):
+            symbol: 交易对 (Trading pair)
+            current_price: 当前价格 (Current price)
+            
+        返回 (Returns):
+            bool: 是否触发止损 (Whether stop loss is triggered)
+        """
+        try:
+            # 检查是否持有该交易对头寸
+            if symbol not in self.positions:
+                return False
+                
+            position = self.positions[symbol]
+            
+            # 检查是否触发止损
+            if position["stop_price"] > 0 and current_price <= position["stop_price"]:
+                # 发送止损触发通知
+                stop_msg = (
+                    f"⚠️ 止损触发 (Stop Loss Triggered)\n"
+                    f"品种 (Symbol): {symbol}\n"
+                    f"当前价 (Price): {current_price:.8f}\n"
+                    f"止损价 (Stop): {position['stop_price']:.8f}\n"
+                    f"入场价 (Entry): {position['entry_price']:.8f}\n"
+                    f"盈亏 (P/L): {(current_price - position['entry_price']) * position['quantity']:.8f} USDT\n"
+                    f"盈亏% (P/L%): {((current_price - position['entry_price'])/position['entry_price'])*100:.2f}%"
+                )
+                self.notifier.notify(stop_msg, "WARN")
+                
+                # 执行止损订单
+                self.execute_order(
+                    symbol=symbol,
+                    side="SELL",
+                    quantity=position["quantity"],
+                    reason="Stop loss triggered"
+                )
+                
+                return True
+                
+            return False
+                
+        except Exception as e:
+            # 发送错误通知
+            self.notifier.notify_error(e, f"Stop check for {symbol}")
+            return False
+            
+    def _execute_order_internal(self, symbol: str, side: str, quantity: float, 
+                              price: Optional[float] = None) -> Dict[str, Any]:
+        """
+        内部订单执行逻辑。
+        Internal order execution logic.
+        """
+        # 实际的订单执行代码 (Actual order execution code)
+        # 这里应该调用交易所API (Should call exchange API here)
+        pass 

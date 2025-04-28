@@ -10,6 +10,44 @@ import configparser
 from urllib.parse import urlencode
 import requests
 import pandas as pd
+from functools import wraps
+import logging
+
+# 配置日志
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+def rate_limit_retry(max_retries=3, base_delay=1):
+    """
+    处理HTTP 429 (Too Many Requests) 的装饰器
+    
+    参数:
+        max_retries: 最大重试次数
+        base_delay: 基础延迟时间(秒)
+    """
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            retries = 0
+            while retries < max_retries:
+                try:
+                    return func(*args, **kwargs)
+                except requests.exceptions.HTTPError as e:
+                    if e.response.status_code == 429:  # Too Many Requests
+                        retries += 1
+                        if retries == max_retries:
+                            logger.error(f"达到最大重试次数 {max_retries}，请求失败")
+                            raise
+                        
+                        # 计算退避时间，使用指数退避
+                        delay = base_delay * (2 ** (retries - 1))
+                        logger.warning(f"遇到速率限制，等待 {delay} 秒后重试 (尝试 {retries}/{max_retries})")
+                        time.sleep(delay)
+                    else:
+                        raise
+            return None
+        return wrapper
+    return decorator
 
 class BinanceClient:
     """Binance API客户端，支持Testnet"""
@@ -77,6 +115,7 @@ class BinanceClient:
         response = requests.get(f"{self.base_url}{endpoint}", headers=headers, params=params)
         return response.json()
     
+    @rate_limit_retry(max_retries=3, base_delay=1)
     def get_klines(self, symbol, interval='1d', limit=100):
         """
         获取K线数据
@@ -97,27 +136,21 @@ class BinanceClient:
         }
         
         response = requests.get(f"{self.base_url}{endpoint}", params=params)
+        response.raise_for_status()  # 检查HTTP错误
         data = response.json()
         
         # 转换为DataFrame
         df = pd.DataFrame(data, columns=[
-            'open_time', 'open', 'high', 'low', 'close', 'volume',
-            'close_time', 'quote_volume', 'trades', 'taker_buy_base', 
+            'timestamp', 'open', 'high', 'low', 'close', 'volume',
+            'close_time', 'quote_volume', 'trades', 'taker_buy_base',
             'taker_buy_quote', 'ignore'
         ])
         
         # 转换数据类型
-        numeric_columns = ['open', 'high', 'low', 'close', 'volume']
-        for col in numeric_columns:
+        df['timestamp'] = pd.to_datetime(df['timestamp'], unit='ms')
+        for col in ['open', 'high', 'low', 'close', 'volume', 'quote_volume']:
             df[col] = df[col].astype(float)
             
-        # 转换时间戳
-        df['open_time'] = pd.to_datetime(df['open_time'], unit='ms')
-        df['close_time'] = pd.to_datetime(df['close_time'], unit='ms')
-        
-        # 设置索引
-        df.set_index('open_time', inplace=True)
-        
         return df
     
     def place_order(self, symbol, side, order_type, quantity, price=None, stop_price=None):
@@ -127,13 +160,13 @@ class BinanceClient:
         参数:
             symbol: 交易对，如'BTCUSDT'
             side: 方向，'BUY' 或 'SELL'
-            order_type: 订单类型，'LIMIT', 'MARKET', 'STOP_LOSS', 'STOP_LOSS_LIMIT'等
+            order_type: 订单类型，如'LIMIT', 'MARKET', 'STOP_LOSS_LIMIT'
             quantity: 数量
-            price: 价格 (限价单必填)
-            stop_price: 触发价格 (止损单必填)
+            price: 价格（限价单必需）
+            stop_price: 止损价（止损单必需）
             
         返回:
-            dict: API响应
+            dict: 订单信息
         """
         endpoint = "/v3/order"
         timestamp = int(time.time() * 1000)
@@ -143,30 +176,29 @@ class BinanceClient:
             'side': side,
             'type': order_type,
             'quantity': quantity,
-            'timestamp': timestamp,
-            'newOrderRespType': 'FULL'  # 返回完整响应
+            'timestamp': timestamp
         }
         
-        # 添加价格参数
-        if price and order_type not in ['MARKET', 'STOP_LOSS']:
-            params['price'] = f"{price:.8f}"
+        if price:
+            params['price'] = price
+        if stop_price:
+            params['stopPrice'] = stop_price
             
-        # 添加止损价参数
-        if stop_price and order_type in ['STOP_LOSS', 'STOP_LOSS_LIMIT']:
-            params['stopPrice'] = f"{stop_price:.8f}"
-            
-        # 市价单特殊处理
-        if order_type == 'MARKET':
-            params['timeInForce'] = 'GTC'
-            
-        # 添加签名
         params['signature'] = self._generate_signature(params)
         
-        # 发送请求
         headers = {'X-MBX-APIKEY': self.api_key}
         response = requests.post(f"{self.base_url}{endpoint}", headers=headers, params=params)
+        response.raise_for_status()
         
-        return response.json()
+        result = response.json()
+        
+        # 检查订单是否成功
+        if result.get('code') != 0:
+            error_msg = result.get('msg', '未知错误')
+            logger.error(f"下单失败: {error_msg}")
+            raise Exception(f"下单失败: {error_msg}")
+            
+        return result
     
     def cancel_order(self, symbol, order_id=None, orig_client_order_id=None):
         """取消订单"""

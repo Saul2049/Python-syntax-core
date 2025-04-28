@@ -1,8 +1,9 @@
 import pandas as pd
 import numpy as np
+from typing import Union, Literal, Optional
 
 
-def moving_average(series: pd.Series, window: int, kind: str = "sma") -> pd.Series:
+def moving_average(series: pd.Series, window: int, kind: Literal["sma", "ema", "wma"] = "sma") -> pd.Series:
     """
     计算移动平均线。
     Calculate moving average.
@@ -17,6 +18,11 @@ def moving_average(series: pd.Series, window: int, kind: str = "sma") -> pd.Seri
               
     返回 (Returns):
         pd.Series: 计算后的均线序列 (Resulting moving average series)
+        
+    说明 (Notes):
+        - EMA计算使用span参数，确保与传统技术分析软件的计算方法一致
+        - span = 2/(alpha) - 1，其中alpha是平滑因子
+        - 当window=20时，相当于传统EMA的20日周期
     """
     kind = kind.lower()
     
@@ -38,17 +44,55 @@ def moving_average(series: pd.Series, window: int, kind: str = "sma") -> pd.Seri
         raise ValueError(f"不支持的移动平均类型 (Unsupported moving average type): {kind}")
 
 
+def vectorized_cross(
+    fast: pd.Series, 
+    slow: pd.Series, 
+    direction: Literal["above", "below"] = "above",
+    threshold: float = 0.0,
+    return_series: bool = True
+) -> Union[pd.Series, np.ndarray]:
+    """
+    向量化交叉检测函数。
+    Vectorized cross detection function.
+    
+    参数 (Parameters):
+        fast: 快速线 (Fast line)
+        slow: 慢速线 (Slow line)
+        direction: 交叉方向 (Cross direction)
+                  'above': 上穿 (Cross above)
+                  'below': 下穿 (Cross below)
+        threshold: 交叉阈值 (Cross threshold)
+                  用于控制交叉的灵敏度，默认0.0表示严格交叉
+        return_series: 是否返回Series (Whether to return Series)
+                      True: 返回布尔Series，保留原始索引
+                      False: 返回交叉点的索引数组
+    
+    返回 (Returns):
+        Union[pd.Series, np.ndarray]: 交叉信号 (Cross signals)
+        
+    说明 (Notes):
+        - 当direction='above'时，检测fast上穿slow
+        - 当direction='below'时，检测fast下穿slow
+        - threshold参数可以用于控制交叉的灵敏度
+          * threshold > 0: 需要更大的价格差才触发交叉
+          * threshold < 0: 允许更小的价格差触发交叉
+    """
+    if direction == "above":
+        cross = (fast.shift(1) <= slow.shift(1) + threshold) & (fast > slow + threshold)
+    else:
+        cross = (fast.shift(1) >= slow.shift(1) - threshold) & (fast < slow - threshold)
+    
+    return cross if return_series else np.where(cross)[0]
+
+
 def bullish_cross_indices(fast: pd.Series, slow: pd.Series) -> np.ndarray:
     """Return indices where `fast` strictly crosses above `slow`."""
-    # prior fast ≤ slow and current fast > slow
-    cross = (fast.shift(1) <= slow.shift(1)) & (fast > slow)
-    return np.where(cross)[0]
+    return vectorized_cross(fast, slow, direction="above", return_series=False)
 
 
 def bearish_cross_indices(fast: pd.Series, slow: pd.Series) -> np.ndarray:
     """Return indices where `fast` crosses below `slow`."""
-    cross = (fast.shift(1) >= slow.shift(1)) & (fast < slow)
-    return np.where(cross)[0]
+    return vectorized_cross(fast, slow, direction="below", return_series=False)
 
 
 def bullish_cross_series(fast: pd.Series, slow: pd.Series) -> pd.Series:
@@ -67,7 +111,7 @@ def bullish_cross_series(fast: pd.Series, slow: pd.Series) -> pd.Series:
         # 或者和其他条件组合
         buy_signal = cross_series & (rsi < 30)
     """
-    return (fast.shift(1) <= slow.shift(1)) & (fast > slow)
+    return vectorized_cross(fast, slow, direction="above")
 
 
 def bearish_cross_series(fast: pd.Series, slow: pd.Series) -> pd.Series:
@@ -79,4 +123,4 @@ def bearish_cross_series(fast: pd.Series, slow: pd.Series) -> pd.Series:
     - 进行.diff()操作
     - 与其他条件组合
     """
-    return (fast.shift(1) >= slow.shift(1)) & (fast < slow) 
+    return vectorized_cross(fast, slow, direction="below") 
