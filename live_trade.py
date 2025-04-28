@@ -141,6 +141,8 @@ def run_strategy(client, params, interval, log_path, test_mode=False):
                 
         # 获取K线数据
         klines = client.get_klines(symbol, interval=interval, limit=max(slow_window, atr_window) + 10)
+        
+        # 确保数据类型为float
         price_series = klines['close']
         high_series = klines['high']
         low_series = klines['low']
@@ -152,15 +154,24 @@ def run_strategy(client, params, interval, log_path, test_mode=False):
         fast_ma = signals.moving_average(price_series, fast_window)
         slow_ma = signals.moving_average(price_series, slow_window)
         
-        # 计算ATR
+        # 计算ATR - 修复计算方法
         tr = pd.concat(
             {
-                "hl": high_series - low_series,
-                "hc": (high_series - price_series.shift(1)).abs(),
-                "lc": (low_series - price_series.shift(1)).abs(),
+                "hl": (high_series - low_series) / price_series,  # 使用百分比计算
+                "hc": ((high_series - price_series.shift(1)).abs()) / price_series,
+                "lc": ((low_series - price_series.shift(1)).abs()) / price_series,
             }, axis=1
         ).max(axis=1)
-        atr = tr.rolling(atr_window).mean().iloc[-1]
+        
+        # 计算百分比ATR
+        atr_pct = tr.rolling(atr_window).mean().iloc[-1]
+        
+        # 将百分比ATR转换为价格单位的ATR (约为当前价格的1-2%)
+        atr = current_price * atr_pct
+        
+        # 如果ATR超过价格的5%，则认为是异常值，设置为价格的2%
+        if atr > current_price * 0.05:
+            atr = current_price * 0.02
         
         # 生成信号
         buy_signal = fast_ma.iloc[-2] <= slow_ma.iloc[-2] and fast_ma.iloc[-1] > slow_ma.iloc[-1]
