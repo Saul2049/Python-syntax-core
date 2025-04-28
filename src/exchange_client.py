@@ -1,309 +1,386 @@
+#!/usr/bin/env python3
+# exchange_client.py
+# 加密货币交易所客户端接口
+
+import json
 import logging
+import random
+import socket
 import time
 from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional
+from typing import Dict, List, Optional, Tuple, Union
 
-from src.network import NetworkClient, with_retry
+import pandas as pd
+import requests
+from requests.exceptions import ConnectionError, Timeout
 
-# 设置日志记录器 (Setup logger)
-logger = logging.getLogger(__name__)
+# 设置日志
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+)
+logger = logging.getLogger("exchange_client")
 
 
-class ExchangeClient(NetworkClient):
-    """
-    交易所API客户端，提供重试和状态恢复功能。
-    Exchange API client with retry and state recovery functionality.
-    """
+class ExchangeClient:
+    """交易所API客户端接口"""
 
     def __init__(
-        self, api_key: str, api_secret: str, state_dir: Optional[str] = None
+        self,
+        api_key: str,
+        api_secret: str,
+        base_url: str = "https://api.example.com",
+        timeout: int = 10,
+        retry_count: int = 3,
+        retry_delay: int = 1,
+        demo_mode: bool = False,
     ):
-        """
-        初始化交易所客户端。
-        Initialize exchange client.
-
-        参数 (Parameters):
-            api_key: API密钥 (API key)
-            api_secret: API密钥 (API secret)
-            state_dir: 状态文件目录，默认为None (使用默认交易目录)
-                     (State file directory, default None (uses default trades directory))
-        """
-        super().__init__(state_dir)
         self.api_key = api_key
         self.api_secret = api_secret
+        self.base_url = base_url
+        self.timeout = timeout
+        self.retry_count = retry_count
+        self.retry_delay = retry_delay
+        self.demo_mode = demo_mode
+        self.session = requests.Session()
+        self.session.headers.update(
+            {
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json",
+            }
+        )
+        self._last_request_time = 0
+        self._rate_limit_per_sec = 5  # 每秒请求限制
 
-    @with_retry(state_file="get_account_balance")
-    def get_account_balance(self) -> Dict[str, float]:
-        """
-        获取账户余额，带重试和状态恢复功能。
-        Get account balance with retry and state recovery.
+        # 用于演示模式的状态存储
+        if demo_mode:
+            self._demo_balances = {"BTC": 1.0, "ETH": 10.0, "USDT": 10000.0}
+            self._demo_orders = []
+            self._demo_market_data = {}
+            self._load_demo_data()
 
-        返回 (Returns):
-            Dict[str, float]: 币种余额字典 (Currency balance dictionary)
-        """
-        logger.info("Fetching account balance")
-
-        # 这里应该是实际的API调用代码 (Actual API call code would go here)
-        # 示例代码 (Example code)
-        time.sleep(0.5)  # 模拟网络延迟 (Simulate network delay)
-
-        # 模拟网络错误 (Simulate network error)
-        if datetime.now().second % 10 < 3:  # 30% 失败率 (30% failure rate)
-            raise ConnectionError(
-                "Simulated network error in get_account_balance"
+    def _load_demo_data(self):
+        """加载演示数据"""
+        try:
+            df = pd.read_csv(
+                "btc_eth.csv", parse_dates=["date"], index_col="date"
             )
+            self._demo_market_data = {
+                "BTC/USDT": df["btc"].to_dict(),
+                "ETH/USDT": df["eth"].to_dict(),
+            }
+            logger.info("已加载演示数据")
+        except Exception as e:
+            logger.warning(f"无法加载演示数据: {e}")
+            # 创建一些随机数据作为备用
+            now = datetime.now()
+            dates = [now - timedelta(days=i) for i in range(100)]
+            self._demo_market_data = {
+                "BTC/USDT": {
+                    d: 30000 + random.randint(-1000, 1000) for d in dates
+                },
+                "ETH/USDT": {
+                    d: 2000 + random.randint(-100, 100) for d in dates
+                },
+            }
 
-        # 模拟成功响应 (Simulate successful response)
-        return {"BTC": 0.5, "ETH": 5.0, "USDT": 10000.0}
+    def _request(
+        self,
+        method: str,
+        endpoint: str,
+        params: dict = None,
+        data: dict = None,
+    ) -> dict:
+        """
+        发送HTTP请求到交易所API
 
-    @with_retry(
-        state_file="place_order",
-        retry_config={"max_retries": 10, "base_delay": 2.0},
-    )
+        包含速率限制、重试逻辑和错误处理
+        """
+        url = f"{self.base_url}{endpoint}"
+
+        # 演示模式模拟网络错误和延迟
+        if self.demo_mode:
+            # 随机模拟网络延迟
+            time.sleep(random.uniform(0.1, 0.5))
+            # 随机模拟网络错误
+            if random.random() < 0.05:  # 5%概率出错
+                error_type = random.choice(
+                    [ConnectionError, Timeout, socket.error]
+                )
+                raise error_type("模拟网络错误")
+
+        # 实现速率限制
+        current_time = time.time()
+        time_since_last_request = current_time - self._last_request_time
+        if time_since_last_request < 1.0 / self._rate_limit_per_sec:
+            sleep_time = (
+                1.0 / self._rate_limit_per_sec - time_since_last_request
+            )
+            time.sleep(sleep_time)
+
+        # 带重试的请求逻辑
+        for attempt in range(self.retry_count):
+            try:
+                response = self.session.request(
+                    method=method,
+                    url=url,
+                    params=params,
+                    json=data,
+                    timeout=self.timeout,
+                )
+                self._last_request_time = time.time()
+
+                # 检查HTTP状态码
+                response.raise_for_status()
+
+                # 解析并返回JSON响应
+                return response.json()
+
+            except (ConnectionError, Timeout, socket.error) as e:
+                if attempt < self.retry_count - 1:
+                    sleep_time = self.retry_delay * (2**attempt)  # 指数退避
+                    logger.warning(
+                        f"请求失败 (尝试 {attempt+1}/{self.retry_count}): "
+                        f"{str(e)}. 等待 {sleep_time}秒后重试..."
+                    )
+                    time.sleep(sleep_time)
+                else:
+                    logger.error(f"请求失败，已达到最大重试次数: {str(e)}")
+                    raise
+
+            except Exception as e:
+                logger.error(f"请求过程中出现错误: {str(e)}")
+                raise
+
+    def get_account_balance(self) -> Dict[str, float]:
+        """获取账户余额"""
+        if self.demo_mode:
+            return self._demo_balances.copy()
+
+        endpoint = "/api/v1/account/balance"
+        response = self._request("GET", endpoint)
+        return {asset: float(balance) for asset, balance in response.items()}
+
+    def get_ticker(self, symbol: str) -> Dict[str, float]:
+        """获取交易对的最新行情"""
+        if self.demo_mode:
+            # 在演示模式下返回最新市场数据
+            market_data = self._demo_market_data.get(symbol, {})
+            if not market_data:
+                return {"price": 0.0, "volume": 0.0}
+
+            latest_date = max(market_data.keys())
+            return {
+                "price": market_data[latest_date],
+                "volume": random.uniform(100, 1000),
+            }
+
+        endpoint = f"/api/v1/ticker/{symbol}"
+        return self._request("GET", endpoint)
+
     def place_order(
         self,
         symbol: str,
         side: str,
+        order_type: str,
         quantity: float,
         price: Optional[float] = None,
-        order_type: str = "LIMIT",
-    ) -> Dict[str, Any]:
+    ) -> Dict:
         """
-        下单接口，带重试和状态恢复功能。
-        Place order with retry and state recovery.
+        下单接口
 
-        参数 (Parameters):
-            symbol: 交易对 (Trading pair)
-            side: 交易方向 (Trade side) - BUY/SELL
-            quantity: 交易数量 (Trade quantity)
-            price: 价格，市价单可为None (Price, can be None for market orders)
-            order_type: 订单类型 (Order type) - LIMIT/MARKET
+        参数:
+            symbol: 交易对，如 "BTC/USDT"
+            side: 买卖方向，"buy" 或 "sell"
+            order_type: 订单类型，"limit" 或 "market"
+            quantity: 数量
+            price: 价格，仅限价单需要
 
-        返回 (Returns):
-            Dict[str, Any]: 订单信息 (Order information)
+        返回:
+            包含订单ID和状态的字典
         """
-        # 保存订单状态 (Save order state)
-        timestamp_str = datetime.now().strftime('%Y%m%d%H%M%S')
-        operation = f"order_{symbol}_{side}_{timestamp_str}"
-        order_state = {
-            "symbol": symbol,
-            "side": side,
-            "quantity": quantity,
-            "price": price,
-            "order_type": order_type,
-            "status": "pending",
-            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        }
-        self.save_operation_state(operation, order_state)
-
-        logger.info(
-            f"Placing {side} order for {quantity} {symbol} at price {price}"
-        )
-
-        # 这里应该是实际的API调用代码 (Actual API call code would go here)
-        # 示例代码 (Example code)
-        time.sleep(1.0)  # 模拟网络延迟 (Simulate network delay)
-
-        # 模拟网络错误 (Simulate network error)
-        if datetime.now().second % 10 < 3:  # 30% 失败率 (30% failure rate)
-            raise ConnectionError("Simulated network error in place_order")
-
-        # 生成订单ID (Generate order ID)
-        order_id = f"ORDER{int(datetime.now().timestamp())}"
-
-        # 更新订单状态 (Update order state)
-        # 生成模拟成交价格
-        now = datetime.now()
-        fake_price = float(f"{now.second + 50000}.{now.microsecond}")
-        executed_price = price or fake_price
-        
-        order_state.update(
-            {
+        if self.demo_mode:
+            order_id = (
+                f"demo_{int(time.time() * 1000)}_{random.randint(1000, 9999)}"
+            )
+            order = {
+                "id": order_id,
+                "symbol": symbol,
+                "side": side,
+                "type": order_type,
+                "quantity": quantity,
+                "price": price if price else self.get_ticker(symbol)["price"],
                 "status": "filled",
-                "order_id": order_id,
-                "executed_price": executed_price,
-                "executed_quantity": quantity,
-                "executed_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "timestamp": datetime.now().isoformat(),
             }
-        )
-        self.save_operation_state(operation, order_state)
+            self._demo_orders.append(order)
 
-        # 返回订单信息 (Return order information)
-        return {
+            # 更新演示模式的余额
+            base, quote = symbol.split("/")
+            if side == "buy":
+                self._demo_balances[quote] -= quantity * (
+                    price or self.get_ticker(symbol)["price"]
+                )
+                self._demo_balances[base] += quantity
+            else:
+                self._demo_balances[base] -= quantity
+                self._demo_balances[quote] += quantity * (
+                    price or self.get_ticker(symbol)["price"]
+                )
+
+            return order
+
+        endpoint = "/api/v1/order"
+        data = {
             "symbol": symbol,
-            "order_id": order_id,
             "side": side,
-            "price": order_state["executed_price"],
+            "type": order_type,
             "quantity": quantity,
-            "status": "FILLED",
-            "transact_time": int(datetime.now().timestamp() * 1000),
         }
 
-    @with_retry(state_file="get_historical_trades")
+        if order_type == "limit" and price is not None:
+            data["price"] = price
+
+        return self._request("POST", endpoint, data=data)
+
     def get_historical_trades(
+        self, symbol: str, limit: int = 100
+    ) -> List[Dict]:
+        """获取历史成交记录"""
+        if self.demo_mode:
+            return self._demo_orders
+
+        endpoint = f"/api/v1/trades/{symbol}"
+        params = {"limit": limit}
+        return self._request("GET", endpoint, params=params)
+
+    def get_historical_klines(
         self,
         symbol: str,
-        start_time: Optional[datetime] = None,
-        end_time: Optional[datetime] = None,
+        interval: str = "1d",
+        start_time: Optional[int] = None,
+        end_time: Optional[int] = None,
         limit: int = 500,
-    ) -> List[Dict[str, Any]]:
+    ) -> List[List]:
         """
-        获取历史交易记录，带重试和状态恢复功能。
-        Get historical trades with retry and state recovery.
+        获取K线历史数据
 
-        参数 (Parameters):
-            symbol: 交易对 (Trading pair)
-            start_time: 开始时间 (Start time)
-            end_time: 结束时间 (End time)
-            limit: 返回记录限制 (Limit of returned records)
+        参数:
+            symbol: 交易对
+            interval: 时间间隔，如 "1m", "5m", "1h", "1d"
+            start_time: 开始时间戳（毫秒）
+            end_time: 结束时间戳（毫秒）
+            limit: 返回的数据点数量上限
 
-        返回 (Returns):
-            List[Dict[str, Any]]: 交易记录列表 (List of trade records)
+        返回:
+            K线数据列表，每个元素包含 [时间戳, 开盘价, 最高价, 最低价, 收盘价, 交易量]
         """
-        # 设置默认时间范围 (Set default time range)
-        if end_time is None:
-            end_time = datetime.now()
-        if start_time is None:
-            start_time = end_time - timedelta(days=1)
+        if self.demo_mode:
+            if symbol not in self._demo_market_data:
+                return []
 
-        # 转换为毫秒时间戳 (Convert to millisecond timestamps)
-        start_ms = int(start_time.timestamp() * 1000)
-        end_ms = int(end_time.timestamp() * 1000)
+            market_data = self._demo_market_data[symbol]
+            dates = sorted(market_data.keys())
 
-        logger.info(
-            f"Fetching historical trades for {symbol} "
-            f"from {start_time} to {end_time}"
-        )
+            if start_time:
+                start_date = datetime.fromtimestamp(start_time / 1000)
+                dates = [d for d in dates if d >= start_date]
 
-        # 检查是否有已保存的进度 (Check for saved progress)
-        operation = f"trades_{symbol}_{start_ms}_{end_ms}"
-        state = self.load_operation_state(operation)
-        trades = state.get("trades", [])
+            if end_time:
+                end_date = datetime.fromtimestamp(end_time / 1000)
+                dates = [d for d in dates if d <= end_date]
 
-        if trades:
-            logger.info(
-                f"Resuming from {len(trades)} previously fetched trades"
-            )
-            return trades  # 如果已经完成，直接返回 (If already completed, return directly)
+            # 限制返回的数据点数量
+            if limit and len(dates) > limit:
+                dates = dates[-limit:]
 
-        # 这里应该是实际的API调用代码 (Actual API call code would go here)
-        # 示例代码 (Example code)
-        time.sleep(1.5)  # 模拟网络延迟 (Simulate network delay)
+            result = []
+            for date in dates:
+                price = market_data[date]
+                timestamp = int(date.timestamp() * 1000)
+                # 模拟生成 OHLCV 数据
+                open_price = price * random.uniform(0.995, 1.005)
+                high_price = price * random.uniform(1.005, 1.015)
+                low_price = price * random.uniform(0.985, 0.995)
+                close_price = price
+                volume = random.uniform(100, 1000)
 
-        # 模拟网络错误 (Simulate network error)
-        if datetime.now().second % 10 < 3:  # 30% 失败率 (30% failure rate)
-            raise ConnectionError(
-                "Simulated network error in get_historical_trades"
-            )
+                result.append(
+                    [
+                        timestamp,
+                        open_price,
+                        high_price,
+                        low_price,
+                        close_price,
+                        volume,
+                    ]
+                )
 
-        # 模拟交易记录 (Simulate trade records)
-        result = []
-        for i in range(10):
-            trade_time = start_time + timedelta(hours=i)
-            trade = {
-                "id": 100000 + i,
-                "symbol": symbol,
-                "price": 50000.0 + (i * 10),
-                "qty": 0.01,
-                "quoteQty": (50000.0 + (i * 10)) * 0.01,
-                "time": int(trade_time.timestamp() * 1000),
-                "isBuyerMaker": bool(i % 2),
-                "isBestMatch": True,
-            }
-            result.append(trade)
-
-        # 保存结果到状态文件 (Save result to state file)
-        state_data = {
-            "trades": result,
-            "status": "completed",
-            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        }
-        self.save_operation_state(operation, state_data)
-
-        return result
-
-    @with_retry(state_file="market_data_sync")
-    def sync_market_data(
-        self, symbols: List[str], days: int = 7
-    ) -> Dict[str, Any]:
-        """
-        同步市场数据，带重试和状态恢复功能。
-        Sync market data with retry and state recovery.
-
-        参数 (Parameters):
-            symbols: 交易对列表 (List of trading pairs)
-            days: 同步天数 (Number of days to sync)
-
-        返回 (Returns):
-            Dict[str, Any]: 同步结果 (Sync result)
-        """
-        operation = "market_data_sync"
-        state = self.load_operation_state(operation)
-        completed_symbols = state.get("completed_symbols", [])
-
-        result = {
-            "total_symbols": len(symbols),
-            "completed_symbols": len(completed_symbols),
-            "data": {},
-        }
-
-        # 检查哪些交易对需要同步 (Check which symbols need syncing)
-        symbols_to_sync = [s for s in symbols if s not in completed_symbols]
-
-        if not symbols_to_sync:
-            logger.info("All symbols already synced")
             return result
 
-        logger.info(
-            f"Syncing market data for {len(symbols_to_sync)} symbols: {symbols_to_sync}"
+        endpoint = f"/api/v1/klines/{symbol}"
+        params = {
+            "interval": interval,
+            "limit": limit,
+        }
+
+        if start_time:
+            params["startTime"] = start_time
+
+        if end_time:
+            params["endTime"] = end_time
+
+        return self._request("GET", endpoint, params=params)
+
+    def sync_market_data(
+        self, symbol: str, interval: str = "1d", days: int = 30
+    ) -> pd.DataFrame:
+        """
+        同步并返回市场数据
+
+        参数:
+            symbol: 交易对
+            interval: 时间间隔
+            days: 获取过去多少天的数据
+
+        返回:
+            包含OHLCV数据的DataFrame
+        """
+        logger.info(f"同步{symbol}市场数据，间隔={interval}，天数={days}")
+
+        end_time = int(time.time() * 1000)
+        start_time = end_time - (days * 24 * 60 * 60 * 1000)
+
+        klines = self.get_historical_klines(
+            symbol=symbol,
+            interval=interval,
+            start_time=start_time,
+            end_time=end_time,
         )
 
-        for symbol in symbols_to_sync:
-            try:
-                logger.info(f"Syncing {symbol}")
+        if not klines:
+            logger.warning(f"未获取到{symbol}的市场数据")
+            return pd.DataFrame()
 
-                # 这里应该是实际的数据同步代码 (Actual data sync code would go here)
-                # 示例代码 (Example code)
-                time.sleep(0.5)  # 模拟处理时间 (Simulate processing time)
-
-                # 模拟网络错误 (Simulate network error)
-                if (
-                    datetime.now().second % 10 < 2
-                ):  # 20% 失败率 (20% failure rate)
-                    raise ConnectionError(
-                        f"Simulated network error syncing {symbol}"
-                    )
-
-                # 模拟成功结果 (Simulate successful result)
-                result["data"][symbol] = {
-                    "candles": f"{days * 24} hourly candles",
-                    "trades": f"{days * 100} trades",
-                }
-
-                # 更新已完成列表 (Update completed list)
-                completed_symbols.append(symbol)
-
-                # 保存进度 (Save progress)
-                state_data = {
-                    "completed_symbols": completed_symbols,
-                    "total_symbols": len(symbols),
-                    "last_updated": datetime.now().strftime(
-                        "%Y-%m-%d %H:%M:%S"
-                    ),
-                }
-                self.save_operation_state(operation, state_data)
-
-            except Exception as e:
-                logger.error(f"Error syncing {symbol}: {e}")
-                # 不捕获异常，让装饰器处理重试 (Don't catch exception, let decorator handle retry)
-                raise
-
-        # 更新结果 (Update result)
-        result["completed_symbols"] = len(completed_symbols)
-        result["status"] = (
-            "completed"
-            if len(completed_symbols) == len(symbols)
-            else "partial"
+        df = pd.DataFrame(
+            klines,
+            columns=[
+                "timestamp",
+                "open",
+                "high",
+                "low",
+                "close",
+                "volume",
+            ],
         )
 
-        return result
+        # 转换时间戳为datetime
+        df["timestamp"] = pd.to_datetime(df["timestamp"], unit="ms")
+        df.set_index("timestamp", inplace=True)
+
+        # 转换价格和交易量为数值类型
+        numeric_columns = ["open", "high", "low", "close", "volume"]
+        df[numeric_columns] = df[numeric_columns].apply(pd.to_numeric)
+
+        logger.info(f"成功同步{len(df)}条{symbol}市场数据")
+        return df

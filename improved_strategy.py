@@ -205,7 +205,7 @@ if __name__ == "__main__":
         f"Sharpe: {metrics.sharpe_ratio(original_ma_equity):.2f}"
     )
     print("-" * 80)
-    
+
     # 绘制权益曲线
     plt.figure(figsize=(12, 8))
     plt.plot(bnh_equity.index, bnh_equity / init_equity, label="买入持有")
@@ -246,7 +246,8 @@ if __name__ == "__main__":
         f"原始MA策略 (7/20):  买入信号 {len(buy_orig)} 次, 卖出信号 {len(sell_orig)} 次"
     )
     print(
-        f"改进MA策略 (50/200): 买入信号 {len(buy_improved)} 次, 卖出信号 {len(sell_improved)} 次"
+        f"改进MA策略 (50/200): 买入信号 {len(buy_improved)} 次, "
+        f"卖出信号 {len(sell_improved)} 次"
     )
     print("-" * 80)
 
