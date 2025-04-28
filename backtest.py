@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 
 from broker import compute_position_size, compute_stop_price
-from data import fetch_klines, load_csv
+from data import load_csv
 from signals import (bearish_cross_indices, bullish_cross_indices,
                      moving_average)
 
@@ -75,7 +75,7 @@ def compute_metrics(equity_series: pd.Series, price: pd.Series):
     years = days / 365.25
     initial = equity_series.iloc[0]
     final = equity_series.iloc[-1]
-    cagr = final / initial ** (1 / years) - 1
+    cagr = (final / initial) ** (1 / years) - 1
     drawdown = (equity_series / equity_series.cummax() - 1).min()
     returns = equity_series.pct_change().dropna()
     sharpe = returns.mean() / returns.std() * np.sqrt(252)
@@ -85,12 +85,17 @@ def compute_metrics(equity_series: pd.Series, price: pd.Series):
 if __name__ == "__main__":
     # Load data from CSV or fetch via Binance
     df = load_csv()
-    # df = pd.concat([fetch_klines('BTCUSDT'), fetch_klines('ETHUSDT')], axis=1)
+    # df = pd.concat([fetch_klines("BTCUSDT"),
+    #               fetch_klines("ETHUSDT")], axis=1)
     price = df["btc"]
 
-    # Run strategy
+    # Run backtest strategy
     equity, equity_series = run_backtest(
-        price, fast_win=3, slow_win=7, risk_per_trade=0.02, stop_mult=1
+        price,
+        fast_win=3,
+        slow_win=7,
+        risk_per_trade=0.02,
+        stop_mult=1
     )
 
     print(f"Final equity: {equity:,.2f} USD")
