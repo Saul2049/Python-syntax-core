@@ -124,18 +124,20 @@ def send_telegram(
         if retry < MAX_RETRIES:
             print(f"尝试重试 ({retry+1}/{MAX_RETRIES})...")
             time.sleep(RETRY_DELAY)
-            return send_telegram(
+            result = send_telegram(
                 token, chat_id, message, parse_mode, debug, retry + 1
             )
+            return result
         return False
     except Exception as e:
         print(f"Telegram通知错误: {e}")
         if retry < MAX_RETRIES:
             print(f"尝试重试 ({retry+1}/{MAX_RETRIES})...")
             time.sleep(RETRY_DELAY)
-            return send_telegram(
+            result = send_telegram(
                 token, chat_id, message, parse_mode, debug, retry + 1
             )
+            return result
         return False
 
 
@@ -144,41 +146,50 @@ def get_formatted_messages(format_type):
     if format_type.lower() == "html":
         return [
             # 买入信号
-            "🟢 <b>买入信号</b>\n0.123 BTC @ 50123.45 USDT\n止损价: 49500.00 USDT\n账户余额: 12345.67 USDT",
+            "🟢 <b>买入信号</b>\n0.123 BTC @ 50123.45 USDT\n"
+            "止损价: 49500.00 USDT\n账户余额: 12345.67 USDT",
             # 等待2秒
             None,
             # 止损更新
-            "🔶 <b>止损更新</b>\n0.123 BTC 持仓\n新止损价: 49800.00 USDT\n账户余额: 12345.67 USDT",
+            "🔶 <b>止损更新</b>\n0.123 BTC 持仓\n"
+            "新止损价: 49800.00 USDT\n账户余额: 12345.67 USDT",
             # 等待2秒
             None,
             # 卖出信号
-            "🔴 <b>卖出信号</b>\n0.123 BTC @ 51234.56 USDT\n账户余额: 12678.90 USDT",
+            "🔴 <b>卖出信号</b>\n0.123 BTC @ 51234.56 USDT\n"
+            "账户余额: 12678.90 USDT",
         ]
     elif format_type.lower() == "markdown":
         return [
             # 买入信号
-            "🟢 *买入信号*\n0.123 BTC @ 50123.45 USDT\n止损价: 49500.00 USDT\n账户余额: 12345.67 USDT",
+            "🟢 *买入信号*\n0.123 BTC @ 50123.45 USDT\n"
+            "止损价: 49500.00 USDT\n账户余额: 12345.67 USDT",
             # 等待2秒
             None,
             # 止损更新
-            "🔶 *止损更新*\n0.123 BTC 持仓\n新止损价: 49800.00 USDT\n账户余额: 12345.67 USDT",
+            "🔶 *止损更新*\n0.123 BTC 持仓\n"
+            "新止损价: 49800.00 USDT\n账户余额: 12345.67 USDT",
             # 等待2秒
             None,
             # 卖出信号
-            "🔴 *卖出信号*\n0.123 BTC @ 51234.56 USDT\n账户余额: 12678.90 USDT",
+            "🔴 *卖出信号*\n0.123 BTC @ 51234.56 USDT\n"
+            "账户余额: 12678.90 USDT",
         ]
     else:  # text
         return [
             # 买入信号
-            "🟢 买入信号\n0.123 BTC @ 50123.45 USDT\n止损价: 49500.00 USDT\n账户余额: 12345.67 USDT",
+            "🟢 买入信号\n0.123 BTC @ 50123.45 USDT\n"
+            "止损价: 49500.00 USDT\n账户余额: 12345.67 USDT",
             # 等待2秒
             None,
             # 止损更新
-            "🔶 止损更新\n0.123 BTC 持仓\n新止损价: 49800.00 USDT\n账户余额: 12345.67 USDT",
+            "🔶 止损更新\n0.123 BTC 持仓\n"
+            "新止损价: 49800.00 USDT\n账户余额: 12345.67 USDT",
             # 等待2秒
             None,
             # 卖出信号
-            "🔴 卖出信号\n0.123 BTC @ 51234.56 USDT\n账户余额: 12678.90 USDT",
+            "🔴 卖出信号\n0.123 BTC @ 51234.56 USDT\n"
+            "账户余额: 12678.90 USDT",
         ]
 
 
@@ -234,13 +245,13 @@ def main():
         )
         return 1
 
-    print(f"Telegram配置:")
+    print("Telegram配置:")
     print(f"Token: {secure_token_display(token)}")
     print(f"Chat ID: {chat_id}")
     print(f"格式: {format_type}")
 
     if debug:
-        print(f"调试模式已启用")
+        print("调试模式已启用")
 
     # 发送单个测试消息
     success = send_telegram(token, chat_id, args.message, format_type, debug)

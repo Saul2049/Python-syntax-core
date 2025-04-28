@@ -1,5 +1,3 @@
-import pandas as pd
-
 from src import broker, data, metrics
 
 
@@ -27,7 +25,7 @@ def test_single_bt_params():
     eq_slow_large = broker.backtest_single(price, slow_win=30)
 
     # 调试信息 - 打印最终值以便检查差异
-    print(f"\nDEBUG VALUES:")
+    print("\nDEBUG VALUES:")
     print(f"Default: {eq_default.iloc[-1]}")
     print(f"Fast=3: {eq_fast_small.iloc[-1]}")
     print(f"Fast=10: {eq_fast_large.iloc[-1]}")
