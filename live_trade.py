@@ -154,22 +154,19 @@ def run_strategy(client, params, interval, log_path, test_mode=False):
         fast_ma = signals.moving_average(price_series, fast_window)
         slow_ma = signals.moving_average(price_series, slow_window)
         
-        # 计算ATR - 修复计算方法
+        # 计算ATR - 改用传统OHLC计算方法
         tr = pd.concat(
             {
-                "hl": (high_series - low_series) / price_series,  # 使用百分比计算
-                "hc": ((high_series - price_series.shift(1)).abs()) / price_series,
-                "lc": ((low_series - price_series.shift(1)).abs()) / price_series,
+                "hl": high_series - low_series,  # 当日最高价与最低价差
+                "hc": (high_series - price_series.shift(1)).abs(),  # 当日最高价与前日收盘价差
+                "lc": (low_series - price_series.shift(1)).abs(),  # 当日最低价与前日收盘价差
             }, axis=1
         ).max(axis=1)
         
-        # 计算百分比ATR
-        atr_pct = tr.rolling(atr_window).mean().iloc[-1]
+        # 计算ATR
+        atr = tr.rolling(atr_window).mean().iloc[-1]
         
-        # 将百分比ATR转换为价格单位的ATR (约为当前价格的1-2%)
-        atr = current_price * atr_pct
-        
-        # 如果ATR超过价格的5%，则认为是异常值，设置为价格的2%
+        # 限制异常值
         if atr > current_price * 0.05:
             atr = current_price * 0.02
         
