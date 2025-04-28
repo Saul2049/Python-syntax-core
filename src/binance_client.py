@@ -39,7 +39,9 @@ def rate_limit_retry(max_retries=3, base_delay=1):
                     if e.response.status_code == 429:  # Too Many Requests
                         retries += 1
                         if retries == max_retries:
-                            logger.error(f"达到最大重试次数 {max_retries}，请求失败")
+                            logger.error(
+                                f"达到最大重试次数 {max_retries}，请求失败"
+                            )
                             raise
 
                         # 计算退避时间，使用指数退避
@@ -99,7 +101,9 @@ class BinanceClient:
             api_secret = config["BINANCE"]["API_SECRET"]
 
         if not api_key or not api_secret:
-            raise ValueError("API Key和Secret必须提供，或从环境变量/配置文件加载")
+            raise ValueError(
+                "API Key和Secret必须提供，或从环境变量/配置文件加载"
+            )
 
         self.api_key = api_key
         self.api_secret = api_secret

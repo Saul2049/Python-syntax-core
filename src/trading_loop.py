@@ -137,7 +137,8 @@ def trading_loop(symbol: str = "BTCUSDT", interval_seconds: int = 60):
     try:
         # 发送启动通知 (Send startup notification)
         broker.notifier.notify(
-            f"🚀 交易机器人启动 (Trading bot started)\n交易对: {symbol}", "INFO"
+            f"🚀 交易机器人启动 (Trading bot started)\n交易对: {symbol}",
+            "INFO",
         )
 
         while True:
@@ -248,7 +249,9 @@ def trading_loop(symbol: str = "BTCUSDT", interval_seconds: int = 60):
 
     except KeyboardInterrupt:
         # 发送关闭通知 (Send shutdown notification)
-        broker.notifier.notify("🛑 交易机器人关闭 (Trading bot stopped)", "INFO")
+        broker.notifier.notify(
+            "🛑 交易机器人关闭 (Trading bot stopped)", "INFO"
+        )
         print("交易循环已关闭 (Trading loop stopped)")
 
 

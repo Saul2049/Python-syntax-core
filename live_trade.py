@@ -41,7 +41,9 @@ def setup_parser():
         help="K线周期，如1m, 5m, 15m, 1h, 4h, 1d (默认: 1d)",
     )
 
-    parser.add_argument("--test", action="store_true", help="仅运行测试模式，不执行实际交易")
+    parser.add_argument(
+        "--test", action="store_true", help="仅运行测试模式，不执行实际交易"
+    )
 
     return parser
 

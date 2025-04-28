@@ -236,7 +236,9 @@ if __name__ == "__main__":
 
     print("\n交易统计:")
     print("-" * 80)
-    print(f"原始MA策略 (7/20):  买入信号 {len(buy_orig)} 次, 卖出信号 {len(sell_orig)} 次")
+    print(
+        f"原始MA策略 (7/20):  买入信号 {len(buy_orig)} 次, 卖出信号 {len(sell_orig)} 次"
+    )
     print(
         f"改进MA策略 (50/200): 买入信号 {len(buy_improved)} 次, 卖出信号 {len(sell_improved)} 次"
     )

@@ -124,7 +124,9 @@ def compare_trades(
 
     else:
         # 如果没有order_id，尝试使用其他字段匹配 (If no order_id, try matching with other fields)
-        print("警告: 未找到order_id列，使用timestamp、symbol、side、price和quantity匹配")
+        print(
+            "警告: 未找到order_id列，使用timestamp、symbol、side、price和quantity匹配"
+        )
         match_cols = ["timestamp", "symbol", "side", "price", "quantity"]
 
         # 确保所有匹配列都存在 (Ensure all matching columns exist)

@@ -37,9 +37,13 @@ def setup_parser():
         help="要发送的测试消息 (默认: ✅ 交易系统通知测试成功!)",
     )
     parser.add_argument(
-        "--full-test", action="store_true", help="直接运行完整通知测试，无需交互确认"
+        "--full-test",
+        action="store_true",
+        help="直接运行完整通知测试，无需交互确认",
     )
-    parser.add_argument("--debug", action="store_true", help="显示详细的调试信息和API响应")
+    parser.add_argument(
+        "--debug", action="store_true", help="显示详细的调试信息和API响应"
+    )
     parser.add_argument(
         "--format",
         choices=["text", "html", "markdown"],

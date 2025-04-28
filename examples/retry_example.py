@@ -85,7 +85,9 @@ def run_sync_example(client):
 
 def run_historical_trades_example(client):
     """运行历史交易查询示例 (Run historical trades example)"""
-    logger.info("==== 运行历史交易查询示例 (Running historical trades example) ====")
+    logger.info(
+        "==== 运行历史交易查询示例 (Running historical trades example) ===="
+    )
     try:
         # 查询历史交易，会自动恢复已获取的数据
         # Query historical trades with automatic resumption of fetched data

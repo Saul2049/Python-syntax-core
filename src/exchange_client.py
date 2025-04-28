@@ -184,9 +184,7 @@ class ExchangeClient(NetworkClient):
             logger.info(
                 f"Resuming from {len(trades)} previously fetched trades"
             )
-            return (
-                trades  # 如果已经完成，直接返回 (If already completed, return directly)
-            )
+            return trades  # 如果已经完成，直接返回 (If already completed, return directly)
 
         # 这里应该是实际的API调用代码 (Actual API call code would go here)
         # 示例代码 (Example code)
