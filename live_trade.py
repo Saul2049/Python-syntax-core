@@ -79,19 +79,43 @@ def initialize_trade_log(log_path='trades.csv'):
 
 def log_trade(log_path, action, symbol, price, quantity, stop_price=None, equity=None, atr=None):
     """记录交易到日志文件"""
+    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    
+    # 构建日志条目
+    log_entry = [
+        timestamp,
+        action,
+        symbol,
+        price,
+        quantity,
+        stop_price or '',
+        equity or '',
+        atr or ''
+    ]
+    
+    # 写入CSV文件
     with open(log_path, 'a', newline='') as f:
         writer = csv.writer(f)
-        writer.writerow([
-            datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-            action,
-            symbol,
-            price,
-            quantity,
-            stop_price or '',
-            equity or '',
-            atr or ''
-        ])
-    print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] {action}: {symbol} {quantity}@{price}")
+        writer.writerow(log_entry)
+    
+    # 格式化控制台输出
+    price_str = f"{price:.2f}" if price else "N/A"
+    qty_str = f"{quantity:.3f}" if quantity else "N/A"
+    stop_str = f"{stop_price:.2f}" if stop_price else "N/A"
+    equity_str = f"{equity:.2f}" if equity else "N/A"
+    
+    # 打印到控制台
+    print(f"[{timestamp}] {'='*50}")
+    print(f"交易: {action} {symbol}")
+    print(f"价格: {price_str} USDT")
+    print(f"数量: {qty_str} {symbol.replace('USDT', '')}")
+    if stop_price:
+        print(f"止损: {stop_str} USDT")
+    if equity:
+        print(f"资金: {equity_str} USDT")
+    if atr:
+        print(f"ATR: {atr:.2f}")
+    print(f"{'='*50}")
 
 def get_trading_params(config):
     """从配置文件获取交易参数"""
@@ -384,6 +408,31 @@ def run_strategy(client, params, interval, log_path, test_mode=False, state=None
                 entry = entry_price_from_state if entry_price_from_state > 0 else current_price * 0.95
                 stop_price = stop_order['stopPrice'] if stop_order else None
                 save_position_state(symbol, True, position, entry, stop_price)
+            
+            # 检查是否需要更新止损
+            elif stop_order and saved_state.get('stop_price') != float(stop_order['stopPrice']):
+                old_stop = saved_state.get('stop_price')
+                new_stop = float(stop_order['stopPrice'])
+                
+                # 记录止损更新
+                log_trade(
+                    log_path=log_path,
+                    action="更新止损",
+                    symbol=symbol,
+                    price=current_price,
+                    quantity=position,
+                    stop_price=new_stop,
+                    equity=equity
+                )
+                
+                # 更新状态文件中的止损价格
+                save_position_state(
+                    symbol, 
+                    True, 
+                    position, 
+                    saved_state.get('entry_price'), 
+                    new_stop
+                )
         
         return True
         
