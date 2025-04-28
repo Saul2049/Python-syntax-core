@@ -65,16 +65,16 @@ def test_cross_series():
     bull_cross = signals.bullish_cross_series(fast, slow)
     assert isinstance(bull_cross, pd.Series)
     assert bull_cross.index.equals(fast.index)
-    assert bull_cross.iloc[2] == True  # 第3个点上穿
-    assert bull_cross.iloc[0] == False
+    assert bull_cross.iloc[2] is True  # 第3个点上穿
+    assert bull_cross.iloc[0] is False
 
     # 测试下穿Series
     bear_cross = signals.bearish_cross_series(fast, slow)
     assert isinstance(bear_cross, pd.Series)
-    assert bear_cross.iloc[3] == True  # 第4个点下穿
+    assert bear_cross.iloc[3] is True  # 第4个点下穿
 
     # 测试与其他条件组合
     condition = pd.Series([True, False, True, False], index=fast.index)
     combined = bull_cross & condition
-    assert combined.iloc[2] == True
-    assert combined.iloc[0] == False
+    assert combined.iloc[2] is True
+    assert combined.iloc[0] is False

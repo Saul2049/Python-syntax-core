@@ -87,7 +87,8 @@ def send_telegram(
         if debug:
             print(f"DEBUG - 请求URL: {url}")
             print(
-                f"DEBUG - 请求参数: {json.dumps(payload, ensure_ascii=False, indent=2)}"
+                "DEBUG - 请求参数: "
+                f"{json.dumps(payload, ensure_ascii=False, indent=2)}"
             )
 
         response = requests.post(url, json=payload)
@@ -97,9 +98,11 @@ def send_telegram(
             print(f"DEBUG - 响应内容: {response.text}")
 
         if response.status_code == 200:
-            print(f"Telegram通知发送成功!")
+            print("Telegram通知发送成功!")
             return True
-        elif response.status_code == 429 and retry < MAX_RETRIES:
+        elif (
+            response.status_code == 429 and retry < MAX_RETRIES
+        ):  # 分割长行
             # 处理API速率限制
             print(f"警告: API速率限制，等待{RETRY_DELAY}秒后重试...")
             time.sleep(RETRY_DELAY)
@@ -228,7 +231,8 @@ def main():
         print("1. 命令行参数: --token YOUR_TOKEN --chat YOUR_CHAT_ID")
         print("2. 环境变量: 设置 TG_TOKEN 和 TG_CHAT")
         print(
-            "3. 使用load_env.py脚本: python load_env.py --tg_token=YOUR_TOKEN --tg_chat=YOUR_CHAT_ID --save"
+            "3. 使用load_env.py脚本: python load_env.py "
+            "--tg_token=YOUR_TOKEN --tg_chat=YOUR_CHAT_ID --save"
         )
         return 1
 
@@ -248,6 +252,7 @@ def main():
         args.full_test
         or (
             not args.full_test
+            and sys.stdin.isatty()
             and input("是否要测试完整的交易通知系列? (Y/n): ").strip().lower()
             in ["", "y", "yes"]
         )
@@ -257,10 +262,10 @@ def main():
             token, chat_id, format_type, debug
         )
         if test_success:
-            print("完整通知测试成功完成!")
+            print("所有通知发送成功!")
         else:
-            print("完整通知测试部分失败。")
-            success = False
+            print("通知测试过程中发生错误")
+            return 1
 
     return 0 if success else 1
 
