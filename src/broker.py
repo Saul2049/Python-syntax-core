@@ -83,11 +83,11 @@ def compute_trailing_stop(entry: float, current_price: float, initial_stop: floa
         return initial_stop
         
     # 1. 移动至保本位(Breakeven) - 当盈利达到breakeven_r时
-    if current_r >= breakeven_r and current_r < trail_r:
-        return max(initial_stop, entry)  # 可以设为完全保本或略低于保本
+    if current_r >= breakeven_r and current_r <= trail_r:
+        return entry  # 移至保本位（入场价格）
         
-    # 2. 跟踪止损(Trailing Stop) - 当盈利达到trail_r时
-    if current_r >= trail_r:
+    # 2. 跟踪止损(Trailing Stop) - 当盈利超过trail_r时
+    if current_r > trail_r:
         if atr is not None and atr > 0:
             # 基于ATR的跟踪距离 - 跟随价格但保持一定距离
             return current_price - atr
