@@ -330,22 +330,26 @@ def run_strategy(client, params, interval, log_path, test_mode=False, state=None
                         quantity=position
                     )
                     
-                    # 尝试取消现有止损单
-                    if stop_order:
-                        client.cancel_order(symbol=symbol, order_id=stop_order['orderId'])
+                    # 检查订单是否成功
+                    if 'orderId' in sell_order:
+                        # 尝试取消现有止损单
+                        if stop_order:
+                            client.cancel_order(symbol=symbol, order_id=stop_order['orderId'])
+                            
+                        # 记录交易
+                        log_trade(
+                            log_path=log_path,
+                            action="SELL",
+                            symbol=symbol,
+                            price=current_price,
+                            quantity=position,
+                            equity=equity
+                        )
                         
-                    # 记录交易
-                    log_trade(
-                        log_path=log_path,
-                        action="SELL",
-                        symbol=symbol,
-                        price=current_price,
-                        quantity=position,
-                        equity=equity
-                    )
-                    
-                    # 更新持仓状态
-                    save_position_state(symbol, False)
+                        # 更新持仓状态
+                        save_position_state(symbol, False)
+                    else:
+                        print(f"卖出订单失败: {sell_order}")
                 else:
                     print("[测试模式] 模拟卖出操作")
                     
@@ -373,29 +377,37 @@ def run_strategy(client, params, interval, log_path, test_mode=False, state=None
                         quantity=size
                     )
                     
-                    # 设置止损单
-                    stop_order = client.place_order(
-                        symbol=symbol,
-                        side="SELL",
-                        order_type="STOP_LOSS",
-                        quantity=size,
-                        stop_price=stop
-                    )
-                    
-                    # 记录交易
-                    log_trade(
-                        log_path=log_path,
-                        action="BUY",
-                        symbol=symbol,
-                        price=current_price,
-                        quantity=size,
-                        stop_price=stop,
-                        equity=equity,
-                        atr=atr
-                    )
-                    
-                    # 更新持仓状态
-                    save_position_state(symbol, True, size, current_price, stop)
+                    # 检查买入订单是否成功
+                    if 'orderId' in buy_order:
+                        # 设置止损单
+                        stop_order = client.place_order(
+                            symbol=symbol,
+                            side="SELL",
+                            order_type="STOP_LOSS",
+                            quantity=size,
+                            stop_price=stop
+                        )
+                        
+                        # 检查止损订单是否成功
+                        if 'orderId' in stop_order:
+                            # 记录交易
+                            log_trade(
+                                log_path=log_path,
+                                action="BUY",
+                                symbol=symbol,
+                                price=current_price,
+                                quantity=size,
+                                stop_price=stop,
+                                equity=equity,
+                                atr=atr
+                            )
+                            
+                            # 更新持仓状态
+                            save_position_state(symbol, True, size, current_price, stop)
+                        else:
+                            print(f"止损订单失败: {stop_order}")
+                    else:
+                        print(f"买入订单失败: {buy_order}")
                 else:
                     print("[测试模式] 模拟买入操作")
         
