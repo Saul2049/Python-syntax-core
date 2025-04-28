@@ -11,10 +11,14 @@ import csv
 import configparser
 import argparse
 import sys
+import json
 from math import isfinite
 
 from src import signals, broker
 from src.binance_client import BinanceClient
+
+# 持仓状态文件路径
+POSITION_STATE_FILE = 'position_state.json'
 
 def setup_parser():
     """设置命令行参数解析器"""
@@ -100,7 +104,113 @@ def get_trading_params(config):
     }
     return params
 
-def run_strategy(client, params, interval, log_path, test_mode=False):
+def save_position_state(symbol, has_position, position_size=0, entry_price=0, stop_price=None):
+    """保存持仓状态到文件"""
+    state = {
+        'symbol': symbol,
+        'has_position': has_position,
+        'position_size': position_size,
+        'entry_price': entry_price,
+        'stop_price': stop_price,
+        'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    }
+    
+    with open(POSITION_STATE_FILE, 'w') as f:
+        json.dump(state, f, indent=4)
+    
+    print(f"持仓状态已保存: {'有持仓' if has_position else '无持仓'}")
+
+def load_position_state():
+    """从文件加载持仓状态"""
+    if not os.path.exists(POSITION_STATE_FILE):
+        return None
+        
+    try:
+        with open(POSITION_STATE_FILE, 'r') as f:
+            state = json.load(f)
+        print(f"已加载持仓状态: {'有持仓' if state.get('has_position') else '无持仓'}")
+        return state
+    except Exception as e:
+        print(f"加载持仓状态失败: {e}")
+        return None
+
+def infer_position_state(client, symbol):
+    """从账户信息推断持仓状态"""
+    try:
+        # 获取账户余额
+        balances = client.get_balance()
+        base_asset = symbol.replace('USDT', '')
+        base_balance = balances.get(base_asset, 0.0)
+        
+        # 获取当前价格
+        klines = client.get_klines(symbol, interval='1h', limit=1)
+        current_price = klines['close'].iloc[0]
+        
+        # 获取历史交易记录
+        trades = []
+        if os.path.exists('trades.csv'):
+            trades_df = pd.read_csv('trades.csv')
+            if not trades_df.empty:
+                trades = trades_df.to_dict('records')
+        
+        # 检查是否有持仓
+        has_position = base_balance > 0.001  # 小于0.001视为无仓位
+        
+        if has_position:
+            # 尝试从交易日志中获取最近的买入记录
+            entry_price = None
+            position_size = base_balance
+            
+            # 从交易日志中查找最近的买入记录
+            buy_trades = [t for t in trades if t.get('action') == 'BUY' and t.get('symbol') == symbol]
+            if buy_trades:
+                # 按时间戳排序找到最近的买入
+                latest_buy = sorted(buy_trades, key=lambda x: x.get('timestamp', ''), reverse=True)[0]
+                entry_price = float(latest_buy.get('price', current_price))
+                
+                # 如果有止损价记录，也获取它
+                stop_price = latest_buy.get('stop_price')
+                if stop_price and stop_price != '':
+                    stop_price = float(stop_price)
+                else:
+                    stop_price = None
+            else:
+                # 如果找不到买入记录，假设以当前价格的95%买入
+                entry_price = current_price * 0.95
+                stop_price = None
+                
+            # 获取当前止损单
+            open_orders = client.get_open_orders(symbol)
+            for order in open_orders:
+                if order['type'] == 'STOP_LOSS' and order['side'] == 'SELL':
+                    stop_price = float(order['stopPrice'])
+                    break
+                    
+            return {
+                'symbol': symbol,
+                'has_position': True,
+                'position_size': position_size,
+                'entry_price': entry_price,
+                'stop_price': stop_price,
+                'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                'inferred': True
+            }
+        
+        return {
+            'symbol': symbol,
+            'has_position': False,
+            'position_size': 0,
+            'entry_price': 0,
+            'stop_price': None,
+            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+            'inferred': True
+        }
+            
+    except Exception as e:
+        print(f"推断持仓状态失败: {e}")
+        return None
+
+def run_strategy(client, params, interval, log_path, test_mode=False, state=None):
     """
     运行交易策略
     
@@ -110,6 +220,7 @@ def run_strategy(client, params, interval, log_path, test_mode=False):
         interval: K线周期
         log_path: 交易日志路径
         test_mode: 是否为测试模式
+        state: 持仓状态（如果有）
     """
     # 获取交易参数
     symbol = params['symbol']
@@ -117,6 +228,9 @@ def run_strategy(client, params, interval, log_path, test_mode=False):
     fast_window = params['fast_window']
     slow_window = params['slow_window']
     atr_window = params['atr_window']
+    
+    # 使用缓存的持仓状态，如果有的话
+    entry_price_from_state = state.get('entry_price', 0) if state else 0
     
     # 获取账户余额和当前仓位
     try:
@@ -205,6 +319,9 @@ def run_strategy(client, params, interval, log_path, test_mode=False):
                         quantity=position,
                         equity=equity
                     )
+                    
+                    # 更新持仓状态
+                    save_position_state(symbol, False)
                 else:
                     print("[测试模式] 模拟卖出操作")
                     
@@ -252,8 +369,21 @@ def run_strategy(client, params, interval, log_path, test_mode=False):
                         equity=equity,
                         atr=atr
                     )
+                    
+                    # 更新持仓状态
+                    save_position_state(symbol, True, size, current_price, stop)
                 else:
                     print("[测试模式] 模拟买入操作")
+        
+        # 在每次策略执行完成后，不论是否有信号触发，都更新状态
+        if has_position and not test_mode:
+            # 如果之前没有保存开仓价但现在有持仓，推断开仓价
+            saved_state = load_position_state()
+            if not saved_state or not saved_state.get('has_position'):
+                # 使用状态中的持仓价或从当前价推断
+                entry = entry_price_from_state if entry_price_from_state > 0 else current_price * 0.95
+                stop_price = stop_order['stopPrice'] if stop_order else None
+                save_position_state(symbol, True, position, entry, stop_price)
         
         return True
         
@@ -279,6 +409,22 @@ def main():
     # 获取交易参数
     params = get_trading_params(config)
     
+    # 尝试加载持仓状态
+    state = load_position_state()
+    
+    # 如果状态文件不存在但账户中有BTC，尝试推断状态
+    if not state:
+        state = infer_position_state(client, params['symbol'])
+        if state and state.get('has_position'):
+            # 保存推断的状态
+            save_position_state(
+                state['symbol'], 
+                state['has_position'], 
+                state['position_size'], 
+                state['entry_price'], 
+                state['stop_price']
+            )
+    
     # 执行模式提示
     mode = "测试模式" if args.test else "实盘模式"
     print(f"启动{mode}...")
@@ -287,6 +433,16 @@ def main():
     print(f"风险系数: {params['risk_fraction']}")
     print(f"均线参数: 快线={params['fast_window']}, 慢线={params['slow_window']}")
     print(f"ATR窗口: {params['atr_window']}")
+    
+    if state:
+        status = "有持仓" if state.get('has_position') else "无持仓"
+        source = "推断" if state.get('inferred') else "缓存"
+        print(f"持仓状态({source}): {status}")
+        if state.get('has_position'):
+            print(f"持仓量: {state.get('position_size')}")
+            print(f"入场价: {state.get('entry_price')}")
+            if state.get('stop_price'):
+                print(f"止损价: {state.get('stop_price')}")
     
     try:
         # 测试连接
@@ -300,12 +456,12 @@ def main():
         # 单次执行或定时执行
         if len(sys.argv) > 1 and sys.argv[1] == 'run_once':
             # 单次执行
-            run_strategy(client, params, args.interval, log_path, args.test)
+            run_strategy(client, params, args.interval, log_path, args.test, state)
         else:
             # 定时执行
             while True:
                 print(f"\n[{datetime.now()}] 执行策略检查")
-                success = run_strategy(client, params, args.interval, log_path, args.test)
+                success = run_strategy(client, params, args.interval, log_path, args.test, state)
                 
                 # 确定下次执行时间
                 if args.interval == '1d':
