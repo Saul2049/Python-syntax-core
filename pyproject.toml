@@ -22,4 +22,9 @@ classifiers = [
     "Intended Audience :: Financial and Insurance Industry",
     "Programming Language :: Python :: 3",
     "Topic :: Office/Business :: Financial :: Investment",
-] 
+]
+
+[tool.black]
+line-length = 79
+target-version = ['py310']
+include = '\.pyi?$' 

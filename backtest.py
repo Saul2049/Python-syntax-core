@@ -5,8 +5,11 @@ import pandas as pd
 
 from broker import compute_position_size, compute_stop_price
 from data import load_csv
-from signals import (bearish_cross_indices, bullish_cross_indices,
-                     moving_average)
+from signals import (
+    bearish_cross_indices,
+    bullish_cross_indices,
+    moving_average,
+)
 
 
 def run_backtest(
@@ -91,11 +94,7 @@ if __name__ == "__main__":
 
     # Run backtest strategy
     equity, equity_series = run_backtest(
-        price,
-        fast_win=3,
-        slow_win=7,
-        risk_per_trade=0.02,
-        stop_mult=1
+        price, fast_win=3, slow_win=7, risk_per_trade=0.02, stop_mult=1
     )
 
     print(f"Final equity: {equity:,.2f} USD")
