@@ -100,9 +100,7 @@ def send_telegram(
         if response.status_code == 200:
             print("Telegram通知发送成功!")
             return True
-        elif (
-            response.status_code == 429 and retry < MAX_RETRIES
-        ):  # 分割长行
+        elif response.status_code == 429 and retry < MAX_RETRIES:  # 分割长行
             # 处理API速率限制
             print(f"警告: API速率限制，等待{RETRY_DELAY}秒后重试...")
             time.sleep(RETRY_DELAY)
