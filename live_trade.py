@@ -12,6 +12,7 @@ import configparser
 import argparse
 import sys
 import json
+import requests
 from math import isfinite
 
 from src import signals, broker
@@ -77,8 +78,35 @@ def initialize_trade_log(log_path='trades.csv'):
             ])
     return log_path
 
+def tg_notify(text: str):
+    """发送Telegram通知"""
+    token = os.getenv("TG_TOKEN")
+    chat_id = os.getenv("TG_CHAT")
+    
+    if not token or not chat_id:
+        print("警告: 未配置Telegram通知 (TG_TOKEN, TG_CHAT)")
+        return
+        
+    try:
+        url = f"https://api.telegram.org/bot{token}/sendMessage"
+        response = requests.post(
+            url, 
+            json={
+                "chat_id": chat_id,
+                "text": text,
+                "parse_mode": "HTML"
+            }
+        )
+        
+        if response.status_code == 200:
+            print(f"Telegram通知发送成功")
+        else:
+            print(f"Telegram通知发送失败: {response.status_code} - {response.text}")
+    except Exception as e:
+        print(f"Telegram通知错误: {e}")
+
 def log_trade(log_path, action, symbol, price, quantity, stop_price=None, equity=None, atr=None):
-    """记录交易到日志文件"""
+    """记录交易到日志文件并发送Telegram通知"""
     timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     
     # 构建日志条目
@@ -116,6 +144,30 @@ def log_trade(log_path, action, symbol, price, quantity, stop_price=None, equity
     if atr:
         print(f"ATR: {atr:.2f}")
     print(f"{'='*50}")
+    
+    # 发送Telegram通知
+    base_asset = symbol.replace('USDT', '')
+    
+    # 根据交易类型构建通知内容
+    if action == "BUY":
+        notify_text = f"🟢 <b>买入信号</b>\n{qty_str} {base_asset} @ {price_str} USDT"
+        if stop_price:
+            notify_text += f"\n止损价: {stop_str} USDT"
+        if equity:
+            notify_text += f"\n账户余额: {equity_str} USDT"
+    elif action == "SELL":
+        notify_text = f"🔴 <b>卖出信号</b>\n{qty_str} {base_asset} @ {price_str} USDT"
+        if equity:
+            notify_text += f"\n账户余额: {equity_str} USDT"
+    elif action == "更新止损":
+        notify_text = f"🔶 <b>止损更新</b>\n{qty_str} {base_asset} 持仓\n新止损价: {stop_str} USDT"
+        if equity:
+            notify_text += f"\n账户余额: {equity_str} USDT"
+    else:
+        notify_text = f"ℹ️ <b>{action}</b>\n{symbol}: {qty_str} @ {price_str} USDT"
+    
+    # 发送通知
+    tg_notify(notify_text)
 
 def get_trading_params(config):
     """从配置文件获取交易参数"""

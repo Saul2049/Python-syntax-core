@@ -25,4 +25,5 @@ venv/
 .coverage
 htmlcov/
 grid_results.csv
-*.png 
+*.png .env
+position_state.json

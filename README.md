@@ -1,163 +1,137 @@
-# Python Algorithmic Trading Framework
+# 加密货币交易系统
 
-```mermaid
-graph LR
-    数据(数据/Data) --> 信号(信号/Signals) --> 风控(风控/Risk) --> 回测(回测/Backtest) --> 指标(指标/Metrics)
-    style 数据 fill:#f9f9f9,stroke:#333,stroke-width:2px
-    style 信号 fill:#f9f9f9,stroke:#333,stroke-width:2px
-    style 风控 fill:#f9f9f9,stroke:#333,stroke-width:2px
-    style 回测 fill:#f9f9f9,stroke:#333,stroke-width:2px
-    style 指标 fill:#f9f9f9,stroke:#333,stroke-width:2px
-```
+这是一个自动化的加密货币交易系统，具有实时交易和Telegram通知功能。
 
-```mermaid
-graph TD
-    A[数据层/Data Layer] -->|提供价格数据| B[信号层/Signals Layer]
-    A -->|提供价格数据| D[回测引擎/Backtest Engine]
-    B -->|生成交易信号| C[执行层/Broker Layer]
-    C -->|执行交易策略| D
-    D -->|生成权益曲线| E[指标层/Metrics Layer]
-    D -->|组合配置| F[投资组合/Portfolio Layer]
-    F -->|生成组合权益| E
-    
-    subgraph 核心模块/Core Modules
-    A["data.py<br/>(数据加载/Data Loading)"]
-    B["signals.py<br/>(技术指标/Technical Indicators)"]
-    C["broker.py<br/>(仓位管理/Position Sizing)"]
-    D["backtest.py<br/>(策略回测/Strategy Backtest)"]
-    E["metrics.py<br/>(性能评估/Performance Metrics)"]
-    F["portfolio_backtest.py<br/>(组合回测/Portfolio Backtest)"]
-    end
-```
+## 主要功能
 
-This repository contains a modular Python framework for backtesting algorithmic trading strategies, with a focus on moving average crossovers and risk-based position sizing. The architecture follows clean separation of concerns:
+- 自动化交易执行
+- 实时市场数据监控
+- Telegram通知系统，发送交易信号和账户更新
+- 可配置的交易策略
+- 止损管理
 
-## Structure
+## 安装
 
-- `src/data.py` - Data loading and API access (CSV, Binance)
-- `src/signals.py` - Technical indicators and signal generation (MA, crossovers)
-- `src/broker.py` - Position sizing and stop-loss logic
-- `src/backtest.py` - Strategy orchestration and backtest runner
-- `tests/` - Unit tests with pytest
+1. 克隆仓库
+   ```bash
+   git clone https://github.com/yourusername/crypto-trading-system.git
+   cd crypto-trading-system
+   ```
 
-## Getting Started
+2. 安装依赖
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-### Installation
+3. 配置系统（见下文）
+
+## 配置
+
+系统使用环境变量或`.env`文件进行配置。主要配置项包括：
+
+- 交易所API凭证
+- 交易参数（币对、数量等）
+- Telegram通知设置（可选）
+
+### Telegram通知配置
+
+系统可以通过Telegram发送实时交易通知，包括买入/卖出信号和止损更新。
+
+#### 设置步骤
+
+1. **创建Telegram机器人**：
+   - 在Telegram中搜索 `@BotFather`
+   - 发送 `/newbot` 命令
+   - 按照提示设置机器人名称和用户名
+   - 获取API令牌(Token)
+
+2. **获取聊天ID**：
+   - 向你的机器人发送消息
+   - 访问 `https://api.telegram.org/bot<YourBOTToken>/getUpdates`
+   - 找到 `chat` 对象中的 `id` 字段
+
+3. **配置系统**：
+
+   可以通过以下方式之一配置Telegram通知：
+
+   - 使用命令行工具：
+     ```bash
+     python load_env.py --tg_token=YOUR_TOKEN --tg_chat=YOUR_CHAT_ID --save
+     ```
+
+   - 直接编辑.env文件，添加：
+     ```
+     TG_TOKEN=your_telegram_bot_token
+     TG_CHAT=your_chat_id
+     ```
+
+   - 设置环境变量：
+     ```bash
+     export TG_TOKEN=your_telegram_bot_token
+     export TG_CHAT=your_chat_id
+     ```
+
+4. **测试配置**：
+   ```bash
+   python test_telegram.py
+   ```
+
+#### 通知格式示例
+
+系统会发送以下格式的通知：
+
+- **买入信号**:
+  ```
+  🟢 买入信号
+  0.123 BTC @ 50123.45 USDT
+  止损价: 49500.00 USDT
+  账户余额: 12345.67 USDT
+  ```
+
+- **止损更新**:
+  ```
+  🔶 止损更新
+  0.123 BTC 持仓
+  新止损价: 49800.00 USDT
+  账户余额: 12345.67 USDT
+  ```
+
+- **卖出信号**:
+  ```
+  🔴 卖出信号
+  0.123 BTC @ 51234.56 USDT
+  账户余额: 12678.90 USDT
+  ```
+
+更多详细信息，请参阅 [Telegram通知文档](README_TELEGRAM.md)。
+
+## 使用方法
+
+### 启动实时交易
 
 ```bash
-# Option 1: Regular installation
-pip install -r requirements.txt
-
-# Option 2: Development installation (recommended for contributors)
-pip install -e .                 # Install the package in development mode
-pip install -r dev-requirements.txt  # Install development tools
+python live_trade.py
 ```
 
-### Running
+### 命令行参数
 
-```bash
-# Run the backtest
-python -c "from src.backtest import run_backtest; print(run_backtest().iloc[-1])"
-
-# Run the tests
-pytest
+```
+--config      配置文件路径(可选)
+--pair        交易对(例如 BTC/USDT)
+--qty         交易数量
+--exchange    交易所名称
 ```
 
-## Examples
+## 安全注意事项
 
-### Simple Moving Average Demo
-```python
-from src import data, signals
+- 永远不要共享你的API密钥或Telegram令牌
+- 考虑对机器人使用受限API密钥，仅具有交易权限而无提款权限
+- 定期检查和更新权限
 
-df = data.load_csv()
-sma_5 = signals.moving_average(df["btc"], 5)
-print(sma_5.tail())
-```
+## 贡献
 
-### Modern Signal Generation
-```python
-from src import data, signals
-import matplotlib.pyplot as plt
+欢迎贡献！请提交问题或拉取请求。
 
-# 加载价格数据
-price = data.load_csv()["btc"]
+## 许可证
 
-# 计算快慢均线
-fast_ma = signals.moving_average(price, 5)
-slow_ma = signals.moving_average(price, 20)
-
-# 生成交叉信号Series
-buy_signals = signals.bullish_cross_series(fast_ma, slow_ma)
-sell_signals = signals.bearish_cross_series(fast_ma, slow_ma)
-
-# 仅提取有信号的点
-buy_points = price[buy_signals]
-sell_points = price[sell_signals]
-
-# 输出买卖点数量
-print(f"Buy signals: {len(buy_points)}, Sell signals: {len(sell_points)}")
-
-# 绘制价格和信号
-plt.figure(figsize=(12, 6))
-plt.plot(price, label='Price')
-plt.plot(fast_ma, label='Fast MA', alpha=0.7)
-plt.plot(slow_ma, label='Slow MA', alpha=0.7)
-plt.scatter(buy_points.index, buy_points, color='green', marker='^', label='Buy')
-plt.scatter(sell_points.index, sell_points, color='red', marker='v', label='Sell')
-plt.legend()
-plt.title('Price with MA Crossover Signals')
-plt.show()
-```
-
-### Strategy vs Buy & Hold
-```python
-import matplotlib.pyplot as plt
-from src import data, backtest
-
-# Load data and run strategy
-price = data.load_csv()["btc"]
-eq = backtest.run_backtest()
-buy_hold = price / price.iloc[0] * eq.iloc[0]
-
-# Plot comparison
-plt.plot(eq, label="Strategy")
-plt.plot(buy_hold, label="Buy & Hold")
-plt.legend()
-plt.title("Trading Strategy vs Buy & Hold")
-plt.xlabel("Date")
-plt.ylabel("Equity ($)")
-plt.show()
-```
-
-### Moving Average Types Demo
-```python
-from src import data, signals
-import matplotlib.pyplot as plt
-
-# 加载价格数据
-price = data.load_csv()["btc"]
-
-# 计算不同类型的20日均线
-sma = signals.moving_average(price, 20, kind="sma")  # 简单移动平均线
-ema = signals.moving_average(price, 20, kind="ema")  # 指数移动平均线
-wma = signals.moving_average(price, 20, kind="wma")  # 加权移动平均线
-
-# 绘制价格和均线对比
-plt.figure(figsize=(12, 6))
-plt.plot(price, label='Price', alpha=0.7)
-plt.plot(sma, label='SMA(20)', linewidth=2)
-plt.plot(ema, label='EMA(20)', linewidth=2)
-plt.plot(wma, label='WMA(20)', linewidth=2)
-plt.legend()
-plt.title('BTC Price with Different Moving Averages')
-plt.xlabel('Date')
-plt.ylabel('Price ($)')
-plt.grid(True, alpha=0.3)
-plt.show()
-
-# 分析不同均线的特性
-print("均线响应速度比较 (最近日期的值):")
-print(f"价格: {price.iloc[-1]:.2f}")
-print(f"SMA: {sma.iloc[-1]:.2f}")
-print(f"EMA: {ema.iloc[-1]:.2f}")
-print(f"WMA: {wma.iloc[-1]:.2f}") 
+MIT 
