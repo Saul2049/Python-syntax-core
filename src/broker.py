@@ -1,15 +1,15 @@
 from datetime import datetime, timedelta
 from math import isfinite
-from typing import Any, Dict, Optional, Tuple, List, Union, Callable
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 
 from src import utils
 from src.notify import Notifier
 
 # 由于循环导入问题，延迟导入下面的模块
-from . import signals, metrics
+from . import metrics, signals
 
 
 def compute_atr(series: pd.Series, window: int = 14) -> float:
