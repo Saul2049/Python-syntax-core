@@ -2,9 +2,17 @@
 """
 测试Telegram通知功能
 """
+# -----------------------------------------------
+# CI 环境通常没有 TG_TOKEN/TG_CHAT，若缺失则整文件跳过
+# -----------------------------------------------
+import os
+import pytest
+
+if "TG_TOKEN" not in os.environ or "TG_CHAT" not in os.environ:  # pragma: no cover
+    pytest.skip("Telegram creds missing, skipping telegram tests in CI", allow_module_level=True)
+
 import argparse
 import json
-import os
 import sys
 import time
 
