@@ -54,7 +54,7 @@ def moving_average(series: pd.Series, window: int, kind: str = "simple", type: s
     """
     # 向后兼容，优先使用kind参数
     ma_type = kind if type is None else type
-    
+
     if ma_type.lower() in ["simple", "sma"]:
         return series.rolling(window=window).mean()
     elif ma_type.lower() in ["exponential", "ema"]:
