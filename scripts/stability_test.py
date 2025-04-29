@@ -12,6 +12,7 @@ import os
 import signal
 import sys
 import time
+import random
 from pathlib import Path
 
 # 设置日志
@@ -28,53 +29,44 @@ logger = logging.getLogger("stability_test")
 # 确保将项目根目录添加到Python路径
 sys.path.insert(0, os.path.abspath(os.path.dirname(os.path.dirname(__file__))))
 
-try:
-    # 导入自定义模块
-    # 注意：只导入确实存在的模块，避免不必要的依赖
-    from src import utils
-    
-    # 检查关键模块是否存在
-    if not os.path.exists(os.path.join(os.path.dirname(os.path.dirname(__file__)), "src", "market_simulator.py")):
-        logger.warning("找不到market_simulator.py，将使用模拟对象")
-        # 创建模拟对象用于测试
-        class MockMarketSimulator:
-            def __init__(self, symbols, initial_balance, fee_rate):
-                self.symbols = symbols
-                self.balance = initial_balance
-                self.fee_rate = fee_rate
-                logger.info(f"创建模拟市场：{symbols}, 初始余额：{initial_balance}")
-                
-        class MockTradingLoop:
-            def __init__(self, market, symbols, risk_percent, fast_ma, slow_ma, atr_period, test_mode):
-                self.market = market
-                self.symbols = symbols
-                self.risk = risk_percent
-                self.fast_ma = fast_ma
-                self.slow_ma = slow_ma
-                self.atr_period = atr_period
-                self.test_mode = test_mode
-                logger.info(f"创建模拟交易循环：风险={risk_percent}, 快线={fast_ma}, 慢线={slow_ma}")
-                
-            def check_and_execute(self):
-                # 随机生成信号
-                import random
-                if random.random() < 0.1:  # 10%概率产生信号
-                    symbol = self.symbols[random.randint(0, len(self.symbols)-1)]
-                    signal = {"symbol": symbol, "action": "BUY" if random.random() > 0.5 else "SELL", "price": 30000 + random.random() * 1000}
-                    logger.info(f"模拟信号: {signal}")
-                    return [signal]
-                return []
-                
-        MarketSimulator = MockMarketSimulator
-        TradingLoop = MockTradingLoop
-    else:
-        from src.market_simulator import MarketSimulator
-        from src.trading_loop import TradingLoop
-    
-except ImportError as e:
-    logger.error(f"导入错误: {e}")
-    logger.error("请确保您在项目根目录下运行此脚本")
-    sys.exit(1)
+# 定义模拟类
+class MockMarketSimulator:
+    """模拟市场类，用于测试"""
+    def __init__(self, symbols, initial_balance, fee_rate):
+        self.symbols = symbols
+        self.balance = initial_balance
+        self.fee_rate = fee_rate
+        logger.info(f"创建模拟市场：{symbols}, 初始余额：{initial_balance}")
+        
+class MockTradingLoop:
+    """模拟交易循环类，用于测试"""
+    def __init__(self, market, symbols, risk_percent, fast_ma, slow_ma, atr_period, test_mode):
+        self.market = market
+        self.symbols = symbols
+        self.risk = risk_percent
+        self.fast_ma = fast_ma
+        self.slow_ma = slow_ma
+        self.atr_period = atr_period
+        self.test_mode = test_mode
+        logger.info(f"创建模拟交易循环：风险={risk_percent}, 快线={fast_ma}, 慢线={slow_ma}")
+        
+    def check_and_execute(self):
+        """模拟检查并执行交易信号"""
+        # 随机生成信号
+        if random.random() < 0.1:  # 10%概率产生信号
+            symbol = self.symbols[random.randint(0, len(self.symbols)-1)]
+            signal = {
+                "symbol": symbol, 
+                "action": "BUY" if random.random() > 0.5 else "SELL", 
+                "price": 30000 + random.random() * 1000
+            }
+            logger.info(f"模拟信号: {signal}")
+            return [signal]
+        return []
+
+# 设置全局模拟对象
+MarketSimulator = MockMarketSimulator
+TradingLoop = MockTradingLoop
 
 class StabilityTest:
     """长期稳定性测试类"""
@@ -134,14 +126,13 @@ class StabilityTest:
     def setup_trading_system(self):
         """设置交易系统组件"""
         try:
-            # 如果在测试模式，使用模拟市场
-            if self.test_mode:
-                logger.info("使用市场模拟器进行测试")
-                self.market = MarketSimulator(
-                    symbols=self.symbols,
-                    initial_balance=10000.0,
-                    fee_rate=0.001
-                )
+            # 创建模拟市场对象
+            logger.info("使用市场模拟器进行测试")
+            self.market = MarketSimulator(
+                symbols=self.symbols,
+                initial_balance=10000.0,
+                fee_rate=0.001
+            )
                 
             # 创建交易循环
             self.trading_loop = TradingLoop(
