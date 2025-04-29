@@ -39,24 +39,32 @@ def crossunder(series1: pd.Series, series2: pd.Series) -> pd.Series:
     return (series1 < series2) & (series1.shift(1) >= series2.shift(1))
 
 
-def moving_average(series: pd.Series, window: int, type: str = "simple") -> pd.Series:
+def moving_average(series: pd.Series, window: int, kind: str = "simple", type: str = None) -> pd.Series:
     """
     计算移动平均
 
     参数:
         series: 输入时间序列
         window: 窗口大小
-        type: 移动平均类型，'simple'或'exponential'
+        kind: 移动平均类型，'sma', 'ema', 'wma'('sma'=简单,'ema'=指数,'wma'=加权)
+        type: 旧参数名，为了向后兼容，优先使用kind参数
 
     返回:
         移动平均序列
     """
-    if type.lower() == "simple":
+    # 向后兼容，优先使用kind参数
+    ma_type = kind if type is None else type
+    
+    if ma_type.lower() in ["simple", "sma"]:
         return series.rolling(window=window).mean()
-    elif type.lower() == "exponential":
+    elif ma_type.lower() in ["exponential", "ema"]:
         return series.ewm(span=window, adjust=False).mean()
+    elif ma_type.lower() == "wma":
+        # 实现加权移动平均
+        weights = np.arange(1, window + 1)
+        return series.rolling(window=window).apply(lambda x: np.sum(weights * x) / np.sum(weights), raw=True)
     else:
-        raise ValueError("不支持的移动平均类型，请使用'simple'或'exponential'")
+        raise ValueError(f"不支持的移动平均类型: {ma_type}. 支持的类型: 'sma', 'ema', 'wma'")
 
 
 def momentum(series: pd.Series, period: int = 14) -> pd.Series:
