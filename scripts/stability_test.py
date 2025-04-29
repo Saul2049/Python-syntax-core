@@ -9,10 +9,10 @@ import argparse
 import datetime
 import logging
 import os
+import random
 import signal
 import sys
 import time
-import random
 from pathlib import Path
 
 # 设置日志
