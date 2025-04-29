@@ -40,6 +40,9 @@ echo "==============================================" | tee -a "$LOG_FILE"
 # 启动守护进程监控
 monitor_pid=""
 
+# 检测操作系统类型
+OS_TYPE=$(uname)
+
 # 函数：监控测试进程
 function monitor_test() {
     local pid=$1
@@ -54,14 +57,32 @@ function monitor_test() {
             return 1
         fi
         
-        # 记录系统状态
+        # 记录系统状态 - 根据操作系统调整命令
         echo "--- $(date) ---" >> "$LOG_DIR/system_status_$TEST_ID.log"
+        
+        # CPU使用率
         echo "CPU使用率:" >> "$LOG_DIR/system_status_$TEST_ID.log"
-        top -bn1 | head -n 12 >> "$LOG_DIR/system_status_$TEST_ID.log"
+        if [ "$OS_TYPE" = "Darwin" ]; then
+            # macOS
+            top -l 1 | head -n 12 >> "$LOG_DIR/system_status_$TEST_ID.log"
+        else
+            # Linux
+            top -bn1 | head -n 12 >> "$LOG_DIR/system_status_$TEST_ID.log"
+        fi
         echo "" >> "$LOG_DIR/system_status_$TEST_ID.log"
+        
+        # 内存使用率
         echo "内存使用率:" >> "$LOG_DIR/system_status_$TEST_ID.log"
-        free -m >> "$LOG_DIR/system_status_$TEST_ID.log"
+        if [ "$OS_TYPE" = "Darwin" ]; then
+            # macOS
+            vm_stat >> "$LOG_DIR/system_status_$TEST_ID.log"
+        else
+            # Linux
+            free -m >> "$LOG_DIR/system_status_$TEST_ID.log"
+        fi
         echo "" >> "$LOG_DIR/system_status_$TEST_ID.log"
+        
+        # 磁盘使用率
         echo "磁盘使用率:" >> "$LOG_DIR/system_status_$TEST_ID.log"
         df -h >> "$LOG_DIR/system_status_$TEST_ID.log"
         echo "" >> "$LOG_DIR/system_status_$TEST_ID.log"
@@ -99,5 +120,14 @@ echo "" | tee -a "$LOG_FILE"
 # 保存进程ID以便后续控制
 echo "$TEST_PID $MONITOR_PID" > "$LOG_DIR/pids.txt"
 
-echo "测试预计将在 $(date -d "$DAYS days") 完成" | tee -a "$LOG_FILE"
+# 计算结束日期 - 兼容不同操作系统
+if [ "$OS_TYPE" = "Darwin" ]; then
+    # macOS 使用date -v
+    END_DATE=$(date -v+${DAYS}d)
+else
+    # Linux 使用date -d
+    END_DATE=$(date -d "$DAYS days")
+fi
+
+echo "测试预计将在 $END_DATE 完成" | tee -a "$LOG_FILE"
 echo "完成后将在 $LOG_DIR 生成测试报告" | tee -a "$LOG_FILE" 
