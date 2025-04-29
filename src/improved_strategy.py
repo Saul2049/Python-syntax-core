@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 # improved_strategy.py - 改进策略模块
 
-from typing import Dict, Optional, Tuple, Union
-
 import numpy as np
 import pandas as pd
 import talib as ta

@@ -1,52 +1,128 @@
-from typing import Literal, Optional, Union
+#!/usr/bin/env python3
+# signals.py - 信号处理模块
 
 import numpy as np
 import pandas as pd
+from typing import Union, Tuple, Literal
+
+
+def crossover(series1: pd.Series, series2: pd.Series) -> pd.Series:
+    """
+    检测 series1 上穿 series2
+    
+    参数:
+        series1: 第一个时间序列
+        series2: 第二个时间序列
+    
+    返回:
+        布尔序列，True表示发生上穿
+    """
+    series1, series2 = pd.Series(series1), pd.Series(series2)
+    # 当前值大于，且前一个值小于等于
+    return (series1 > series2) & (series1.shift(1) <= series2.shift(1))
+
+
+def crossunder(series1: pd.Series, series2: pd.Series) -> pd.Series:
+    """
+    检测 series1 下穿 series2
+    
+    参数:
+        series1: 第一个时间序列
+        series2: 第二个时间序列
+    
+    返回:
+        布尔序列，True表示发生下穿
+    """
+    series1, series2 = pd.Series(series1), pd.Series(series2)
+    # 当前值小于，且前一个值大于等于
+    return (series1 < series2) & (series1.shift(1) >= series2.shift(1))
 
 
 def moving_average(
-    series: pd.Series, window: int, kind: Literal["sma", "ema", "wma"] = "sma"
+    series: pd.Series, window: int, type: str = "simple"
 ) -> pd.Series:
     """
-    计算移动平均线。
-    Calculate moving average.
-
-    参数 (Parameters):
-        series: 输入的时间序列数据 (Input time series data)
-        window: 窗口大小 (Window size)
-        kind: 均线类型 (Moving average type)
-              'sma': 简单移动平均 (Simple Moving Average)
-              'ema': 指数移动平均 (Exponential Moving Average)
-              'wma': 加权移动平均 (Weighted Moving Average)
-
-    返回 (Returns):
-        pd.Series: 计算后的均线序列 (Resulting moving average series)
-
-    说明 (Notes):
-        - EMA计算使用span参数，确保与传统技术分析软件的计算方法一致
-        - span = 2/(alpha) - 1，其中alpha是平滑因子
-        - 当window=20时，相当于传统EMA的20日周期
+    计算移动平均
+    
+    参数:
+        series: 输入时间序列
+        window: 窗口大小
+        type: 移动平均类型，'simple'或'exponential'
+    
+    返回:
+        移动平均序列
     """
-    kind = kind.lower()
-
-    if kind == "sma":
-        # 简单移动平均线 (Simple Moving Average)
-        return series.rolling(window).mean()
-    elif kind == "ema":
-        # 指数移动平均线 (Exponential Moving Average)
-        # 使用span参数: span = 2/(alpha) - 1, 确保与传统EMA计算一致
-        # span参数确保与技术分析软件的EMA计算方法一致
-        return series.ewm(span=window, adjust=False, min_periods=1).mean()
-    elif kind == "wma":
-        # 加权移动平均线 (Weighted Moving Average)
-        weights = np.arange(1, window + 1)
-        return series.rolling(window).apply(
-            lambda x: np.sum(weights * x) / weights.sum(), raw=True
-        )
+    if type.lower() == "simple":
+        return series.rolling(window=window).mean()
+    elif type.lower() == "exponential":
+        return series.ewm(span=window, adjust=False).mean()
     else:
-        raise ValueError(
-            f"不支持的移动平均类型 (Unsupported moving average type): {kind}"
-        )
+        raise ValueError("不支持的移动平均类型，请使用'simple'或'exponential'")
+
+
+def momentum(series: pd.Series, period: int = 14) -> pd.Series:
+    """
+    计算动量指标
+    
+    参数:
+        series: 输入时间序列
+        period: 计算周期
+    
+    返回:
+        动量序列
+    """
+    return series.diff(period)
+
+
+def rate_of_change(series: pd.Series, period: int = 14) -> pd.Series:
+    """
+    计算变化率
+    
+    参数:
+        series: 输入时间序列
+        period: 计算周期
+    
+    返回:
+        变化率序列
+    """
+    return series.pct_change(period) * 100
+
+
+def zscore(series: pd.Series, window: int = 20) -> pd.Series:
+    """
+    计算z-score标准化
+    
+    参数:
+        series: 输入时间序列
+        window: 计算窗口
+    
+    返回:
+        z-score序列
+    """
+    rolling_mean = series.rolling(window=window).mean()
+    rolling_std = series.rolling(window=window).std()
+    return (series - rolling_mean) / rolling_std
+
+
+def bollinger_bands(
+    series: pd.Series, window: int = 20, num_std: float = 2.0
+) -> Tuple[pd.Series, pd.Series, pd.Series]:
+    """
+    计算布林带指标
+    
+    参数:
+        series: 输入时间序列
+        window: 计算窗口
+        num_std: 标准差倍数
+    
+    返回:
+        (上轨, 中轨, 下轨)
+    """
+    middle_band = series.rolling(window=window).mean()
+    std_dev = series.rolling(window=window).std()
+    upper_band = middle_band + (std_dev * num_std)
+    lower_band = middle_band - (std_dev * num_std)
+    return upper_band, middle_band, lower_band
 
 
 def vectorized_cross(

@@ -170,15 +170,18 @@ if __name__ == "__main__":
     # 加载数据
     df = pd.read_csv("btc_eth.csv", parse_dates=["date"], index_col="date")
     btc = df["btc"]
+    
+    # 设置初始资金
+    init_equity = 100_000.0
 
     # 运行各种策略
-    bnh_equity = buy_and_hold(btc)
-    tf_equity = trend_following(btc, long_win=200, atr_win=20)
+    bnh_equity = buy_and_hold(btc, init_equity)
+    tf_equity = trend_following(btc, long_win=200, atr_win=20, init_equity=init_equity)
     improved_ma_equity = improved_ma_cross(
-        btc, fast_win=50, slow_win=200, atr_win=20
+        btc, fast_win=50, slow_win=200, atr_win=20, init_equity=init_equity
     )
     original_ma_equity = broker.backtest_single(
-        btc, fast_win=7, slow_win=20, atr_win=20
+        btc, fast_win=7, slow_win=20, atr_win=20, init_equity=init_equity
     )
 
     # 计算和比较绩效指标

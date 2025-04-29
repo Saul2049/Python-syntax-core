@@ -2,13 +2,12 @@
 # exchange_client.py
 # 加密货币交易所客户端接口
 
-import json
 import logging
 import random
 import socket
 import time
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Optional
 
 import pandas as pd
 import requests
