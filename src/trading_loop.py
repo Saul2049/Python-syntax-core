@@ -8,7 +8,6 @@ import pandas as pd
 
 from src.broker import Broker
 from src.signals import moving_average
-from src.utils import get_local_time_str
 
 
 def fetch_price_data(symbol: str) -> pd.DataFrame:

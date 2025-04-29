@@ -1,15 +1,14 @@
 from datetime import datetime, timedelta
 from math import isfinite
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, Optional, Tuple
 
-import numpy as np
 import pandas as pd
 
 from src import utils
 from src.notify import Notifier
 
 # 由于循环导入问题，延迟导入下面的模块
-from . import metrics, signals
+from . import signals
 
 
 def compute_atr(series: pd.Series, window: int = 14) -> float:
@@ -577,7 +576,8 @@ def update_trailing_stop_atr(
             f"ATR: {atr:.8f}\n"
             f"旧止损 (Old): {old_stop:.8f}\n"
             f"新止损 (New): {new_stop:.8f}\n"
-            f"止损距离 (Distance): {(current_price - new_stop):.8f} ({((current_price - new_stop)/current_price)*100:.2f}%)"
+            f"止损距离 (Distance): {(current_price - new_stop):.8f} "
+            f"({((current_price - new_stop)/current_price)*100:.2f}%)"
         )
         notifier.notify(update_msg, "INFO")
 
@@ -804,7 +804,8 @@ class Broker:
                         f"入场价 (Entry): {position['entry_price']:.8f}\n"
                         f"止损价 (Stop): {initial_stop:.8f}\n"
                         f"ATR: {atr:.8f}\n"
-                        f"止损距离 (Distance): {(position['entry_price'] - initial_stop):.8f} ({((position['entry_price'] - initial_stop)/position['entry_price'])*100:.2f}%)"
+                        f"止损距离 (Distance): {(position['entry_price'] - initial_stop):.8f} "
+                        f"({((position['entry_price'] - initial_stop)/position['entry_price'])*100:.2f}%)"
                     )
                     self.notifier.notify(stop_msg, "INFO")
                 else:
