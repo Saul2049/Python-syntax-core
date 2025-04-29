@@ -3,7 +3,7 @@
 
 import os
 from datetime import datetime
-from typing import Dict, Optional, Union, Callable
+from typing import Callable, Dict, Optional, Union
 
 import matplotlib.pyplot as plt
 import numpy as np

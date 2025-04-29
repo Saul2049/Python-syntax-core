@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 # signals.py - 信号处理模块
 
+from typing import Literal, Tuple, Union
+
 import numpy as np
 import pandas as pd
-from typing import Union, Tuple, Literal
 
 
 def crossover(series1: pd.Series, series2: pd.Series) -> pd.Series:
