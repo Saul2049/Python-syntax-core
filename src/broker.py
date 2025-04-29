@@ -1,11 +1,15 @@
 from datetime import datetime, timedelta
 from math import isfinite
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, Optional, Tuple, List, Union, Callable
 
 import pandas as pd
+import numpy as np
 
 from src import utils
 from src.notify import Notifier
+
+# 由于循环导入问题，延迟导入下面的模块
+from . import signals, metrics
 
 
 def compute_atr(series: pd.Series, window: int = 14) -> float:
@@ -150,9 +154,6 @@ def compute_trailing_stop(
 
     # 默认返回初始止损
     return initial_stop
-
-
-from src import signals  # 避免循环引用
 
 
 def backtest_single(

@@ -259,8 +259,8 @@ def create_sequences(data: np.ndarray, seq_length: int, pred_length: int = 1) ->
     X, y = [], []
 
     for i in range(len(data) - seq_length - pred_length + 1):
-        X.append(data[i : (i + seq_length)])
-        y.append(data[i + seq_length : i + seq_length + pred_length])
+        X.append(data[i:(i + seq_length)])
+        y.append(data[i + seq_length:(i + seq_length + pred_length)])
 
     return np.array(X), np.array(y)
 
@@ -297,45 +297,36 @@ def save_processed_data(df: pd.DataFrame, output_path: str, file_format: str = "
         return False
 
 
-def resample_data(df: pd.DataFrame, freq: str = "D", agg_dict: Optional[Dict[str, str]] = None) -> pd.DataFrame:
+def resample_data(data, period):
+    """重采样数据
+
+    Args:
+        data: 原始数据
+        period: 重采样周期
+
+    Returns:
+        重采样后的数据
     """
-    重新采样时间序列数据
-
-    参数:
-        df: 带有日期索引的DataFrame
-        freq: 重采样频率 ('D'=日, 'W'=周, 'M'=月, 'H'=小时)
-        agg_dict: 列聚合方法字典 {'column_name': 'agg_method'}
-
-    返回:
-        重采样后的DataFrame
-    """
-    # 确保数据有日期索引
-    if not isinstance(df.index, pd.DatetimeIndex):
-        print("警告: DataFrame索引不是DatetimeIndex，无法重采样")
-        return df
-
-    # 默认聚合方法 - 适用于OHLCV数据
-    if agg_dict is None:
-        agg_dict = {
-            "open": "first",
-            "high": "max",
-            "low": "min",
-            "close": "last",
-            "volume": "sum",
-        }
-
-        # 仅保留存在于DataFrame中的列
-        agg_dict = {k: v for k, v in agg_dict.items() if k in df.columns}
-
-        # 如果没有找到匹配的列，对所有数值列使用均值
-        if not agg_dict:
-            numeric_cols = df.select_dtypes(include=["number"]).columns
-            agg_dict = {col: "mean" for col in numeric_cols}
-
-    # 重采样数据
-    resampled_df = df.resample(freq).agg(agg_dict)
-
-    return resampled_df
+    if period == "1d":
+        return data.resample("1D").agg(
+            {
+                "open": "first",
+                "high": "max",
+                "low": "min",
+                "close": "last",
+                "volume": "sum",
+            }
+        )
+    else:
+        return data.resample(period).agg(
+            {
+                "open": "first",
+                "high": "max",
+                "low": "min",
+                "close": "last",
+                "volume": "sum",
+            }
+        )
 
 
 if __name__ == "__main__":

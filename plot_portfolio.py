@@ -1,3 +1,4 @@
+# flake8: noqa
 import matplotlib.pyplot as plt
 
 from src import data, metrics

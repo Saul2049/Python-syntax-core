@@ -8,6 +8,7 @@ import pandas as pd
 
 from src.broker import Broker
 from src.signals import moving_average
+from src.utils import get_local_time_str
 
 
 def fetch_price_data(symbol: str) -> pd.DataFrame:
@@ -191,7 +192,8 @@ def trading_loop(symbol: str = "BTCUSDT", interval_seconds: int = 60):
 
                 # 打印状态 (Print status)
                 print(
-                    f"[{current_time}] 价格: {current_price:.2f}, ATR: {atr:.2f}, 信号: {'BUY' if signals['buy_signal'] else 'SELL' if signals['sell_signal'] else 'HOLD'}"
+                    f"[{current_time}] 价格: {current_price:.2f}, ATR: {atr:.2f}, "
+                    f"信号: {'BUY' if signals['buy_signal'] else 'SELL' if signals['sell_signal'] else 'HOLD'}"
                 )
 
                 # 每小时发送状态通知 (Send status notification every hour)
@@ -212,9 +214,13 @@ def trading_loop(symbol: str = "BTCUSDT", interval_seconds: int = 60):
                         status_msg += f"\n止损价 (Stop): {position['stop_price']:.8f}"
                         status_msg += f"\n数量 (Quantity): {position['quantity']:.8f}"
                         status_msg += (
-                            f"\n盈亏 (P/L): {(current_price - position['entry_price']) * position['quantity']:.8f} USDT"
+                            f"\n盈亏 (P/L): "
+                            f"{(current_price - position['entry_price']) * position['quantity']:.8f} USDT"
                         )
-                        status_msg += f"\n盈亏% (P/L%): {((current_price - position['entry_price'])/position['entry_price'])*100:.2f}%"
+                        status_msg += (
+                            f"\n盈亏% (P/L%): "
+                            f"{((current_price - position['entry_price'])/position['entry_price'])*100:.2f}%"
+                        )
 
                     broker.notifier.notify(status_msg, "INFO")
                     last_check = current_time

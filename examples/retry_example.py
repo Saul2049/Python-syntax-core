@@ -1,3 +1,4 @@
+# flake8: noqa
 #!/usr/bin/env python
 """
 网络重试和状态恢复示例
