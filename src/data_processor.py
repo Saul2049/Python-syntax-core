@@ -259,8 +259,8 @@ def create_sequences(data: np.ndarray, seq_length: int, pred_length: int = 1) ->
     X, y = [], []
 
     for i in range(len(data) - seq_length - pred_length + 1):
-        X.append(data[i:(i + seq_length)])
-        y.append(data[i + seq_length:(i + seq_length + pred_length)])
+        X.append(data[i : (i + seq_length)])
+        y.append(data[i + seq_length : (i + seq_length + pred_length)])
 
     return np.array(X), np.array(y)
 
