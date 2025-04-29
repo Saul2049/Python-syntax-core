@@ -60,11 +60,7 @@ class Notifier:
             error: 异常对象 (Exception object)
             context: 错误上下文 (Error context)
         """
-        error_msg = (
-            f"❗️Error in {context}: {str(error)}"
-            if context
-            else f"❗️Error: {str(error)}"
-        )
+        error_msg = f"❗️Error in {context}: {str(error)}" if context else f"❗️Error: {str(error)}"
         self.notify(error_msg, "ERROR")
 
     def notify_trade(

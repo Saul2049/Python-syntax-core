@@ -3,20 +3,15 @@ import sys
 
 import numpy as np
 import pandas as pd
-import pytest
 
 # Add the project root to path if necessary
-sys.path.insert(
-    0, os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-)
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from src import metrics
 
 
 def test_metrics_outputs():
-    s = pd.Series(
-        [100, 120, 110], index=pd.date_range("2024-01-01", periods=3, freq="D")
-    )
+    s = pd.Series([100, 120, 110], index=pd.date_range("2024-01-01", periods=3, freq="D"))
     assert metrics.max_drawdown(s) < 0  # 回撤必为负
     assert metrics.cagr(s) > -1  # CAGR 合理
 
@@ -36,9 +31,7 @@ def test_cagr():
     # Series over one year with 10% growth
     dates = pd.date_range("2023-01-01", "2024-01-01")
     s = pd.Series([100, 110], index=[dates[0], dates[-1]])
-    assert (
-        abs(metrics.cagr(s) - 0.10) < 1e-4
-    )  # Use looser tolerance for date precision
+    assert abs(metrics.cagr(s) - 0.10) < 1e-4  # Use looser tolerance for date precision
 
     # Test with same start/end value
     s = pd.Series(

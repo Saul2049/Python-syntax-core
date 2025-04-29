@@ -24,12 +24,8 @@ def setup_parser():
     """设置命令行参数解析器"""
     parser = argparse.ArgumentParser(description="测试Telegram通知功能")
 
-    parser.add_argument(
-        "--token", type=str, help="Telegram Bot Token (可选，优先使用环境变量)"
-    )
-    parser.add_argument(
-        "--chat", type=str, help="Telegram Chat ID (可选，优先使用环境变量)"
-    )
+    parser.add_argument("--token", type=str, help="Telegram Bot Token (可选，优先使用环境变量)")
+    parser.add_argument("--chat", type=str, help="Telegram Chat ID (可选，优先使用环境变量)")
     parser.add_argument(
         "--message",
         type=str,
@@ -41,9 +37,7 @@ def setup_parser():
         action="store_true",
         help="直接运行完整通知测试，无需交互确认",
     )
-    parser.add_argument(
-        "--debug", action="store_true", help="显示详细的调试信息和API响应"
-    )
+    parser.add_argument("--debug", action="store_true", help="显示详细的调试信息和API响应")
     parser.add_argument(
         "--format",
         choices=["text", "html", "markdown"],
@@ -63,9 +57,7 @@ def check_network_connection(url="https://api.telegram.org"):
         return False
 
 
-def send_telegram(
-    token, chat_id, message, parse_mode="HTML", debug=False, retry=0
-):
+def send_telegram(token, chat_id, message, parse_mode="HTML", debug=False, retry=0):
     """发送Telegram消息"""
     if not token or not chat_id:
         print("错误: 未提供Telegram Token或Chat ID")
@@ -86,10 +78,7 @@ def send_telegram(
 
         if debug:
             print(f"DEBUG - 请求URL: {url}")
-            print(
-                "DEBUG - 请求参数: "
-                f"{json.dumps(payload, ensure_ascii=False, indent=2)}"
-            )
+            print("DEBUG - 请求参数: " f"{json.dumps(payload, ensure_ascii=False, indent=2)}")
 
         response = requests.post(url, json=payload)
 
@@ -104,9 +93,7 @@ def send_telegram(
             # 处理API速率限制
             print(f"警告: API速率限制，等待{RETRY_DELAY}秒后重试...")
             time.sleep(RETRY_DELAY)
-            return send_telegram(
-                token, chat_id, message, parse_mode, debug, retry + 1
-            )
+            return send_telegram(token, chat_id, message, parse_mode, debug, retry + 1)
         else:
             print(f"Telegram通知发送失败: HTTP {response.status_code}")
             print(f"错误详情: {response.text}")
@@ -115,18 +102,14 @@ def send_telegram(
             if retry < MAX_RETRIES:
                 print(f"尝试重试 ({retry+1}/{MAX_RETRIES})...")
                 time.sleep(RETRY_DELAY)
-                return send_telegram(
-                    token, chat_id, message, parse_mode, debug, retry + 1
-                )
+                return send_telegram(token, chat_id, message, parse_mode, debug, retry + 1)
             return False
     except requests.exceptions.ConnectionError:
         print("错误: 网络连接问题，无法连接到Telegram API")
         if retry < MAX_RETRIES:
             print(f"尝试重试 ({retry+1}/{MAX_RETRIES})...")
             time.sleep(RETRY_DELAY)
-            result = send_telegram(
-                token, chat_id, message, parse_mode, debug, retry + 1
-            )
+            result = send_telegram(token, chat_id, message, parse_mode, debug, retry + 1)
             return result
         return False
     except Exception as e:
@@ -134,9 +117,7 @@ def send_telegram(
         if retry < MAX_RETRIES:
             print(f"尝试重试 ({retry+1}/{MAX_RETRIES})...")
             time.sleep(RETRY_DELAY)
-            result = send_telegram(
-                token, chat_id, message, parse_mode, debug, retry + 1
-            )
+            result = send_telegram(token, chat_id, message, parse_mode, debug, retry + 1)
             return result
         return False
 
@@ -146,50 +127,41 @@ def get_formatted_messages(format_type):
     if format_type.lower() == "html":
         return [
             # 买入信号
-            "🟢 <b>买入信号</b>\n0.123 BTC @ 50123.45 USDT\n"
-            "止损价: 49500.00 USDT\n账户余额: 12345.67 USDT",
+            "🟢 <b>买入信号</b>\n0.123 BTC @ 50123.45 USDT\n" "止损价: 49500.00 USDT\n账户余额: 12345.67 USDT",
             # 等待2秒
             None,
             # 止损更新
-            "🔶 <b>止损更新</b>\n0.123 BTC 持仓\n"
-            "新止损价: 49800.00 USDT\n账户余额: 12345.67 USDT",
+            "🔶 <b>止损更新</b>\n0.123 BTC 持仓\n" "新止损价: 49800.00 USDT\n账户余额: 12345.67 USDT",
             # 等待2秒
             None,
             # 卖出信号
-            "🔴 <b>卖出信号</b>\n0.123 BTC @ 51234.56 USDT\n"
-            "账户余额: 12678.90 USDT",
+            "🔴 <b>卖出信号</b>\n0.123 BTC @ 51234.56 USDT\n" "账户余额: 12678.90 USDT",
         ]
     elif format_type.lower() == "markdown":
         return [
             # 买入信号
-            "🟢 *买入信号*\n0.123 BTC @ 50123.45 USDT\n"
-            "止损价: 49500.00 USDT\n账户余额: 12345.67 USDT",
+            "🟢 *买入信号*\n0.123 BTC @ 50123.45 USDT\n" "止损价: 49500.00 USDT\n账户余额: 12345.67 USDT",
             # 等待2秒
             None,
             # 止损更新
-            "🔶 *止损更新*\n0.123 BTC 持仓\n"
-            "新止损价: 49800.00 USDT\n账户余额: 12345.67 USDT",
+            "🔶 *止损更新*\n0.123 BTC 持仓\n" "新止损价: 49800.00 USDT\n账户余额: 12345.67 USDT",
             # 等待2秒
             None,
             # 卖出信号
-            "🔴 *卖出信号*\n0.123 BTC @ 51234.56 USDT\n"
-            "账户余额: 12678.90 USDT",
+            "🔴 *卖出信号*\n0.123 BTC @ 51234.56 USDT\n" "账户余额: 12678.90 USDT",
         ]
     else:  # text
         return [
             # 买入信号
-            "🟢 买入信号\n0.123 BTC @ 50123.45 USDT\n"
-            "止损价: 49500.00 USDT\n账户余额: 12345.67 USDT",
+            "🟢 买入信号\n0.123 BTC @ 50123.45 USDT\n" "止损价: 49500.00 USDT\n账户余额: 12345.67 USDT",
             # 等待2秒
             None,
             # 止损更新
-            "🔶 止损更新\n0.123 BTC 持仓\n"
-            "新止损价: 49800.00 USDT\n账户余额: 12345.67 USDT",
+            "🔶 止损更新\n0.123 BTC 持仓\n" "新止损价: 49800.00 USDT\n账户余额: 12345.67 USDT",
             # 等待2秒
             None,
             # 卖出信号
-            "🔴 卖出信号\n0.123 BTC @ 51234.56 USDT\n"
-            "账户余额: 12678.90 USDT",
+            "🔴 卖出信号\n0.123 BTC @ 51234.56 USDT\n" "账户余额: 12678.90 USDT",
         ]
 
 
@@ -239,10 +211,7 @@ def main():
         print("请通过以下方式之一提供凭据:")
         print("1. 命令行参数: --token YOUR_TOKEN --chat YOUR_CHAT_ID")
         print("2. 环境变量: 设置 TG_TOKEN 和 TG_CHAT")
-        print(
-            "3. 使用load_env.py脚本: python load_env.py "
-            "--tg_token=YOUR_TOKEN --tg_chat=YOUR_CHAT_ID --save"
-        )
+        print("3. 使用load_env.py脚本: python load_env.py " "--tg_token=YOUR_TOKEN --tg_chat=YOUR_CHAT_ID --save")
         return 1
 
     print("Telegram配置:")
@@ -262,14 +231,11 @@ def main():
         or (
             not args.full_test
             and sys.stdin.isatty()
-            and input("是否要测试完整的交易通知系列? (Y/n): ").strip().lower()
-            in ["", "y", "yes"]
+            and input("是否要测试完整的交易通知系列? (Y/n): ").strip().lower() in ["", "y", "yes"]
         )
     ):
         print("\n测试交易通知序列...")
-        test_success = test_trade_notifications(
-            token, chat_id, format_type, debug
-        )
+        test_success = test_trade_notifications(token, chat_id, format_type, debug)
         if test_success:
             print("所有通知发送成功!")
         else:

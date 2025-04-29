@@ -39,16 +39,12 @@ def rate_limit_retry(max_retries=3, base_delay=1):
                     if e.response.status_code == 429:  # Too Many Requests
                         retries += 1
                         if retries == max_retries:
-                            logger.error(
-                                f"达到最大重试次数 {max_retries}，请求失败"
-                            )
+                            logger.error(f"达到最大重试次数 {max_retries}，请求失败")
                             raise
 
                         # 计算退避时间，使用指数退避
                         delay = base_delay * (2 ** (retries - 1))
-                        logger.warning(
-                            f"遇到速率限制，等待 {delay} 秒后重试 (尝试 {retries}/{max_retries})"
-                        )
+                        logger.warning(f"遇到速率限制，等待 {delay} 秒后重试 (尝试 {retries}/{max_retries})")
                         time.sleep(delay)
                     else:
                         raise
@@ -84,14 +80,8 @@ class BinanceClient:
 
         # 从环境变量加载
         if load_from_env and not (api_key and api_secret):
-            api_key = os.environ.get(
-                "BINANCE_TESTNET_API_KEY" if testnet else "BINANCE_API_KEY"
-            )
-            api_secret = os.environ.get(
-                "BINANCE_TESTNET_API_SECRET"
-                if testnet
-                else "BINANCE_API_SECRET"
-            )
+            api_key = os.environ.get("BINANCE_TESTNET_API_KEY" if testnet else "BINANCE_API_KEY")
+            api_secret = os.environ.get("BINANCE_TESTNET_API_SECRET" if testnet else "BINANCE_API_SECRET")
 
         # 从配置文件加载
         if config_file and not (api_key and api_secret):
@@ -101,9 +91,7 @@ class BinanceClient:
             api_secret = config["BINANCE"]["API_SECRET"]
 
         if not api_key or not api_secret:
-            raise ValueError(
-                "API Key和Secret必须提供，或从环境变量/配置文件加载"
-            )
+            raise ValueError("API Key和Secret必须提供，或从环境变量/配置文件加载")
 
         self.api_key = api_key
         self.api_secret = api_secret
@@ -137,9 +125,7 @@ class BinanceClient:
         params["signature"] = self._generate_signature(params)
 
         headers = {"X-MBX-APIKEY": self.api_key}
-        response = requests.get(
-            f"{self.base_url}{endpoint}", headers=headers, params=params
-        )
+        response = requests.get(f"{self.base_url}{endpoint}", headers=headers, params=params)
         return response.json()
 
     @rate_limit_retry(max_retries=3, base_delay=1)
@@ -188,9 +174,7 @@ class BinanceClient:
 
         return df
 
-    def place_order(
-        self, symbol, side, order_type, quantity, price=None, stop_price=None
-    ):
+    def place_order(self, symbol, side, order_type, quantity, price=None, stop_price=None):
         """
         下单
 
@@ -224,9 +208,7 @@ class BinanceClient:
         params["signature"] = self._generate_signature(params)
 
         headers = {"X-MBX-APIKEY": self.api_key}
-        response = requests.post(
-            f"{self.base_url}{endpoint}", headers=headers, params=params
-        )
+        response = requests.post(f"{self.base_url}{endpoint}", headers=headers, params=params)
         response.raise_for_status()
 
         result = response.json()
@@ -257,9 +239,7 @@ class BinanceClient:
         params["signature"] = self._generate_signature(params)
 
         headers = {"X-MBX-APIKEY": self.api_key}
-        response = requests.delete(
-            f"{self.base_url}{endpoint}", headers=headers, params=params
-        )
+        response = requests.delete(f"{self.base_url}{endpoint}", headers=headers, params=params)
 
         return response.json()
 
@@ -275,9 +255,7 @@ class BinanceClient:
         params["signature"] = self._generate_signature(params)
 
         headers = {"X-MBX-APIKEY": self.api_key}
-        response = requests.get(
-            f"{self.base_url}{endpoint}", headers=headers, params=params
-        )
+        response = requests.get(f"{self.base_url}{endpoint}", headers=headers, params=params)
 
         return response.json()
 
@@ -292,9 +270,7 @@ class BinanceClient:
             float或dict: 如果提供asset，返回该资产余额，否则返回所有资产余额字典
         """
         account_info = self.get_account_info()
-        balances = {
-            b["asset"]: float(b["free"]) for b in account_info["balances"]
-        }
+        balances = {b["asset"]: float(b["free"]) for b in account_info["balances"]}
 
         if asset:
             return balances.get(asset, 0.0)

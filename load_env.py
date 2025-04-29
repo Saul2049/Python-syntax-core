@@ -3,9 +3,7 @@
 环境变量加载脚本 - 配置Telegram通知和API密钥
 """
 import argparse
-import configparser
 import os
-import sys
 
 
 def setup_parser():
@@ -89,9 +87,7 @@ def main():
     if not (tg_token and tg_chat):
         print("\n请设置Telegram通知所需的环境变量:")
         print("方法1: 命令行参数")
-        print(
-            "  python load_env.py --tg_token=YOUR_TOKEN --tg_chat=YOUR_CHAT_ID --save"
-        )
+        print("  python load_env.py --tg_token=YOUR_TOKEN --tg_chat=YOUR_CHAT_ID --save")
         print("方法2: 创建.env文件，添加以下内容:")
         print("  TG_TOKEN=YOUR_TOKEN")
         print("  TG_CHAT=YOUR_CHAT_ID")

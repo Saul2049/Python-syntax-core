@@ -33,15 +33,13 @@ def simple_ma_cross(
 
     # 当短期移动平均线上穿长期移动平均线时买入
     signals.loc[
-        (signals["short_ma"] > signals["long_ma"])
-        & (signals["short_ma"].shift(1) <= signals["long_ma"].shift(1)),
+        (signals["short_ma"] > signals["long_ma"]) & (signals["short_ma"].shift(1) <= signals["long_ma"].shift(1)),
         "signal",
     ] = 1
 
     # 当短期移动平均线下穿长期移动平均线时卖出
     signals.loc[
-        (signals["short_ma"] < signals["long_ma"])
-        & (signals["short_ma"].shift(1) >= signals["long_ma"].shift(1)),
+        (signals["short_ma"] < signals["long_ma"]) & (signals["short_ma"].shift(1) >= signals["long_ma"].shift(1)),
         "signal",
     ] = -1
 
@@ -77,15 +75,13 @@ def bollinger_breakout(
 
     # 当价格突破上轨时买入
     signals.loc[
-        (data[column] > signals["upper_band"])
-        & (data[column].shift(1) <= signals["upper_band"].shift(1)),
+        (data[column] > signals["upper_band"]) & (data[column].shift(1) <= signals["upper_band"].shift(1)),
         "signal",
     ] = 1
 
     # 当价格跌破下轨时卖出
     signals.loc[
-        (data[column] < signals["lower_band"])
-        & (data[column].shift(1) >= signals["lower_band"].shift(1)),
+        (data[column] < signals["lower_band"]) & (data[column].shift(1) >= signals["lower_band"].shift(1)),
         "signal",
     ] = -1
 
@@ -126,8 +122,7 @@ def rsi_strategy(
 
     # 当RSI从超买区域下穿时卖出
     signals.loc[
-        (signals["rsi"] < overbought)
-        & (signals["rsi"].shift(1) >= overbought),
+        (signals["rsi"] < overbought) & (signals["rsi"].shift(1) >= overbought),
         "signal",
     ] = -1
 
@@ -171,15 +166,13 @@ def macd_strategy(
 
     # 当MACD线上穿信号线时买入
     signals.loc[
-        (signals["macd"] > signals["macd_signal"])
-        & (signals["macd"].shift(1) <= signals["macd_signal"].shift(1)),
+        (signals["macd"] > signals["macd_signal"]) & (signals["macd"].shift(1) <= signals["macd_signal"].shift(1)),
         "signal",
     ] = 1
 
     # 当MACD线下穿信号线时卖出
     signals.loc[
-        (signals["macd"] < signals["macd_signal"])
-        & (signals["macd"].shift(1) >= signals["macd_signal"].shift(1)),
+        (signals["macd"] < signals["macd_signal"]) & (signals["macd"].shift(1) >= signals["macd_signal"].shift(1)),
         "signal",
     ] = -1
 
@@ -222,9 +215,7 @@ def improved_ma_cross(
 
     # 计算成交量移动平均
     if "volume" in data.columns:
-        signals["volume_ma"] = (
-            data["volume"].rolling(window=short_window).mean()
-        )
+        signals["volume_ma"] = data["volume"].rolling(window=short_window).mean()
     else:
         # 如果没有成交量数据，将其设置为1，不影响信号
         data["volume"] = 1
@@ -300,15 +291,13 @@ def trend_following_strategy(
 
     # 上升趋势：价格突破上轨
     signals.loc[
-        (data[column] > signals["upper_band"])
-        & (data[column].shift(1) <= signals["upper_band"].shift(1)),
+        (data[column] > signals["upper_band"]) & (data[column].shift(1) <= signals["upper_band"].shift(1)),
         "signal",
     ] = 1
 
     # 下降趋势：价格跌破下轨
     signals.loc[
-        (data[column] < signals["lower_band"])
-        & (data[column].shift(1) >= signals["lower_band"].shift(1)),
+        (data[column] < signals["lower_band"]) & (data[column].shift(1) >= signals["lower_band"].shift(1)),
         "signal",
     ] = -1
 
@@ -359,23 +348,15 @@ def multi_timeframe_strategy(
         )
 
         # 计算高时间框架趋势指标
-        higher_frame["trend_ma"] = (
-            higher_frame[column].rolling(window=long_window // 4).mean()
-        )
-        higher_frame["trend"] = np.where(
-            higher_frame[column] > higher_frame["trend_ma"], 1, -1
-        )
+        higher_frame["trend_ma"] = higher_frame[column].rolling(window=long_window // 4).mean()
+        higher_frame["trend"] = np.where(higher_frame[column] > higher_frame["trend_ma"], 1, -1)
 
         # 将高时间框架趋势映射回原始时间框架
-        higher_trend = higher_frame["trend"].reindex(
-            data.index, method="ffill"
-        )
+        higher_trend = higher_frame["trend"].reindex(data.index, method="ffill")
         signals["higher_trend"] = higher_trend
     else:
         # 如果索引不是时间索引，则简单地使用原始数据作为近似
-        signals["higher_trend"] = np.where(
-            data[column] > signals["long_ma"], 1, -1
-        )
+        signals["higher_trend"] = np.where(data[column] > signals["long_ma"], 1, -1)
 
     # 生成买入信号：短期MA上穿长期MA，且更高时间框架趋势向上
     signals.loc[

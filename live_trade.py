@@ -38,9 +38,7 @@ def setup_parser():
         help="K线周期，如1m, 5m, 15m, 1h, 4h, 1d (默认: 1d)",
     )
 
-    parser.add_argument(
-        "--test", action="store_true", help="仅运行测试模式，不执行实际交易"
-    )
+    parser.add_argument("--test", action="store_true", help="仅运行测试模式，不执行实际交易")
 
     return parser
 
@@ -62,10 +60,7 @@ def load_config(config_file):
             sys.exit(1)
 
     # 验证API凭据
-    if (
-        "API_KEY" not in config["BINANCE"]
-        or "API_SECRET" not in config["BINANCE"]
-    ):
+    if "API_KEY" not in config["BINANCE"] or "API_SECRET" not in config["BINANCE"]:
         print("错误: 配置文件缺少API_KEY或API_SECRET")
         sys.exit(1)
 
@@ -113,9 +108,7 @@ def tg_notify(text: str):
 
     try:
         url = f"https://api.telegram.org/bot{token}/sendMessage"
-        response = requests.post(
-            url, json={"chat_id": chat_id, "text": text, "parse_mode": "HTML"}
-        )
+        response = requests.post(url, json={"chat_id": chat_id, "text": text, "parse_mode": "HTML"})
         response.raise_for_status()
     except Exception as e:
         print(f"Telegram通知发送失败: {e}")
@@ -182,9 +175,7 @@ def log_trade(
         )
 
 
-def save_position_state(
-    symbol, has_position, position_size=0, entry_price=0, stop_price=None
-):
+def save_position_state(symbol, has_position, position_size=0, entry_price=0, stop_price=None):
     """
     保存持仓状态到文件
 
@@ -259,23 +250,15 @@ def get_trading_params(config):
         "slow_window": int(config["TRADING"].get("SLOW_WINDOW", "25")),
         "atr_window": int(config["TRADING"].get("ATR_WINDOW", "14")),
         "risk_percent": float(config["TRADING"].get("RISK_PERCENT", "1.0")),
-        "stop_atr_multiplier": float(
-            config["TRADING"].get("STOP_ATR_MULTIPLIER", "2.0")
-        ),
-        "atr_stop_percent": float(
-            config["TRADING"].get("ATR_STOP_PERCENT", "50.0")
-        ),
+        "stop_atr_multiplier": float(config["TRADING"].get("STOP_ATR_MULTIPLIER", "2.0")),
+        "atr_stop_percent": float(config["TRADING"].get("ATR_STOP_PERCENT", "50.0")),
         "breakeven_r": float(config["TRADING"].get("BREAKEVEN_R", "1.0")),
         "trailing_r": float(config["TRADING"].get("TRAILING_R", "2.0")),
-        "use_trailing_stop": config["TRADING"].getboolean(
-            "USE_TRAILING_STOP", True
-        ),
+        "use_trailing_stop": config["TRADING"].getboolean("USE_TRAILING_STOP", True),
     }
 
 
-def run_strategy(
-    client, params, interval, log_path, test_mode=False, state=None
-):
+def run_strategy(client, params, interval, log_path, test_mode=False, state=None):
     """
     运行交易策略
 
@@ -309,9 +292,7 @@ def run_strategy(
             equity = balance + (position * current_price)
 
             # 计算手续费
-            commission = calculate_commission(
-                position, current_price, client.testnet
-            )
+            commission = calculate_commission(position, current_price, client.testnet)
             equity -= commission
 
             # 生成交易信号
@@ -334,16 +315,11 @@ def run_strategy(
                     stop_price = entry_price * (1 - float(params["stop_loss"]))
 
                     # 保存状态
-                    save_position_state(
-                        symbol, True, position, entry_price, stop_price
-                    )
+                    save_position_state(symbol, True, position, entry_price, stop_price)
 
                     # 发送通知
                     tg_notify(
-                        f"🟢 买入 {symbol}\n"
-                        f"价格: {entry_price}\n"
-                        f"数量: {position}\n"
-                        f"止损: {stop_price}"
+                        f"🟢 买入 {symbol}\n" f"价格: {entry_price}\n" f"数量: {position}\n" f"止损: {stop_price}"
                     )
 
                 # 记录交易
@@ -359,9 +335,7 @@ def run_strategy(
                     commission,
                 )
 
-            elif position > 0 and (
-                latest_signal["sell_signal"] or current_price <= stop_price
-            ):
+            elif position > 0 and (latest_signal["sell_signal"] or current_price <= stop_price):
                 if not test_mode:
                     # 执行卖出
                     order = client.place_order(

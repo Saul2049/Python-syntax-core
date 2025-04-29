@@ -17,8 +17,6 @@ def test_edge_cases(n, expected):
     assert is_prime(n) is expected
 
 
-@pytest.mark.parametrize(
-    "n", [1, 20, 100]
-)  # composite values including larger
+@pytest.mark.parametrize("n", [1, 20, 100])  # composite values including larger
 def test_non_primes(n):
     assert is_prime(n) is False

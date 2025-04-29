@@ -1,8 +1,6 @@
 import sys
 from pathlib import Path
 
-import numpy as np
-import pandas as pd
 import pytest
 
 # 添加项目根目录到Python路径
@@ -97,9 +95,7 @@ def test_backtest_snapshot_eth():
         ("btc", 7, 20, 14, False, 386979.84),
     ],
 )
-def test_backtest_different_params(
-    asset, fast_win, slow_win, atr_win, use_trailing_stop, expected_equity
-):
+def test_backtest_different_params(asset, fast_win, slow_win, atr_win, use_trailing_stop, expected_equity):
     """表格测试：验证不同参数组合下的回测结果"""
     # 加载测试数据
     df = load_csv()

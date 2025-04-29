@@ -1,8 +1,7 @@
 from datetime import datetime, timedelta
-from math import ceil, isfinite
-from typing import Any, Dict, List, Optional, Tuple
+from math import isfinite
+from typing import Any, Dict, Optional, Tuple
 
-import numpy as np
 import pandas as pd
 
 from src import utils
@@ -49,9 +48,7 @@ def trailing_stop(entry: float, atr: float, factor: float = 2.0) -> float:
     return entry - (factor * atr_value)
 
 
-def compute_position_size(
-    equity: float, atr: float, risk_frac: float = 0.02
-) -> int:
+def compute_position_size(equity: float, atr: float, risk_frac: float = 0.02) -> int:
     """
     计算基于风险的仓位大小。
 
@@ -76,9 +73,7 @@ def compute_position_size(
     return max(1, int(position))
 
 
-def compute_stop_price(
-    entry: float, atr: float, multiplier: float = 1.0
-) -> float:
+def compute_stop_price(entry: float, atr: float, multiplier: float = 1.0) -> float:
     """
     计算止损价格。
 
@@ -228,15 +223,8 @@ def backtest_single(
 
     for i, p in enumerate(price):
         # 更新移动止损
-        if (
-            use_trailing_stop
-            and position
-            and entry is not None
-            and initial_stop is not None
-        ):
-            current_atr = (
-                atr.iloc[i] if i < len(atr) and isfinite(atr.iloc[i]) else None
-            )
+        if use_trailing_stop and position and entry is not None and initial_stop is not None:
+            current_atr = atr.iloc[i] if i < len(atr) and isfinite(atr.iloc[i]) else None
             new_stop = compute_trailing_stop(
                 entry,
                 p,
@@ -261,9 +249,7 @@ def backtest_single(
                         "atr": current_atr,
                     }
                 )
-                print(
-                    f"[{price.index[i]}] 止损更新: {old_stop:.2f} -> {stop:.2f} (价格: {p:.2f})"
-                )
+                print(f"[{price.index[i]}] 止损更新: {old_stop:.2f} -> {stop:.2f} (价格: {p:.2f})")
 
         # 止损
         if position and p < stop:
@@ -308,9 +294,7 @@ def backtest_single(
                         "type": "sell_signal",
                     }
                 )
-                print(
-                    f"[{price.index[i]}] 卖出信号: 价格 {p:.2f}, 盈亏: {(p - entry) * position:.2f}"
-                )
+                print(f"[{price.index[i]}] 卖出信号: 价格 {p:.2f}, 盈亏: {(p - entry) * position:.2f}")
 
             position = 0
             entry = None
@@ -339,13 +323,9 @@ def backtest_single(
                         "type": "buy_signal",
                     }
                 )
-                print(
-                    f"[{price.index[i]}] 买入信号: 价格 {p:.2f}, 仓位 {position:.3f}, 止损 {stop:.2f}"
-                )
+                print(f"[{price.index[i]}] 买入信号: 价格 {p:.2f}, 仓位 {position:.3f}, 止损 {stop:.2f}")
 
-        equity_curve.append(
-            equity + (p - entry) * position if position else equity
-        )
+        equity_curve.append(equity + (p - entry) * position if position else equity)
 
     return pd.Series(equity_curve, index=price.index[: len(equity_curve)])
 
@@ -439,9 +419,7 @@ def backtest_portfolio(
         return equity_df
 
     # 计算相对强度 - 使用回报率+波动率
-    returns_dict = {
-        asset: equity_df[asset].pct_change() for asset in prices_dict.keys()
-    }
+    returns_dict = {asset: equity_df[asset].pct_change() for asset in prices_dict.keys()}
 
     # 计算历史表现分数
     performance_df = pd.DataFrame()
@@ -453,9 +431,7 @@ def backtest_portfolio(
         performance_df[asset] = returns.rolling(lookback).mean().fillna(0)
 
         # 计算波动率
-        volatility_df[asset] = (
-            returns.rolling(lookback).std().fillna(0.001)
-        )  # 防止除零
+        volatility_df[asset] = returns.rolling(lookback).std().fillna(0.001)  # 防止除零
 
         # 计算夏普比率
         sharpe_df[asset] = performance_df[asset] / volatility_df[asset]
@@ -471,9 +447,7 @@ def backtest_portfolio(
         composite_df = performance_df.copy()
 
     # 初始化权重矩阵
-    weights_df = pd.DataFrame(
-        1.0 / asset_count, index=equity_df.index, columns=equity_df.columns
-    )
+    weights_df = pd.DataFrame(1.0 / asset_count, index=equity_df.index, columns=equity_df.columns)
 
     # 滚动调整权重
     for i in range(lookback + 1, len(equity_df)):
@@ -504,9 +478,7 @@ def backtest_portfolio(
         if weight_power != 1.0:
             for asset in adjusted_performance.index:
                 if adjusted_performance[asset] > 0:
-                    adjusted_performance[asset] = (
-                        adjusted_performance[asset] ** weight_power
-                    )
+                    adjusted_performance[asset] = adjusted_performance[asset] ** weight_power
 
         # 计算原始权重
         raw_weights = adjusted_performance / adjusted_performance.sum()
@@ -540,16 +512,12 @@ def backtest_portfolio(
         for asset in equity_df.columns:
             # 获取此资产的原始单日回报率
             day_return = (
-                equity_df.iloc[i][asset] / equity_df.iloc[i - 1][asset]
-                if equity_df.iloc[i - 1][asset] > 0
-                else 1.0
+                equity_df.iloc[i][asset] / equity_df.iloc[i - 1][asset] if equity_df.iloc[i - 1][asset] > 0 else 1.0
             )
 
             # 应用加权后的资金计算新权益
             target_allocation = prev_total_equity * weights_df.iloc[i][asset]
-            adjusted_equity_df.iloc[
-                i, adjusted_equity_df.columns.get_loc(asset)
-            ] = (target_allocation * day_return)
+            adjusted_equity_df.iloc[i, adjusted_equity_df.columns.get_loc(asset)] = target_allocation * day_return
 
     # 计算总投资组合价值
     adjusted_equity_df["Portfolio"] = adjusted_equity_df.sum(axis=1)
@@ -666,9 +634,7 @@ class Broker:
         """
         try:
             # 执行订单逻辑 (Order execution logic)
-            order_result = self._execute_order_internal(
-                symbol, side, quantity, price
-            )
+            order_result = self._execute_order_internal(symbol, side, quantity, price)
 
             # 记录交易到CSV (Log trade to CSV)
             trade_data = {
@@ -739,9 +705,7 @@ class Broker:
 
             # 写入CSV，如果文件已存在则追加 (Write to CSV, append if file exists)
             if file_exists:
-                trade_df.to_csv(
-                    trades_file, mode="a", header=False, index=False
-                )
+                trade_df.to_csv(trades_file, mode="a", header=False, index=False)
             else:
                 # 确保目录存在 (Ensure directory exists)
                 trades_file.parent.mkdir(parents=True, exist_ok=True)
@@ -774,9 +738,7 @@ class Broker:
         """
         try:
             # 获取交易文件路径 (Get trade file path)
-            trades_file = utils.get_trades_file(
-                symbol.lower(), self.trades_dir
-            )
+            trades_file = utils.get_trades_file(symbol.lower(), self.trades_dir)
 
             # 检查文件是否存在 (Check if file exists)
             if not trades_file.exists():
@@ -804,9 +766,7 @@ class Broker:
             print(f"Error getting trades: {e}")
             return pd.DataFrame()
 
-    def update_position_stops(
-        self, symbol: str, current_price: float, atr: float
-    ) -> None:
+    def update_position_stops(self, symbol: str, current_price: float, atr: float) -> None:
         """
         更新指定交易对的移动止损。
         Update trailing stop for specified symbol.
@@ -827,17 +787,13 @@ class Broker:
             time_since_update = now - last_update
 
             # 初始止损设置或每小时更新一次
-            if self.positions[symbol][
-                "stop_price"
-            ] == 0.0 or time_since_update >= timedelta(hours=1):
+            if self.positions[symbol]["stop_price"] == 0.0 or time_since_update >= timedelta(hours=1):
                 # 使用ATR更新止损
                 position = self.positions[symbol]
 
                 # 初始止损设置 (如果尚未设置)
                 if position["stop_price"] == 0.0:
-                    initial_stop = position["entry_price"] - (
-                        atr * 2.0
-                    )  # 使用2倍ATR作为初始止损
+                    initial_stop = position["entry_price"] - (atr * 2.0)  # 使用2倍ATR作为初始止损
                     position["stop_price"] = initial_stop
 
                     # 发送初始止损通知
@@ -891,10 +847,7 @@ class Broker:
             position = self.positions[symbol]
 
             # 检查是否触发止损
-            if (
-                position["stop_price"] > 0
-                and current_price <= position["stop_price"]
-            ):
+            if position["stop_price"] > 0 and current_price <= position["stop_price"]:
                 # 发送止损触发通知
                 stop_msg = (
                     f"⚠️ 止损触发 (Stop Loss Triggered)\n"
@@ -937,4 +890,3 @@ class Broker:
         """
         # 实际的订单执行代码 (Actual order execution code)
         # 这里应该调用交易所API (Should call exchange API here)
-        pass

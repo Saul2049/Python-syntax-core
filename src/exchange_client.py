@@ -61,9 +61,7 @@ class ExchangeClient:
     def _load_demo_data(self):
         """加载演示数据"""
         try:
-            df = pd.read_csv(
-                "btc_eth.csv", parse_dates=["date"], index_col="date"
-            )
+            df = pd.read_csv("btc_eth.csv", parse_dates=["date"], index_col="date")
             self._demo_market_data = {
                 "BTC/USDT": df["btc"].to_dict(),
                 "ETH/USDT": df["eth"].to_dict(),
@@ -75,12 +73,8 @@ class ExchangeClient:
             now = datetime.now()
             dates = [now - timedelta(days=i) for i in range(100)]
             self._demo_market_data = {
-                "BTC/USDT": {
-                    d: 30000 + random.randint(-1000, 1000) for d in dates
-                },
-                "ETH/USDT": {
-                    d: 2000 + random.randint(-100, 100) for d in dates
-                },
+                "BTC/USDT": {d: 30000 + random.randint(-1000, 1000) for d in dates},
+                "ETH/USDT": {d: 2000 + random.randint(-100, 100) for d in dates},
             }
 
     def _request(
@@ -103,18 +97,14 @@ class ExchangeClient:
             time.sleep(random.uniform(0.1, 0.5))
             # 随机模拟网络错误
             if random.random() < 0.05:  # 5%概率出错
-                error_type = random.choice(
-                    [ConnectionError, Timeout, socket.error]
-                )
+                error_type = random.choice([ConnectionError, Timeout, socket.error])
                 raise error_type("模拟网络错误")
 
         # 实现速率限制
         current_time = time.time()
         time_since_last_request = current_time - self._last_request_time
         if time_since_last_request < 1.0 / self._rate_limit_per_sec:
-            sleep_time = (
-                1.0 / self._rate_limit_per_sec - time_since_last_request
-            )
+            sleep_time = 1.0 / self._rate_limit_per_sec - time_since_last_request
             time.sleep(sleep_time)
 
         # 带重试的请求逻辑
@@ -139,8 +129,7 @@ class ExchangeClient:
                 if attempt < self.retry_count - 1:
                     sleep_time = self.retry_delay * (2**attempt)  # 指数退避
                     logger.warning(
-                        f"请求失败 (尝试 {attempt+1}/{self.retry_count}): "
-                        f"{str(e)}. 等待 {sleep_time}秒后重试..."
+                        f"请求失败 (尝试 {attempt+1}/{self.retry_count}): " f"{str(e)}. 等待 {sleep_time}秒后重试..."
                     )
                     time.sleep(sleep_time)
                 else:
@@ -199,9 +188,7 @@ class ExchangeClient:
             包含订单ID和状态的字典
         """
         if self.demo_mode:
-            order_id = (
-                f"demo_{int(time.time() * 1000)}_{random.randint(1000, 9999)}"
-            )
+            order_id = f"demo_{int(time.time() * 1000)}_{random.randint(1000, 9999)}"
             order = {
                 "id": order_id,
                 "symbol": symbol,
@@ -217,15 +204,11 @@ class ExchangeClient:
             # 更新演示模式的余额
             base, quote = symbol.split("/")
             if side == "buy":
-                self._demo_balances[quote] -= quantity * (
-                    price or self.get_ticker(symbol)["price"]
-                )
+                self._demo_balances[quote] -= quantity * (price or self.get_ticker(symbol)["price"])
                 self._demo_balances[base] += quantity
             else:
                 self._demo_balances[base] -= quantity
-                self._demo_balances[quote] += quantity * (
-                    price or self.get_ticker(symbol)["price"]
-                )
+                self._demo_balances[quote] += quantity * (price or self.get_ticker(symbol)["price"])
 
             return order
 
@@ -242,9 +225,7 @@ class ExchangeClient:
 
         return self._request("POST", endpoint, data=data)
 
-    def get_historical_trades(
-        self, symbol: str, limit: int = 100
-    ) -> List[Dict]:
+    def get_historical_trades(self, symbol: str, limit: int = 100) -> List[Dict]:
         """获取历史成交记录"""
         if self.demo_mode:
             return self._demo_orders
@@ -331,9 +312,7 @@ class ExchangeClient:
 
         return self._request("GET", endpoint, params=params)
 
-    def sync_market_data(
-        self, symbol: str, interval: str = "1d", days: int = 30
-    ) -> pd.DataFrame:
+    def sync_market_data(self, symbol: str, interval: str = "1d", days: int = 30) -> pd.DataFrame:
         """
         同步并返回市场数据
 

@@ -26,9 +26,7 @@ def fetch_price_data(symbol: str) -> pd.DataFrame:
     # 示例数据结构 (Example data structure)
     return pd.DataFrame(
         {
-            "timestamp": pd.date_range(
-                start="2023-01-01", periods=100, freq="1h"
-            ),
+            "timestamp": pd.date_range(start="2023-01-01", periods=100, freq="1h"),
             "open": np.random.normal(50000, 1000, 100),
             "high": np.random.normal(50500, 1000, 100),
             "low": np.random.normal(49500, 1000, 100),
@@ -64,9 +62,7 @@ def calculate_atr(df: pd.DataFrame, window: int = 14) -> float:
     return df["atr"].iloc[-1]
 
 
-def get_trading_signals(
-    df: pd.DataFrame, fast_win: int = 7, slow_win: int = 25
-) -> Dict[str, Any]:
+def get_trading_signals(df: pd.DataFrame, fast_win: int = 7, slow_win: int = 25) -> Dict[str, Any]:
     """
     获取交易信号。
     Get trading signals.
@@ -89,14 +85,10 @@ def get_trading_signals(
     df["prev_slow"] = df["slow_ma"].shift(1)
 
     # 金叉信号 (Golden cross signal)
-    buy_signal = (df["prev_fast"] <= df["prev_slow"]) & (
-        df["fast_ma"] > df["slow_ma"]
-    )
+    buy_signal = (df["prev_fast"] <= df["prev_slow"]) & (df["fast_ma"] > df["slow_ma"])
 
     # 死叉信号 (Death cross signal)
-    sell_signal = (df["prev_fast"] >= df["prev_slow"]) & (
-        df["fast_ma"] < df["slow_ma"]
-    )
+    sell_signal = (df["prev_fast"] >= df["prev_slow"]) & (df["fast_ma"] < df["slow_ma"])
 
     # 当前价格 (Current price)
     current_price = df["close"].iloc[-1]
@@ -162,15 +154,10 @@ def trading_loop(symbol: str = "BTCUSDT", interval_seconds: int = 60):
 
                 # 如果止损已触发，跳过信号处理 (Skip signal processing if stop loss triggered)
                 if stop_triggered:
-                    print(
-                        "止损已触发，跳过信号处理 (Stop loss triggered, skipping signal processing)"
-                    )
+                    print("止损已触发，跳过信号处理 (Stop loss triggered, skipping signal processing)")
                 else:
                     # 处理买入信号 (Process buy signals)
-                    if (
-                        signals["buy_signal"]
-                        and symbol not in broker.positions
-                    ):
+                    if signals["buy_signal"] and symbol not in broker.positions:
                         # 计算仓位大小 - 假设 1% 风险 (Calculate position size - assume 1% risk)
                         equity = 10000.0  # 示例权益 (Example equity)
                         risk_amount = equity * 0.01
@@ -179,15 +166,10 @@ def trading_loop(symbol: str = "BTCUSDT", interval_seconds: int = 60):
                         quantity = risk_amount / risk_per_unit
 
                         # 限制数量小数位 (Limit decimal places)
-                        quantity = round(
-                            quantity, 3
-                        )  # 假设最小单位是0.001 (Assume minimum unit is 0.001)
+                        quantity = round(quantity, 3)  # 假设最小单位是0.001 (Assume minimum unit is 0.001)
 
                         # 执行买入订单 (Execute buy order)
-                        reason = (
-                            f"MA交叉: 快线 {signals['fast_ma']:.2f} "
-                            f"上穿 慢线 {signals['slow_ma']:.2f}"
-                        )
+                        reason = f"MA交叉: 快线 {signals['fast_ma']:.2f} " f"上穿 慢线 {signals['slow_ma']:.2f}"
                         broker.execute_order(
                             symbol=symbol,
                             side="BUY",
@@ -199,10 +181,7 @@ def trading_loop(symbol: str = "BTCUSDT", interval_seconds: int = 60):
                     elif signals["sell_signal"] and symbol in broker.positions:
                         # 执行卖出订单 (Execute sell order)
                         position = broker.positions[symbol]
-                        reason = (
-                            f"MA交叉: 快线 {signals['fast_ma']:.2f} "
-                            f"下穿 慢线 {signals['slow_ma']:.2f}"
-                        )
+                        reason = f"MA交叉: 快线 {signals['fast_ma']:.2f} " f"下穿 慢线 {signals['slow_ma']:.2f}"
                         broker.execute_order(
                             symbol=symbol,
                             side="SELL",
@@ -216,9 +195,7 @@ def trading_loop(symbol: str = "BTCUSDT", interval_seconds: int = 60):
                 )
 
                 # 每小时发送状态通知 (Send status notification every hour)
-                if (
-                    current_time - last_check
-                ).total_seconds() >= 3600:  # 3600秒 = 1小时
+                if (current_time - last_check).total_seconds() >= 3600:  # 3600秒 = 1小时
                     status_msg = (
                         f"📈 状态更新 (Status Update)\n"
                         f"品种 (Symbol): {symbol}\n"
@@ -231,16 +208,12 @@ def trading_loop(symbol: str = "BTCUSDT", interval_seconds: int = 60):
 
                     if symbol in broker.positions:
                         position = broker.positions[symbol]
+                        status_msg += f"\n入场价 (Entry): {position['entry_price']:.8f}"
+                        status_msg += f"\n止损价 (Stop): {position['stop_price']:.8f}"
+                        status_msg += f"\n数量 (Quantity): {position['quantity']:.8f}"
                         status_msg += (
-                            f"\n入场价 (Entry): {position['entry_price']:.8f}"
+                            f"\n盈亏 (P/L): {(current_price - position['entry_price']) * position['quantity']:.8f} USDT"
                         )
-                        status_msg += (
-                            f"\n止损价 (Stop): {position['stop_price']:.8f}"
-                        )
-                        status_msg += (
-                            f"\n数量 (Quantity): {position['quantity']:.8f}"
-                        )
-                        status_msg += f"\n盈亏 (P/L): {(current_price - position['entry_price']) * position['quantity']:.8f} USDT"
                         status_msg += f"\n盈亏% (P/L%): {((current_price - position['entry_price'])/position['entry_price'])*100:.2f}%"
 
                     broker.notifier.notify(status_msg, "INFO")
@@ -256,9 +229,7 @@ def trading_loop(symbol: str = "BTCUSDT", interval_seconds: int = 60):
 
     except KeyboardInterrupt:
         # 发送关闭通知 (Send shutdown notification)
-        broker.notifier.notify(
-            "🛑 交易机器人关闭 (Trading bot stopped)", "INFO"
-        )
+        broker.notifier.notify("🛑 交易机器人关闭 (Trading bot stopped)", "INFO")
         print("交易循环已关闭 (Trading loop stopped)")
 
 

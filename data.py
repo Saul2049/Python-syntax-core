@@ -10,9 +10,7 @@ def load_csv(path: str = "btc_eth.csv") -> pd.DataFrame:
     return df
 
 
-def fetch_klines(
-    symbol: str, interval: str = "1d", limit: int = 100
-) -> pd.Series:
+def fetch_klines(symbol: str, interval: str = "1d", limit: int = 100) -> pd.Series:
     """
     Fetch historical klines for a given symbol from Binance API and return the closing price series.
     """

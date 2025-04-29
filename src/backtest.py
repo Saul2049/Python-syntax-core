@@ -64,9 +64,7 @@ def run_backtest(
                 entry = p
                 stop = compute_stop_price(entry, atr.iloc[i], stop_mult)
 
-        equity_curve.append(
-            equity + (p - entry) * position if position else equity
-        )
+        equity_curve.append(equity + (p - entry) * position if position else equity)
 
     return pd.Series(equity_curve, index=price.index)
 

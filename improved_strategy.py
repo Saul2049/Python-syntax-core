@@ -10,9 +10,7 @@ import pandas as pd
 from src import broker, metrics, signals
 
 
-def buy_and_hold(
-    price: pd.Series, init_equity: float = 100_000.0
-) -> pd.Series:
+def buy_and_hold(price: pd.Series, init_equity: float = 100_000.0) -> pd.Series:
     """
     简单的买入持有策略
 
@@ -72,15 +70,8 @@ def trend_following(
 
     for i, p in enumerate(price):
         # 更新移动止损
-        if (
-            use_trailing_stop
-            and position
-            and entry is not None
-            and initial_stop is not None
-        ):
-            current_atr = (
-                atr.iloc[i] if i < len(atr) and isfinite(atr.iloc[i]) else None
-            )
+        if use_trailing_stop and position and entry is not None and initial_stop is not None:
+            current_atr = atr.iloc[i] if i < len(atr) and isfinite(atr.iloc[i]) else None
             new_stop = broker.compute_trailing_stop(
                 entry,
                 p,
@@ -109,21 +100,14 @@ def trend_following(
             initial_stop = None
 
         # 入场信号: 价格在长期均线上方 + 至少有20天数据 + 之前没有仓位
-        if (
-            i > long_win
-            and p > long_ma.iloc[i]
-            and position == 0
-            and isfinite(atr.iloc[i])
-        ):
+        if i > long_win and p > long_ma.iloc[i] and position == 0 and isfinite(atr.iloc[i]):
             size = broker.compute_position_size(equity, atr.iloc[i], risk_frac)
             position = size
             entry = p
             stop = broker.compute_stop_price(entry, atr.iloc[i])
             initial_stop = stop
 
-        equity_curve.append(
-            equity + (p - entry) * position if position else equity
-        )
+        equity_curve.append(equity + (p - entry) * position if position else equity)
 
     return pd.Series(equity_curve, index=price.index[: len(equity_curve)])
 
@@ -170,19 +154,15 @@ if __name__ == "__main__":
     # 加载数据
     df = pd.read_csv("btc_eth.csv", parse_dates=["date"], index_col="date")
     btc = df["btc"]
-    
+
     # 设置初始资金
     init_equity = 100_000.0
 
     # 运行各种策略
     bnh_equity = buy_and_hold(btc, init_equity)
     tf_equity = trend_following(btc, long_win=200, atr_win=20, init_equity=init_equity)
-    improved_ma_equity = improved_ma_cross(
-        btc, fast_win=50, slow_win=200, atr_win=20, init_equity=init_equity
-    )
-    original_ma_equity = broker.backtest_single(
-        btc, fast_win=7, slow_win=20, atr_win=20, init_equity=init_equity
-    )
+    improved_ma_equity = improved_ma_cross(btc, fast_win=50, slow_win=200, atr_win=20, init_equity=init_equity)
+    original_ma_equity = broker.backtest_single(btc, fast_win=7, slow_win=20, atr_win=20, init_equity=init_equity)
 
     # 计算和比较绩效指标
     print("\n策略绩效比较:")
@@ -245,13 +225,8 @@ if __name__ == "__main__":
 
     print("\n交易统计:")
     print("-" * 80)
-    print(
-        f"原始MA策略 (7/20):  买入信号 {len(buy_orig)} 次, 卖出信号 {len(sell_orig)} 次"
-    )
-    print(
-        f"改进MA策略 (50/200): 买入信号 {len(buy_improved)} 次, "
-        f"卖出信号 {len(sell_improved)} 次"
-    )
+    print(f"原始MA策略 (7/20):  买入信号 {len(buy_orig)} 次, 卖出信号 {len(sell_orig)} 次")
+    print(f"改进MA策略 (50/200): 买入信号 {len(buy_improved)} 次, " f"卖出信号 {len(sell_improved)} 次")
     print("-" * 80)
 
     # 计算各策略CAGR

@@ -44,22 +44,14 @@ def test_invalid_ma_type():
 def test_crosses():
     fast = pd.Series([1, 2, 3, 4])
     slow = pd.Series([2, 2, 2, 2])
-    assert np.array_equal(
-        signals.bullish_cross_indices(fast, slow), np.array([2])
-    )
-    assert np.array_equal(
-        signals.bearish_cross_indices(slow, fast), np.array([2])
-    )
+    assert np.array_equal(signals.bullish_cross_indices(fast, slow), np.array([2]))
+    assert np.array_equal(signals.bearish_cross_indices(slow, fast), np.array([2]))
 
 
 def test_cross_series():
     # 创建测试数据
-    fast = pd.Series(
-        [1, 2, 3, 2], index=pd.date_range("2023-01-01", periods=4)
-    )
-    slow = pd.Series(
-        [2, 2, 2, 3], index=pd.date_range("2023-01-01", periods=4)
-    )
+    fast = pd.Series([1, 2, 3, 2], index=pd.date_range("2023-01-01", periods=4))
+    slow = pd.Series([2, 2, 2, 3], index=pd.date_range("2023-01-01", periods=4))
 
     # 测试上穿Series
     bull_cross = signals.bullish_cross_series(fast, slow)

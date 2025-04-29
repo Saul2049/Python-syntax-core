@@ -7,7 +7,7 @@ from datetime import datetime
 import numpy as np
 import pandas as pd
 
-from src import broker, signals
+from src import broker
 from src.data import load_csv
 
 # 读取实盘交易记录
@@ -46,9 +46,7 @@ price_data = load_csv()["btc"]
 valid_price_data = price_data[price_data.index >= pd.Timestamp(start_date)]
 if valid_price_data.empty:
     print("价格数据不包含交易日期范围，无法进行对比")
-    print(
-        f"价格数据范围: {price_data.index.min().date()} 至 {price_data.index.max().date()}"
-    )
+    print(f"价格数据范围: {price_data.index.min().date()} 至 {price_data.index.max().date()}")
     exit(0)
 
 # 运行回测

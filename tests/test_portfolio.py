@@ -1,6 +1,4 @@
-import numpy as np
 import pandas as pd
-import pytest
 
 from src import metrics, portfolio_backtest
 from src.portfolio_backtest import run_portfolio

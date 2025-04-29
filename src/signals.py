@@ -9,11 +9,11 @@ from typing import Union, Tuple, Literal
 def crossover(series1: pd.Series, series2: pd.Series) -> pd.Series:
     """
     检测 series1 上穿 series2
-    
+
     参数:
         series1: 第一个时间序列
         series2: 第二个时间序列
-    
+
     返回:
         布尔序列，True表示发生上穿
     """
@@ -25,11 +25,11 @@ def crossover(series1: pd.Series, series2: pd.Series) -> pd.Series:
 def crossunder(series1: pd.Series, series2: pd.Series) -> pd.Series:
     """
     检测 series1 下穿 series2
-    
+
     参数:
         series1: 第一个时间序列
         series2: 第二个时间序列
-    
+
     返回:
         布尔序列，True表示发生下穿
     """
@@ -38,17 +38,15 @@ def crossunder(series1: pd.Series, series2: pd.Series) -> pd.Series:
     return (series1 < series2) & (series1.shift(1) >= series2.shift(1))
 
 
-def moving_average(
-    series: pd.Series, window: int, type: str = "simple"
-) -> pd.Series:
+def moving_average(series: pd.Series, window: int, type: str = "simple") -> pd.Series:
     """
     计算移动平均
-    
+
     参数:
         series: 输入时间序列
         window: 窗口大小
         type: 移动平均类型，'simple'或'exponential'
-    
+
     返回:
         移动平均序列
     """
@@ -63,11 +61,11 @@ def moving_average(
 def momentum(series: pd.Series, period: int = 14) -> pd.Series:
     """
     计算动量指标
-    
+
     参数:
         series: 输入时间序列
         period: 计算周期
-    
+
     返回:
         动量序列
     """
@@ -77,11 +75,11 @@ def momentum(series: pd.Series, period: int = 14) -> pd.Series:
 def rate_of_change(series: pd.Series, period: int = 14) -> pd.Series:
     """
     计算变化率
-    
+
     参数:
         series: 输入时间序列
         period: 计算周期
-    
+
     返回:
         变化率序列
     """
@@ -91,11 +89,11 @@ def rate_of_change(series: pd.Series, period: int = 14) -> pd.Series:
 def zscore(series: pd.Series, window: int = 20) -> pd.Series:
     """
     计算z-score标准化
-    
+
     参数:
         series: 输入时间序列
         window: 计算窗口
-    
+
     返回:
         z-score序列
     """
@@ -109,12 +107,12 @@ def bollinger_bands(
 ) -> Tuple[pd.Series, pd.Series, pd.Series]:
     """
     计算布林带指标
-    
+
     参数:
         series: 输入时间序列
         window: 计算窗口
         num_std: 标准差倍数
-    
+
     返回:
         (上轨, 中轨, 下轨)
     """
@@ -159,13 +157,9 @@ def vectorized_cross(
           * threshold < 0: 允许更小的价格差触发交叉
     """
     if direction == "above":
-        cross = (fast.shift(1) <= slow.shift(1) + threshold) & (
-            fast > slow + threshold
-        )
+        cross = (fast.shift(1) <= slow.shift(1) + threshold) & (fast > slow + threshold)
     else:
-        cross = (fast.shift(1) >= slow.shift(1) - threshold) & (
-            fast < slow - threshold
-        )
+        cross = (fast.shift(1) >= slow.shift(1) - threshold) & (fast < slow - threshold)
 
     return cross if return_series else np.where(cross)[0]
 

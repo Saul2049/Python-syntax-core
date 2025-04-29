@@ -71,9 +71,7 @@ def fetch_klines(
     return df
 
 
-def fetch_historical_data(
-    symbol: str, interval: str = "1d", years: int = 2
-) -> pd.DataFrame:
+def fetch_historical_data(symbol: str, interval: str = "1d", years: int = 2) -> pd.DataFrame:
     """
     获取多年的历史数据，通过多次API调用分批获取。
 
@@ -87,9 +85,7 @@ def fetch_historical_data(
     """
     # 计算开始和结束时间
     end_time = int(datetime.now().timestamp() * 1000)
-    start_time = int(
-        (datetime.now() - timedelta(days=365 * years)).timestamp() * 1000
-    )
+    start_time = int((datetime.now() - timedelta(days=365 * years)).timestamp() * 1000)
 
     # 存储所有数据的列表
     all_data = []
