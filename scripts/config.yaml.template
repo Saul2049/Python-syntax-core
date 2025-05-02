@@ -1,0 +1,51 @@
+# 交易配置 (Trading Configuration)
+trading:
+  # 交易对列表 (Trading Pairs)
+  symbols:
+    - BTC/USDT
+    - ETH/USDT
+    - LTC/USDT
+  # 风险百分比 (Risk Percentage)
+  risk_percent: 0.5
+  # 检查间隔(秒) (Check Interval in seconds)
+  check_interval: 60
+  # 测试模式 (Test Mode)
+  test_mode: true
+  # 技术指标参数 (Technical Indicators)
+  indicators:
+    fast_ma: 7
+    slow_ma: 25
+    atr_period: 14
+
+# 数据源配置 (Data Source Configuration)
+data_sources:
+  # 是否使用币安测试网 (Use Binance Testnet)
+  use_binance_testnet: true
+  # 自动切换数据源 (Automatic Fallback)
+  auto_fallback: true
+  # 切换间隔(秒) (Switch Interval in seconds)
+  min_switch_interval: 300
+
+# 监控配置 (Monitoring Configuration)
+monitoring:
+  # 是否启用监控 (Enable Monitoring)
+  enabled: true
+  # Prometheus导出器端口 (Prometheus Exporter Port)
+  port: 9090
+  # 是否启用告警 (Enable Alerts)
+  alerts_enabled: true
+  # 心跳超时(秒) (Heartbeat Timeout in seconds)
+  heartbeat_timeout: 180
+
+# 日志配置 (Logging Configuration)
+logging:
+  # 日志级别 (Log Level)
+  level: INFO
+  # 日志目录 (Log Directory)
+  log_dir: logs/stability_test
+  # 是否记录到控制台 (Log to Console)
+  console: true
+  # 日志文件最大大小(MB) (Maximum Log File Size)
+  max_file_size_mb: 10
+  # 保留日志文件数 (Number of Log Files to Keep)
+  backup_count: 5 

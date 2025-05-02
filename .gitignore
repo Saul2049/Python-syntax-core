@@ -1,11 +1,9 @@
-# Git ignore for Python project
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
-.pytest_cache/
 *.so
 .Python
-env/
 build/
 develop-eggs/
 dist/
@@ -17,16 +15,75 @@ lib64/
 parts/
 sdist/
 var/
+wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+MANIFEST
+
+# 虚拟环境
 venv/
-.venv/
+env/
+ENV/
+.env
+.venv
+env/
+env.bak/
+venv.bak/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.project
+.pydevproject
+.settings/
+
+# 日志和数据文件
+logs/
+*.log
+data/
+*.csv
+*.json
+*.pickle
+*.db
+*.sqlite3
+
+# 配置文件和敏感信息
+config.yaml
+config.ini
+secrets.yaml
+*.pem
+*.key
+
+# 系统文件
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 备份文件
+*.bak
+*~
+*.backup
+
+# 临时文件
+tmp/
+temp/
+.tmp/
+.temp/
+
+# 归档文件
+*.tar.gz
+*.zip
+*.rar
+*.7z
+
+# 其他
 .coverage
 htmlcov/
-grid_results.csv
-*.png .env
-position_state.json
+.pytest_cache/
+.tox/
 
 # Configuration and secrets
 config.ini

@@ -1,6 +1,235 @@
-# 加密货币交易系统
+# 交易系统框架
 
-一个功能完整的加密货币自动化交易系统，提供回测、优化和实盘交易功能，适合初学者和有经验的交易者使用。
+这是一个用Python开发的模块化交易系统框架，支持多数据源、热/冷切换、监控告警和容器化部署等功能。
+
+## 功能特性
+
+- **多数据源支持**：支持Binance测试网和模拟市场数据
+- **热/冷切换**：自动在数据源之间切换，确保可靠性
+- **灵活配置**：支持YAML、INI和环境变量多种配置方式
+- **性能监控**：内置Prometheus指标导出，支持Grafana可视化
+- **容器化部署**：支持Docker容器化运行和管理
+- **完整日志**：详细的日志记录，支持日志轮转和持久化
+- **CI/CD流程**：自动化测试、构建和部署
+
+## 系统架构
+
+```
+┌───────────────────┐     ┌───────────────────┐
+│  数据层           │     │  配置管理         │
+│  - Binance测试网  │     │  - YAML           │
+│  - 模拟数据       │     │  - .ENV           │
+└─────────┬─────────┘     └────────┬──────────┘
+          │                        │
+┌─────────▼─────────┐     ┌────────▼──────────┐
+│  交易逻辑         │     │  监控系统         │
+│  - 信号生成       │◄────┤  - Prometheus     │
+│  - 执行交易       │     │  - Grafana        │
+└─────────┬─────────┘     └────────┬──────────┘
+          │                        │
+          └────────────┬───────────┘
+                      │
+           ┌──────────▼───────────┐
+           │  容器化部署          │
+           │  - Docker            │
+           │  - 健康检查          │
+           └──────────────────────┘
+```
+
+## 数据层架构
+
+系统采用分层设计，数据层由以下组件组成：
+
+1. **抽象市场数据提供者** (`MarketDataProvider`)：定义统一接口
+2. **具体数据提供者实现**：
+   - `BinanceTestnetDataProvider`：连接币安测试网
+   - `MockMarketDataProvider`：提供模拟数据
+3. **市场数据管理器** (`MarketDataManager`)：负责数据源选择和切换
+
+### 数据源切换机制
+
+- **自动故障转移**：当主数据源(Binance测试网)失败时，自动切换到备用数据源(模拟数据)
+- **自动恢复**：主数据源恢复后，自动切回
+- **可配置参数**：切换时间间隔、重试次数等
+
+## 配置管理
+
+系统支持多种配置方式，按优先级从高到低：
+
+1. **命令行参数**：直接在启动时指定
+2. **环境变量**：通过.env文件或系统环境变量设置
+3. **YAML配置文件**：结构化配置数据
+4. **INI配置文件**：兼容旧版格式
+5. **默认值**：内置的安全默认值
+
+### 配置示例
+
+```yaml
+# 交易配置
+trading:
+  symbols:
+    - BTC/USDT
+    - ETH/USDT
+  risk_percent: 0.5
+  check_interval: 60
+
+# 数据源配置
+data_sources:
+  use_binance_testnet: true
+  auto_fallback: true
+  min_switch_interval: 300
+
+# 监控配置
+monitoring:
+  enabled: true
+  port: 9090
+  alerts_enabled: true
+  heartbeat_timeout: 180
+```
+
+## 日志系统
+
+系统采用分层日志架构，支持全面的日志收集和分析：
+
+### 日志类型
+
+1. **系统日志**：记录整体运行状态、错误和警告
+2. **交易对日志**：每个交易对单独的日志文件
+3. **性能指标日志**：记录内存、CPU等系统资源使用情况
+
+### 日志轮转
+
+- **大小轮转**：根据文件大小自动轮转(如10MB)
+- **数量控制**：默认保留5个备份，完整模式保留100个以上
+- **日志归档**：可自动创建历史日志归档用于长期分析
+
+### 日志分析
+
+完整的日志历史可用于：
+- 内存波动分析
+- 信号分布统计
+- 错误模式识别
+- 性能优化
+
+## 监控系统
+
+系统内置Prometheus指标导出器，提供关键运行指标：
+
+### 核心指标
+
+1. **trade_count**：交易计数器，按交易对和操作类型分类
+2. **error_count**：错误计数器，按错误类型分类
+3. **heartbeat_age**：心跳年龄，监控系统活跃度
+4. **data_source_status**：数据源状态指标
+5. **memory_usage**：内存使用情况
+6. **price**：各交易对价格
+
+### Grafana集成
+
+系统支持与Grafana集成创建可视化仪表板，包括：
+- 交易活动监控
+- 系统资源仪表板
+- 错误率告警
+- 数据源状态监控
+
+## 部署选项
+
+系统支持多种部署方式：
+
+### Docker容器化部署
+
+使用提供的Dockerfile和docker-compose.yml文件快速部署：
+
+```bash
+# 构建并启动所有服务
+docker-compose up -d
+```
+
+### 健康检查
+
+- 容器内建Health Check，监控`/metrics`端点
+- 支持自动重启和故障恢复
+- 配置了适当的启动和超时时间
+
+### 自动升级
+
+- 支持蓝绿部署策略
+- 通过CI/CD流程自动构建和测试
+- 零停机升级机制
+
+## 持续集成与部署
+
+项目使用GitHub Actions实现自动化CI/CD流程：
+
+1. **代码质量检查**：运行flake8/black/isort确保代码质量
+2. **自动化测试**：使用pytest运行单元测试
+3. **Docker镜像构建**：构建并推送到GitHub容器注册表(GHCR)
+4. **镜像验证**：测试构建的镜像，确保功能正常
+5. **自动部署**：支持自动部署到生产环境
+
+## 快速开始
+
+### 安装依赖
+
+```bash
+pip install -r requirements.txt
+```
+
+### 创建配置
+
+```bash
+cp scripts/config.yaml.template config.yaml
+# 编辑配置文件设置参数
+```
+
+### 运行稳定性测试
+
+```bash
+./scripts/run_stability_test.sh --days 7 --interval 60
+```
+
+### 命令行选项
+
+```
+稳定性测试运行脚本
+
+用法: ./scripts/run_stability_test.sh [选项]
+
+选项:
+  --days N               测试持续天数 (默认: 3)
+  --interval N           检查间隔(秒) (默认: 60)
+  --mock-only            仅使用模拟数据，不连接Binance
+  --config FILE          使用指定的INI配置文件
+  --config-yaml FILE     使用指定的YAML配置文件
+  --env-file FILE        使用指定的环境变量文件
+  --symbols "S1,S2"      要测试的交易对，逗号分隔
+  --monitoring-port N    监控端口 (默认: 9090)
+  --no-preserve-logs     不保留完整历史日志
+  --help                 显示此帮助信息
+```
+
+### Docker运行
+
+```bash
+# 构建镜像
+docker build -t trading-system .
+
+# 运行容器
+docker run -d -p 9090:9090 -v $(pwd)/config.yaml:/app/config.yaml -v $(pwd)/logs:/app/logs trading-system
+```
+
+## 文档
+
+详细文档请参阅：
+
+- [数据源文档](docs/DATA_SOURCES.md) - 数据层详细设计和使用方法
+- [监控系统文档](docs/MONITORING.md) - Prometheus和Grafana配置指南
+- [Docker部署文档](docs/DOCKER_DEPLOYMENT.md) - 容器化部署详细说明
+- [CI/CD文档](docs/CI_CD.md) - 持续集成与部署流程
+
+## 许可证
+
+MIT
 
 ```mermaid
 graph TD

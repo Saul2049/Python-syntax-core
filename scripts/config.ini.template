@@ -1,6 +1,6 @@
 [general]
 # 一般设置
-symbols = BTC/USDT,ETH/USDT,LTC/USDT
+symbols = BTC/USDT,ETH/USDT
 risk_percent = 0.5
 check_interval = 60
 test_mode = true
@@ -22,15 +22,4 @@ api_secret = YOUR_BINANCE_TESTNET_API_SECRET
 [logging]
 # 日志设置
 level = INFO
-log_dir = logs/stability_test
-
-[BINANCE]
-API_KEY = RJ36X1UYesKrUwf6rnIQkkd5Cfyk2f0Epe719Xb9q2PR28QcrKdPZ5jBL2qGMehr
-API_SECRET = uimocTQN5g8RF1P9UZN9zQ0rLuqIXrot4xuABgJZjbWRgoU0NOxoUvlG8lyfey1S
-
-[TRADING]
-SYMBOL = BTCUSDT
-RISK_FRACTION = 0.02
-FAST_WINDOW = 7
-SLOW_WINDOW = 20
-ATR_WINDOW = 14 
+log_dir = logs/stability_test 

@@ -1,133 +1,153 @@
 #!/bin/bash
-# 运行稳定性测试的脚本
-# Script to run a stability test
+# 稳定性测试运行脚本
 
-set -e
+# 设置路径和环境变量
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+PROJECT_ROOT="$( cd "$SCRIPT_DIR/.." && pwd )"
+LOG_DIR="$PROJECT_ROOT/logs/stability_test_$(date +%Y%m%d)"
 
-# 确保在项目根目录运行
-cd "$(dirname "$0")/.."
-ROOT_DIR=$(pwd)
-
-# 创建日志目录
-LOG_DIR="$ROOT_DIR/logs/stability_test_$(date +%Y%m%d)"
+# 确保日志目录存在
 mkdir -p "$LOG_DIR"
 
-# 安装必要的依赖
-echo "正在检查并安装必要的依赖..."
-pip install --quiet psutil
-pip install --quiet -r requirements.txt
-
-# 生成唯一的测试ID
-TEST_ID=$(date +%Y%m%d_%H%M%S)
-LOG_FILE="$LOG_DIR/stability_test_$TEST_ID.log"
-
-# 设置测试参数
-SYMBOLS="BTC/USDT,ETH/USDT"
+# 默认参数
 DAYS=3
-INTERVAL=60  # 每分钟检查一次
-RISK=0.5     # 降低风险系数进行测试
+INTERVAL=60
+MOCK_ONLY=0
+CONFIG_FILE=""
+CONFIG_YAML=""
+ENV_FILE=""
+SYMBOLS=""
+MONITORING_PORT=9090
+PRESERVE_LOGS=1  # 默认保留完整日志
 
-echo "==============================================" | tee -a "$LOG_FILE"
-echo "开始稳定性测试 (ID: $TEST_ID)" | tee -a "$LOG_FILE"
-echo "测试时间: $(date)" | tee -a "$LOG_FILE" 
-echo "测试交易对: $SYMBOLS" | tee -a "$LOG_FILE"
-echo "持续时间: $DAYS 天" | tee -a "$LOG_FILE"
-echo "检查间隔: $INTERVAL 秒" | tee -a "$LOG_FILE"
-echo "风险系数: $RISK" | tee -a "$LOG_FILE"
-echo "日志文件: $LOG_FILE" | tee -a "$LOG_FILE"
-echo "==============================================" | tee -a "$LOG_FILE"
+# 处理命令行参数
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --days)
+      DAYS="$2"
+      shift 2
+      ;;
+    --interval)
+      INTERVAL="$2"
+      shift 2
+      ;;
+    --mock-only)
+      MOCK_ONLY=1
+      shift
+      ;;
+    --config)
+      CONFIG_FILE="$2"
+      shift 2
+      ;;
+    --config-yaml)
+      CONFIG_YAML="$2"
+      shift 2
+      ;;
+    --env-file)
+      ENV_FILE="$2"
+      shift 2
+      ;;
+    --symbols)
+      SYMBOLS="$2"
+      shift 2
+      ;;
+    --monitoring-port)
+      MONITORING_PORT="$2"
+      shift 2
+      ;;
+    --no-preserve-logs)
+      PRESERVE_LOGS=0
+      shift
+      ;;
+    --help)
+      echo "稳定性测试运行脚本"
+      echo ""
+      echo "用法: $0 [选项]"
+      echo ""
+      echo "选项:"
+      echo "  --days N               测试持续天数 (默认: 3)"
+      echo "  --interval N           检查间隔(秒) (默认: 60)"
+      echo "  --mock-only            仅使用模拟数据，不连接Binance"
+      echo "  --config FILE          使用指定的INI配置文件"
+      echo "  --config-yaml FILE     使用指定的YAML配置文件"
+      echo "  --env-file FILE        使用指定的.env环境变量文件"
+      echo "  --symbols \"S1,S2\"      要测试的交易对，逗号分隔"
+      echo "  --monitoring-port N    监控端口 (默认: 9090)"
+      echo "  --no-preserve-logs     不保留完整历史日志"
+      echo "  --help                 显示此帮助信息"
+      exit 0
+      ;;
+    *)
+      echo "未知选项: $1"
+      exit 1
+      ;;
+  esac
+done
 
-# 启动守护进程监控
-monitor_pid=""
+# 构建命令行参数
+ARGS=("--days" "$DAYS" "--interval" "$INTERVAL" "--monitoring-port" "$MONITORING_PORT")
 
-# 检测操作系统类型
-OS_TYPE=$(uname)
-
-# 函数：监控测试进程
-function monitor_test() {
-    local pid=$1
-    local log_file=$2
-    local check_interval=300  # 每5分钟检查一次
-
-    echo "启动监控进程..." | tee -a "$log_file"
-    
-    while true; do
-        if ! ps -p $pid > /dev/null; then
-            echo "警告: 测试进程 $pid 不再运行，退出监控." | tee -a "$log_file"
-            return 1
-        fi
-        
-        # 记录系统状态 - 根据操作系统调整命令
-        echo "--- $(date) ---" >> "$LOG_DIR/system_status_$TEST_ID.log"
-        
-        # CPU使用率
-        echo "CPU使用率:" >> "$LOG_DIR/system_status_$TEST_ID.log"
-        if [ "$OS_TYPE" = "Darwin" ]; then
-            # macOS
-            top -l 1 | head -n 12 >> "$LOG_DIR/system_status_$TEST_ID.log"
-        else
-            # Linux
-            top -bn1 | head -n 12 >> "$LOG_DIR/system_status_$TEST_ID.log"
-        fi
-        echo "" >> "$LOG_DIR/system_status_$TEST_ID.log"
-        
-        # 内存使用率
-        echo "内存使用率:" >> "$LOG_DIR/system_status_$TEST_ID.log"
-        if [ "$OS_TYPE" = "Darwin" ]; then
-            # macOS
-            vm_stat >> "$LOG_DIR/system_status_$TEST_ID.log"
-        else
-            # Linux
-            free -m >> "$LOG_DIR/system_status_$TEST_ID.log"
-        fi
-        echo "" >> "$LOG_DIR/system_status_$TEST_ID.log"
-        
-        # 磁盘使用率
-        echo "磁盘使用率:" >> "$LOG_DIR/system_status_$TEST_ID.log"
-        df -h >> "$LOG_DIR/system_status_$TEST_ID.log"
-        echo "" >> "$LOG_DIR/system_status_$TEST_ID.log"
-        
-        sleep $check_interval
-    done
-}
-
-# 启动测试
-echo "启动稳定性测试..." | tee -a "$LOG_FILE"
-python scripts/stability_test.py \
-    --symbols "$SYMBOLS" \
-    --days "$DAYS" \
-    --interval "$INTERVAL" \
-    --risk "$RISK" \
-    --log-dir "$LOG_DIR" >> "$LOG_FILE" 2>&1 &
-
-TEST_PID=$!
-echo "测试进程ID: $TEST_PID" | tee -a "$LOG_FILE"
-
-# 启动监控
-monitor_test $TEST_PID "$LOG_FILE" &
-MONITOR_PID=$!
-echo "监控进程ID: $MONITOR_PID" | tee -a "$LOG_FILE"
-
-# 显示如何检查测试状态
-echo "" | tee -a "$LOG_FILE"
-echo "测试正在后台运行。您可以使用以下命令检查状态:" | tee -a "$LOG_FILE"
-echo "  tail -f $LOG_FILE" | tee -a "$LOG_FILE"
-echo "" | tee -a "$LOG_FILE"
-echo "要终止测试，请运行:" | tee -a "$LOG_FILE"
-echo "  kill $TEST_PID $MONITOR_PID" | tee -a "$LOG_FILE"
-echo "" | tee -a "$LOG_FILE"
-
-# 保存进程ID以便后续控制
-echo "$TEST_PID $MONITOR_PID" > "$LOG_DIR/pids.txt"
-
-# 计算结束日期 - 兼容不同操作系统
-if [ "$OS_TYPE" = "Darwin" ]; then
-    # macOS 使用date -v
-    END_DATE=$(date -v+${DAYS}d)
-else
-    # Linux 使用date -d
-    END_DATE=$(date -d "$DAYS days")
+# 添加可选参数
+if [[ $MOCK_ONLY -eq 1 ]]; then
+  ARGS+=("--mock-only")
 fi
 
-echo "测试预计将在 $END_DATE 完成" | tee -a "$LOG_FILE"
-echo "完成后将在 $LOG_DIR 生成测试报告" | tee -a "$LOG_FILE" 
+if [[ -n "$CONFIG_FILE" ]]; then
+  ARGS+=("--config" "$CONFIG_FILE")
+fi
+
+if [[ -n "$CONFIG_YAML" ]]; then
+  ARGS+=("--config-yaml" "$CONFIG_YAML")
+fi
+
+if [[ -n "$ENV_FILE" ]]; then
+  ARGS+=("--env-file" "$ENV_FILE")
+fi
+
+if [[ -n "$SYMBOLS" ]]; then
+  ARGS+=("--symbols" "$SYMBOLS")
+fi
+
+if [[ $PRESERVE_LOGS -eq 0 ]]; then
+  ARGS+=("--no-preserve-logs")
+fi
+
+# 设置Python路径
+PYTHONPATH="$PROJECT_ROOT:$PYTHONPATH"
+export PYTHONPATH
+
+# 输出当前设置
+echo "启动稳定性测试:"
+echo "- 持续时间: $DAYS 天"
+echo "- 检查间隔: $INTERVAL 秒"
+echo "- 日志目录: $LOG_DIR"
+echo "- 保留完整日志: $([ "$PRESERVE_LOGS" -eq 1 ] && echo "是" || echo "否")"
+echo "- 监控端口: $MONITORING_PORT"
+if [[ -n "$SYMBOLS" ]]; then
+  echo "- 交易对: $SYMBOLS"
+fi
+if [[ $MOCK_ONLY -eq 1 ]]; then
+  echo "- 仅使用模拟数据"
+fi
+
+# 运行测试
+echo "运行命令: python $SCRIPT_DIR/stability_test.py ${ARGS[@]} --log-dir $LOG_DIR"
+python "$SCRIPT_DIR/stability_test.py" "${ARGS[@]}" --log-dir "$LOG_DIR"
+
+# 检查运行结果
+EXIT_CODE=$?
+if [[ $EXIT_CODE -eq 0 ]]; then
+  echo "稳定性测试成功完成"
+else
+  echo "稳定性测试失败或被中断，退出代码: $EXIT_CODE"
+fi
+
+# 创建日志归档
+if [[ $EXIT_CODE -eq 0 && $PRESERVE_LOGS -eq 1 ]]; then
+  ARCHIVE_NAME="stability_logs_$(date +%Y%m%d_%H%M%S).tar.gz"
+  echo "创建日志归档: $ARCHIVE_NAME"
+  tar -czf "$PROJECT_ROOT/logs/$ARCHIVE_NAME" -C "$PROJECT_ROOT/logs" "$(basename $LOG_DIR)"
+  echo "日志归档已创建: $PROJECT_ROOT/logs/$ARCHIVE_NAME"
+fi
+
+exit $EXIT_CODE 
