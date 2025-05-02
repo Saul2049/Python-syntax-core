@@ -12,9 +12,9 @@ authors = [
 ]
 requires-python = ">=3.8"
 dependencies = [
-    "pandas>=2.1.4",
-    "numpy>=1.26.3",
-    "matplotlib>=3.8.2",
+    "pandas==2.0.3",
+    "numpy==1.25.1",
+    "matplotlib==3.7.2",
     "tqdm>=4.66.1",
 ]
 classifiers = [
@@ -23,6 +23,13 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "Topic :: Office/Business :: Financial :: Investment",
 ]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+python_classes = "Test*"
+python_functions = "test_*"
+addopts = "--verbose"
 
 [tool.black]
 line-length = 100
