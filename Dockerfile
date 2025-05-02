@@ -12,7 +12,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY . /app/
 
 # 安装Python依赖
-RUN pip install --no-cache-dir -r requirements.txt
+# 明确指定pytest版本，避免冲突
+RUN pip install --no-cache-dir 'pytest>=7.4.0,<8.0.0' && \
+    pip install --no-cache-dir -r requirements.txt
 
 # 设置环境变量
 ENV PYTHONUNBUFFERED=1 \
