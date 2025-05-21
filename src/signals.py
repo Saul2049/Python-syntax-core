@@ -39,7 +39,9 @@ def crossunder(series1: pd.Series, series2: pd.Series) -> pd.Series:
     return (series1 < series2) & (series1.shift(1) >= series2.shift(1))
 
 
-def moving_average(series: pd.Series, window: int, kind: str = "simple", type: str = None) -> pd.Series:
+def moving_average(
+    series: pd.Series, window: int, kind: str = "simple", type: str = None
+) -> pd.Series:
     """
     计算移动平均
 
@@ -62,7 +64,9 @@ def moving_average(series: pd.Series, window: int, kind: str = "simple", type: s
     elif ma_type.lower() == "wma":
         # 实现加权移动平均
         weights = np.arange(1, window + 1)
-        return series.rolling(window=window).apply(lambda x: np.sum(weights * x) / np.sum(weights), raw=True)
+        return series.rolling(window=window).apply(
+            lambda x: np.sum(weights * x) / np.sum(weights), raw=True
+        )
     else:
         raise ValueError(f"不支持的移动平均类型: {ma_type}. 支持的类型: 'sma', 'ema', 'wma'")
 

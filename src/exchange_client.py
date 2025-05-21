@@ -129,7 +129,8 @@ class ExchangeClient:
                 if attempt < self.retry_count - 1:
                     sleep_time = self.retry_delay * (2**attempt)  # 指数退避
                     logger.warning(
-                        f"请求失败 (尝试 {attempt+1}/{self.retry_count}): " f"{str(e)}. 等待 {sleep_time}秒后重试..."
+                        f"请求失败 (尝试 {attempt+1}/{self.retry_count}): "
+                        f"{str(e)}. 等待 {sleep_time}秒后重试..."
                     )
                     time.sleep(sleep_time)
                 else:

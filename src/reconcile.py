@@ -11,7 +11,9 @@ from src import utils
 from src.broker import Broker
 
 
-def get_exchange_trades(symbol: str, start_date: str, end_date: str, api_key: str, api_secret: str) -> pd.DataFrame:
+def get_exchange_trades(
+    symbol: str, start_date: str, end_date: str, api_key: str, api_secret: str
+) -> pd.DataFrame:
     """
     从交易所获取交易历史。
     Get trade history from exchange.
@@ -306,7 +308,9 @@ def daily_reconciliation(
     balances = verify_balances(symbol, api_key, api_secret)
 
     # 记录结果 (Log results)
-    log_reconciliation_results(symbol, date, matched, exchange_only, local_only, balances, output_dir)
+    log_reconciliation_results(
+        symbol, date, matched, exchange_only, local_only, balances, output_dir
+    )
 
     # 发送通知 (Send notification)
     if notify and (len(exchange_only) > 0 or len(local_only) > 0):

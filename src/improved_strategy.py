@@ -33,13 +33,15 @@ def simple_ma_cross(
 
     # 当短期移动平均线上穿长期移动平均线时买入
     signals.loc[
-        (signals["short_ma"] > signals["long_ma"]) & (signals["short_ma"].shift(1) <= signals["long_ma"].shift(1)),
+        (signals["short_ma"] > signals["long_ma"])
+        & (signals["short_ma"].shift(1) <= signals["long_ma"].shift(1)),
         "signal",
     ] = 1
 
     # 当短期移动平均线下穿长期移动平均线时卖出
     signals.loc[
-        (signals["short_ma"] < signals["long_ma"]) & (signals["short_ma"].shift(1) >= signals["long_ma"].shift(1)),
+        (signals["short_ma"] < signals["long_ma"])
+        & (signals["short_ma"].shift(1) >= signals["long_ma"].shift(1)),
         "signal",
     ] = -1
 
@@ -75,13 +77,15 @@ def bollinger_breakout(
 
     # 当价格突破上轨时买入
     signals.loc[
-        (data[column] > signals["upper_band"]) & (data[column].shift(1) <= signals["upper_band"].shift(1)),
+        (data[column] > signals["upper_band"])
+        & (data[column].shift(1) <= signals["upper_band"].shift(1)),
         "signal",
     ] = 1
 
     # 当价格跌破下轨时卖出
     signals.loc[
-        (data[column] < signals["lower_band"]) & (data[column].shift(1) >= signals["lower_band"].shift(1)),
+        (data[column] < signals["lower_band"])
+        & (data[column].shift(1) >= signals["lower_band"].shift(1)),
         "signal",
     ] = -1
 
@@ -166,13 +170,15 @@ def macd_strategy(
 
     # 当MACD线上穿信号线时买入
     signals.loc[
-        (signals["macd"] > signals["macd_signal"]) & (signals["macd"].shift(1) <= signals["macd_signal"].shift(1)),
+        (signals["macd"] > signals["macd_signal"])
+        & (signals["macd"].shift(1) <= signals["macd_signal"].shift(1)),
         "signal",
     ] = 1
 
     # 当MACD线下穿信号线时卖出
     signals.loc[
-        (signals["macd"] < signals["macd_signal"]) & (signals["macd"].shift(1) >= signals["macd_signal"].shift(1)),
+        (signals["macd"] < signals["macd_signal"])
+        & (signals["macd"].shift(1) >= signals["macd_signal"].shift(1)),
         "signal",
     ] = -1
 
@@ -291,13 +297,15 @@ def trend_following_strategy(
 
     # 上升趋势：价格突破上轨
     signals.loc[
-        (data[column] > signals["upper_band"]) & (data[column].shift(1) <= signals["upper_band"].shift(1)),
+        (data[column] > signals["upper_band"])
+        & (data[column].shift(1) <= signals["upper_band"].shift(1)),
         "signal",
     ] = 1
 
     # 下降趋势：价格跌破下轨
     signals.loc[
-        (data[column] < signals["lower_band"]) & (data[column].shift(1) >= signals["lower_band"].shift(1)),
+        (data[column] < signals["lower_band"])
+        & (data[column].shift(1) >= signals["lower_band"].shift(1)),
         "signal",
     ] = -1
 

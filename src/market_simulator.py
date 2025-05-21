@@ -104,7 +104,9 @@ class MarketSimulator:
         )
 
         # 计算佣金
-        self.positions["commission"] = abs(self.positions["signal"]) * self.positions["exec_price"] * self.commission
+        self.positions["commission"] = (
+            abs(self.positions["signal"]) * self.positions["exec_price"] * self.commission
+        )
 
         # 记录交易
         self._record_trades()
@@ -152,7 +154,11 @@ class MarketSimulator:
             if row["signal"] != prev_signal:
                 if row["signal"] > 0 and prev_signal <= 0:
                     # 买入信号
-                    units_to_buy = self.holdings.loc[date, "cash"] * 0.99 / (row["exec_price"] * (1 + self.commission))
+                    units_to_buy = (
+                        self.holdings.loc[date, "cash"]
+                        * 0.99
+                        / (row["exec_price"] * (1 + self.commission))
+                    )
                     cost = units_to_buy * row["exec_price"] * (1 + self.commission)
 
                     self.holdings.loc[date, "units"] += units_to_buy
@@ -181,7 +187,9 @@ class MarketSimulator:
         self.performance["daily_returns"] = self.performance["total_value"].pct_change()
 
         # 计算累计收益率
-        self.performance["cumulative_returns"] = self.performance["total_value"] / self.initial_capital - 1
+        self.performance["cumulative_returns"] = (
+            self.performance["total_value"] / self.initial_capital - 1
+        )
 
         # 计算其他指标
         self._calculate_risk_metrics()
@@ -193,7 +201,9 @@ class MarketSimulator:
         years = days / 365.0
 
         total_return = self.performance["cumulative_returns"].iloc[-1]
-        self.performance["annualized_return"] = (1 + total_return) ** (1 / years) - 1 if years > 0 else total_return
+        self.performance["annualized_return"] = (
+            (1 + total_return) ** (1 / years) - 1 if years > 0 else total_return
+        )
 
         # 波动率
         self.performance["volatility"] = self.performance["daily_returns"].std() * np.sqrt(252)
@@ -201,7 +211,8 @@ class MarketSimulator:
         # 夏普比率
         risk_free_rate = 0.0  # 可以根据需要调整
         self.performance["sharpe_ratio"] = (
-            (self.performance["annualized_return"] - risk_free_rate) / self.performance["volatility"]
+            (self.performance["annualized_return"] - risk_free_rate)
+            / self.performance["volatility"]
             if self.performance["volatility"].iloc[-1] > 0
             else 0
         )
@@ -392,7 +403,9 @@ def run_simple_backtest(
         包含回测统计数据的字典
     """
     # 创建模拟器实例
-    simulator = MarketSimulator(data, initial_capital=initial_capital, commission=commission, slippage=slippage)
+    simulator = MarketSimulator(
+        data, initial_capital=initial_capital, commission=commission, slippage=slippage
+    )
 
     # 运行回测
     simulator.run_backtest(strategy_func, **strategy_params)

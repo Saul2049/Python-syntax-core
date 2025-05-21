@@ -59,7 +59,8 @@ def calculate_atr(df: pd.DataFrame, window: int = 14) -> float:
     df["atr"] = df["tr"].rolling(window).mean()
 
     # 返回最新的ATR值 (Return latest ATR value)
-    return df["atr"].iloc[-1]
+    # Handle empty ATR series case
+    return df["atr"].iloc[-1] if not df["atr"].empty else 0.0
 
 
 def get_trading_signals(df: pd.DataFrame, fast_win: int = 7, slow_win: int = 25) -> Dict[str, Any]:
@@ -154,40 +155,20 @@ def trading_loop(symbol: str = "BTCUSDT", interval_seconds: int = 60):
 
                 # 如果止损已触发，跳过信号处理 (Skip signal processing if stop loss triggered)
                 if stop_triggered:
-                    print("止损已触发，跳过信号处理 (Stop loss triggered, skipping signal processing)")
+                    print(
+                        "止损已触发，跳过信号处理 (Stop loss triggered, skipping signal processing)"
+                    )
                 else:
-                    # 处理买入信号 (Process buy signals)
-                    if signals["buy_signal"] and symbol not in broker.positions:
-                        # 计算仓位大小 - 假设 1% 风险 (Calculate position size - assume 1% risk)
-                        equity = 10000.0  # 示例权益 (Example equity)
-                        risk_amount = equity * 0.01
-                        stop_price = current_price - (atr * 2.0)
-                        risk_per_unit = current_price - stop_price
-                        quantity = risk_amount / risk_per_unit
-
-                        # 限制数量小数位 (Limit decimal places)
-                        quantity = round(quantity, 3)  # 假设最小单位是0.001 (Assume minimum unit is 0.001)
-
-                        # 执行买入订单 (Execute buy order)
-                        reason = f"MA交叉: 快线 {signals['fast_ma']:.2f} " f"上穿 慢线 {signals['slow_ma']:.2f}"
-                        broker.execute_order(
-                            symbol=symbol,
-                            side="BUY",
-                            quantity=quantity,
-                            reason=reason,
-                        )
-
-                    # 处理卖出信号 (Process sell signals)
-                    elif signals["sell_signal"] and symbol in broker.positions:
-                        # 执行卖出订单 (Execute sell order)
-                        position = broker.positions[symbol]
-                        reason = f"MA交叉: 快线 {signals['fast_ma']:.2f} " f"下穿 慢线 {signals['slow_ma']:.2f}"
-                        broker.execute_order(
-                            symbol=symbol,
-                            side="SELL",
-                            quantity=position["quantity"],
-                            reason=reason,
-                        )
+                    # 处理交易信号
+                    _handle_trading_signals(
+                        broker=broker,
+                        signals_data=signals,
+                        symbol=symbol,
+                        current_price=current_price,
+                        atr=atr,
+                        equity=10000.0,  # 示例权益 (Example equity)
+                        risk_percent=0.01,  # 示例风险百分比 (Example risk percentage)
+                    )
 
                 # 打印状态 (Print status)
                 print(
@@ -197,31 +178,7 @@ def trading_loop(symbol: str = "BTCUSDT", interval_seconds: int = 60):
 
                 # 每小时发送状态通知 (Send status notification every hour)
                 if (current_time - last_check).total_seconds() >= 3600:  # 3600秒 = 1小时
-                    status_msg = (
-                        f"📈 状态更新 (Status Update)\n"
-                        f"品种 (Symbol): {symbol}\n"
-                        f"价格 (Price): {current_price:.8f}\n"
-                        f"ATR: {atr:.8f}\n"
-                        f"快线 (Fast MA): {signals['fast_ma']:.8f}\n"
-                        f"慢线 (Slow MA): {signals['slow_ma']:.8f}\n"
-                        f"头寸 (Position): {'有' if symbol in broker.positions else '无'}"
-                    )
-
-                    if symbol in broker.positions:
-                        position = broker.positions[symbol]
-                        status_msg += f"\n入场价 (Entry): {position['entry_price']:.8f}"
-                        status_msg += f"\n止损价 (Stop): {position['stop_price']:.8f}"
-                        status_msg += f"\n数量 (Quantity): {position['quantity']:.8f}"
-                        status_msg += (
-                            f"\n盈亏 (P/L): "
-                            f"{(current_price - position['entry_price']) * position['quantity']:.8f} USDT"
-                        )
-                        status_msg += (
-                            f"\n盈亏% (P/L%): "
-                            f"{((current_price - position['entry_price'])/position['entry_price'])*100:.2f}%"
-                        )
-
-                    broker.notifier.notify(status_msg, "INFO")
+                    _send_hourly_status(broker, symbol, current_price, atr, signals)
                     last_check = current_time
 
             except Exception as e:
@@ -236,6 +193,121 @@ def trading_loop(symbol: str = "BTCUSDT", interval_seconds: int = 60):
         # 发送关闭通知 (Send shutdown notification)
         broker.notifier.notify("🛑 交易机器人关闭 (Trading bot stopped)", "INFO")
         print("交易循环已关闭 (Trading loop stopped)")
+
+
+def _calculate_trade_quantity(
+    equity: float, current_price: float, atr: float, risk_percent: float
+) -> float:
+    """
+    计算基于风险的交易数量。
+    Calculate trade quantity based on risk.
+    """
+    if atr <= 0:  # 防止ATR为0或负数导致除零错误或逻辑问题
+        print("ATR is zero or negative, cannot calculate trade quantity.")
+        return 0.0
+
+    risk_amount = equity * risk_percent
+    # 假设止损设置在2倍ATR下方 (Assume stop loss is set 2 * ATR below)
+    # 对于买入，止损价 = 当前价 - (ATR * 2)
+    # risk_per_unit 是每单位资产在触及止损时的预期损失
+    stop_price_offset = atr * 2.0
+    risk_per_unit = stop_price_offset # More direct: risk per unit is the stop distance
+
+    if risk_per_unit <= 0: # 防止除零或负数 (Prevent division by zero or negative)
+        print("Risk per unit is zero or negative, cannot calculate trade quantity.")
+        return 0.0
+
+    quantity = risk_amount / risk_per_unit
+    return round(quantity, 3)  # 假设最小单位是0.001 (Assume minimum unit is 0.001)
+
+
+def _handle_trading_signals(
+    broker: Broker,
+    signals_data: Dict[str, Any],
+    symbol: str,
+    current_price: float,
+    atr: float,
+    equity: float,
+    risk_percent: float,
+):
+    """
+    处理交易信号并执行订单。
+    Process trading signals and execute orders.
+    """
+    # 处理买入信号 (Process buy signals)
+    if signals_data["buy_signal"] and symbol not in broker.positions:
+        quantity = _calculate_trade_quantity(equity, current_price, atr, risk_percent)
+        if quantity > 0:
+            reason = (
+                f"MA交叉: 快线 {signals_data['fast_ma']:.2f} "
+                f"上穿 慢线 {signals_data['slow_ma']:.2f}"
+            )
+            broker.execute_order(
+                symbol=symbol,
+                side="BUY",
+                quantity=quantity,
+                reason=reason,
+            )
+
+    # 处理卖出信号 (Process sell signals)
+    elif signals_data["sell_signal"] and symbol in broker.positions:
+        position = broker.positions[symbol]
+        reason = (
+            f"MA交叉: 快线 {signals_data['fast_ma']:.2f} "
+            f"下穿 慢线 {signals_data['slow_ma']:.2f}"
+        )
+        broker.execute_order(
+            symbol=symbol,
+            side="SELL",
+            quantity=position["quantity"], # Sell the entire position
+            reason=reason,
+        )
+
+
+def _send_hourly_status(
+    broker: Broker,
+    symbol: str,
+    current_price: float,
+    atr: float,
+    signals_data: Dict[str, Any],
+):
+    """
+    发送每小时状态更新通知。
+    Send hourly status update notification.
+    """
+    status_msg = (
+        f"📈 状态更新 (Status Update)\n"
+        f"品种 (Symbol): {symbol}\n"
+        f"价格 (Price): {current_price:.8f}\n"
+        f"ATR: {atr:.8f}\n"
+        f"快线 (Fast MA): {signals_data['fast_ma']:.8f}\n"
+        f"慢线 (Slow MA): {signals_data['slow_ma']:.8f}\n"
+        f"头寸 (Position): {'有' if symbol in broker.positions else '无'}"
+    )
+
+    if symbol in broker.positions:
+        position = broker.positions[symbol]
+        status_msg += f"\n入场价 (Entry): {position['entry_price']:.8f}"
+        status_msg += f"\n止损价 (Stop): {position['stop_price']:.8f}"
+        status_msg += f"\n数量 (Quantity): {position['quantity']:.8f}"
+        # Ensure entry_price is not zero to avoid division by zero for P/L%
+        entry_price_for_calc = position['entry_price'] if position['entry_price'] != 0 else current_price
+        if entry_price_for_calc == 0 and current_price == 0 : # Avoid division by zero if both are zero
+             pnl_percent = 0.0
+        elif entry_price_for_calc == 0: # if entry is zero but current is not, treat as 100% gain or loss if appropriate
+            pnl_percent = 100.0 if current_price > 0 else -100.0
+        else:
+            pnl_percent = ((current_price - entry_price_for_calc) / entry_price_for_calc) * 100
+
+        status_msg += (
+            f"\n盈亏 (P/L): "
+            f"{(current_price - position['entry_price']) * position['quantity']:.8f} USDT"
+        )
+        status_msg += (
+            f"\n盈亏% (P/L%): {pnl_percent:.2f}%"
+        )
+
+    broker.notifier.notify(status_msg, "INFO")
 
 
 if __name__ == "__main__":

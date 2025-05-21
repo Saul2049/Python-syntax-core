@@ -294,7 +294,9 @@ def backtest_single(
                         "type": "sell_signal",
                     }
                 )
-                print(f"[{price.index[i]}] 卖出信号: 价格 {p:.2f}, 盈亏: {(p - entry) * position:.2f}")
+                print(
+                    f"[{price.index[i]}] 卖出信号: 价格 {p:.2f}, 盈亏: {(p - entry) * position:.2f}"
+                )
 
             position = 0
             entry = None
@@ -323,7 +325,9 @@ def backtest_single(
                         "type": "buy_signal",
                     }
                 )
-                print(f"[{price.index[i]}] 买入信号: 价格 {p:.2f}, 仓位 {position:.3f}, 止损 {stop:.2f}")
+                print(
+                    f"[{price.index[i]}] 买入信号: 价格 {p:.2f}, 仓位 {position:.3f}, 止损 {stop:.2f}"
+                )
 
         equity_curve.append(equity + (p - entry) * position if position else equity)
 
@@ -390,7 +394,7 @@ def backtest_portfolio(
 
     asset_count = len(prices_dict)
     if asset_count == 0:
-        return pd.Series()
+        return pd.Series(dtype=float)  # Return empty Series with float dtype for consistency
 
     # 计算每个资产的基础回测曲线
     base_equity = init_equity / asset_count if asset_count > 1 else init_equity
@@ -512,16 +516,124 @@ def backtest_portfolio(
         for asset in equity_df.columns:
             # 获取此资产的原始单日回报率
             day_return = (
-                equity_df.iloc[i][asset] / equity_df.iloc[i - 1][asset] if equity_df.iloc[i - 1][asset] > 0 else 1.0
+                equity_df.iloc[i][asset] / equity_df.iloc[i - 1][asset]
+                if equity_df.iloc[i - 1][asset] > 0
+                else 1.0
             )
 
             # 应用加权后的资金计算新权益
             target_allocation = prev_total_equity * weights_df.iloc[i][asset]
-            adjusted_equity_df.iloc[i, adjusted_equity_df.columns.get_loc(asset)] = target_allocation * day_return
+            adjusted_equity_df.iloc[i, adjusted_equity_df.columns.get_loc(asset)] = (
+                target_allocation * day_return
+            )
 
     # 计算总投资组合价值
     adjusted_equity_df["Portfolio"] = adjusted_equity_df.sum(axis=1)
 
+    return adjusted_equity_df
+
+
+def _calculate_dynamic_weights(
+    composite_df: pd.DataFrame,
+    index: pd.Index,
+    asset_count: int,
+    lookback: int,
+    min_weight_factor: float,
+    max_weight_factor: float,
+    weight_power: float,
+    asset_keys: list,
+) -> pd.DataFrame:
+    """
+    Helper function to calculate dynamic weights for assets in a portfolio.
+    """
+    # 初始化权重矩阵
+    weights_df = pd.DataFrame(1.0 / asset_count, index=index, columns=composite_df.columns)
+
+    # 滚动调整权重
+    for i in range(lookback + 1, len(index)):
+        # 获取当前绩效指标
+        performance = composite_df.iloc[i - 1]  # 使用前一天的指标
+
+        # 避免所有资产都是负收益的极端情况
+        if all(performance <= 0):
+            min_performance = performance.min()
+            if min_performance < 0:
+                # 在所有为负时，选择最不差的
+                adjusted_performance = performance - min_performance + 0.0001
+            else:
+                # 所有为0时，保持等权
+                weights_df.iloc[i] = 1.0 / asset_count
+                continue
+        else:
+            # 将负指标调整为0
+            adjusted_performance = performance.copy()
+            adjusted_performance[adjusted_performance < 0] = 0
+
+        # 如果所有调整后表现都是0，使用等权
+        if adjusted_performance.sum() == 0:
+            weights_df.iloc[i] = 1.0 / asset_count
+            continue
+
+        # 使用幂函数放大表现差异 - 增强表现好的资产权重
+        if weight_power != 1.0:
+            for asset in adjusted_performance.index:
+                if adjusted_performance[asset] > 0:
+                    adjusted_performance[asset] = adjusted_performance[asset] ** weight_power
+
+        # 计算原始权重
+        raw_weights = adjusted_performance / adjusted_performance.sum()
+
+        # 应用权重限制
+        constrained_weights = raw_weights.copy()
+
+        # 限制权重在最小和最大范围内
+        base_weight = 1.0 / asset_count
+        for asset in asset_keys: # Use asset_keys passed to function
+            min_allowed = base_weight * min_weight_factor
+            max_allowed = base_weight * max_weight_factor
+
+            if constrained_weights[asset] < min_allowed:
+                constrained_weights[asset] = min_allowed
+            elif constrained_weights[asset] > max_allowed:
+                constrained_weights[asset] = max_allowed
+
+        # 重新归一化确保权重之和=1
+        weights_df.iloc[i] = constrained_weights / constrained_weights.sum()
+    return weights_df
+
+
+def _adjust_equity_with_weights(
+    equity_df: pd.DataFrame,
+    weights_df: pd.DataFrame,
+    lookback: int,
+) -> pd.DataFrame:
+    """
+    Helper function to adjust equity based on dynamic weights.
+    """
+    # 初始化调整后的权益曲线
+    adjusted_equity_df = equity_df.copy()
+
+    # 从第lookback天起，应用动态权重策略调整仓位
+    for i in range(lookback + 1, len(equity_df)):
+        # 上一天的总权益
+        prev_total_equity = adjusted_equity_df.iloc[i - 1].sum()
+
+        # 根据新权重重新分配资金
+        for asset in equity_df.columns:
+            # 获取此资产的原始单日回报率
+            # Ensure equity_df.iloc[i-1][asset] is not zero to avoid division by zero
+            day_return_denominator = equity_df.iloc[i-1][asset]
+            day_return = (
+                equity_df.iloc[i][asset] / day_return_denominator
+                if day_return_denominator != 0  # Check for zero denominator
+                else 1.0 # If previous day equity was 0, assume no change or handle as appropriate
+            )
+
+            # 应用加权后的资金计算新权益
+            target_allocation = prev_total_equity * weights_df.iloc[i][asset]
+            adjusted_equity_df.iloc[i, adjusted_equity_df.columns.get_loc(asset)] = (
+                target_allocation * day_return
+            )
     return adjusted_equity_df
 
 
@@ -788,7 +900,9 @@ class Broker:
             time_since_update = now - last_update
 
             # 初始止损设置或每小时更新一次
-            if self.positions[symbol]["stop_price"] == 0.0 or time_since_update >= timedelta(hours=1):
+            if self.positions[symbol]["stop_price"] == 0.0 or time_since_update >= timedelta(
+                hours=1
+            ):
                 # 使用ATR更新止损
                 position = self.positions[symbol]
 

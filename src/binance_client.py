@@ -44,7 +44,9 @@ def rate_limit_retry(max_retries=3, base_delay=1):
 
                         # 计算退避时间，使用指数退避
                         delay = base_delay * (2 ** (retries - 1))
-                        logger.warning(f"遇到速率限制，等待 {delay} 秒后重试 (尝试 {retries}/{max_retries})")
+                        logger.warning(
+                            f"遇到速率限制，等待 {delay} 秒后重试 (尝试 {retries}/{max_retries})"
+                        )
                         time.sleep(delay)
                     else:
                         raise
@@ -81,7 +83,9 @@ class BinanceClient:
         # 从环境变量加载
         if load_from_env and not (api_key and api_secret):
             api_key = os.environ.get("BINANCE_TESTNET_API_KEY" if testnet else "BINANCE_API_KEY")
-            api_secret = os.environ.get("BINANCE_TESTNET_API_SECRET" if testnet else "BINANCE_API_SECRET")
+            api_secret = os.environ.get(
+                "BINANCE_TESTNET_API_SECRET" if testnet else "BINANCE_API_SECRET"
+            )
 
         # 从配置文件加载
         if config_file and not (api_key and api_secret):

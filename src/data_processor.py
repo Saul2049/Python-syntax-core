@@ -35,7 +35,9 @@ def load_data(file_path: str, columns: Optional[List[str]] = None) -> pd.DataFra
         return pd.DataFrame()
 
 
-def process_ohlcv_data(df: pd.DataFrame, date_column: str = "date", fill_missing: bool = True) -> pd.DataFrame:
+def process_ohlcv_data(
+    df: pd.DataFrame, date_column: str = "date", fill_missing: bool = True
+) -> pd.DataFrame:
     """
     处理OHLCV (Open, High, Low, Close, Volume) 数据
 
@@ -64,7 +66,9 @@ def process_ohlcv_data(df: pd.DataFrame, date_column: str = "date", fill_missing
     if fill_missing:
         # 对于价格数据，使用前向填充
         price_columns = [
-            col for col in df_processed.columns if any(x in col.lower() for x in ["open", "high", "low", "close"])
+            col
+            for col in df_processed.columns
+            if any(x in col.lower() for x in ["open", "high", "low", "close"])
         ]
         if price_columns:
             df_processed[price_columns] = df_processed[price_columns].fillna(method="ffill")
@@ -159,7 +163,9 @@ def add_technical_indicators(df: pd.DataFrame, price_column: str = "close") -> p
 
     df_with_indicators["MACD_line"] = ema_12 - ema_26
     df_with_indicators["MACD_signal"] = df_with_indicators["MACD_line"].ewm(span=9).mean()
-    df_with_indicators["MACD_histogram"] = df_with_indicators["MACD_line"] - df_with_indicators["MACD_signal"]
+    df_with_indicators["MACD_histogram"] = (
+        df_with_indicators["MACD_line"] - df_with_indicators["MACD_signal"]
+    )
 
     return df_with_indicators
 
@@ -204,7 +210,9 @@ def normalize_data(
     scaler = MinMaxScaler(feature_range=feature_range)
 
     if isinstance(data, pd.DataFrame):
-        normalized_data = pd.DataFrame(scaler.fit_transform(data), columns=data.columns, index=data.index)
+        normalized_data = pd.DataFrame(
+            scaler.fit_transform(data), columns=data.columns, index=data.index
+        )
     else:  # pd.Series
         normalized_data = pd.Series(
             scaler.fit_transform(data.values.reshape(-1, 1)).flatten(),
@@ -244,7 +252,9 @@ def create_train_test_split(
     return train_df, test_df
 
 
-def create_sequences(data: np.ndarray, seq_length: int, pred_length: int = 1) -> Tuple[np.ndarray, np.ndarray]:
+def create_sequences(
+    data: np.ndarray, seq_length: int, pred_length: int = 1
+) -> Tuple[np.ndarray, np.ndarray]:
     """
     为时间序列预测创建序列数据
 

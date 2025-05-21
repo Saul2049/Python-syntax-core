@@ -147,30 +147,15 @@ def with_retry(
         @wraps(func)
         def wrapper(*args: Any, **kwargs: Any) -> T:
             max_retries = retry_config.get("max_retries", DEFAULT_RETRY_CONFIG["max_retries"])
-            state_data = {}
-            state_path = None
-
-            # 确定状态文件路径 (Determine state file path)
-            if state_file:
-                state_dir = Path(utils.get_trades_dir()) / "states"
-                state_path = state_dir / f"{state_file}.json"
-
-                # 加载已有状态 (Load existing state)
-                state_data = load_state(state_path)
-
-                # 从状态恢复参数 (Restore parameters from state)
-                if "saved_args" in state_data and "saved_kwargs" in state_data:
-                    logger.info(f"Resuming from saved state in {state_path}")
-
-                    # 可以选择性地恢复参数 (Optionally restore parameters)
-                    # 此处是一个简化示例，实际应用可能需要更复杂的处理
-                    # This is a simplified example, actual applications may need more complex handling
-                    if "resume_params" in kwargs and kwargs.get("resume_params", False):
-                        # 仅在显式要求时恢复参数 (Only restore parameters when explicitly requested)
-                        saved_kwargs = state_data["saved_kwargs"]
-                        for key, value in saved_kwargs.items():
-                            if key not in kwargs:
-                                kwargs[key] = value
+            
+            # Initialize state and potentially update kwargs from saved state
+            state_path, initial_kwargs = _initialize_retry_state(
+                state_file, func.__name__, 
+                kwargs.pop("resume_params", False), # Pass and remove resume_params from kwargs
+                kwargs 
+            )
+            # Update kwargs with those potentially restored from state
+            kwargs = initial_kwargs
 
             attempt = 0
             last_exception = None
@@ -179,78 +164,125 @@ def with_retry(
                 try:
                     if attempt > 0:
                         delay = calculate_retry_delay(attempt, retry_config)
-                        logger.info(f"Retry {attempt}/{max_retries} after {delay:.2f}s delay")
+                        logger.info(f"Retry {attempt}/{max_retries} after {delay:.2f}s delay for {func.__name__}")
                         time.sleep(delay)
 
-                    # 保存当前调用状态 (Save current call state)
-                    if state_path:
-                        # 注意：这里简单地保存了参数，但应考虑安全性和大小限制
-                        # Note: This simply saves the parameters, but security and size limits should be considered
-                        current_state = {
-                            "function": func.__name__,
-                            "attempt": attempt,
-                            "saved_args": [str(arg) for arg in args],  # 简化，实际应用可能需要更复杂的序列化
-                            "saved_kwargs": {k: str(v) for k, v in kwargs.items() if k != "password"},
-                            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                        }
-                        save_state(state_path, current_state)
+                    # Save current ("running") state before attempting the function call
+                    _save_retry_state(state_path, func.__name__, "running", attempt, args, kwargs)
 
-                    # 执行原始函数 (Execute original function)
+                    # Execute original function
                     result = func(*args, **kwargs)
 
-                    # 成功执行后清除状态文件 (Clear state file after successful execution)
-                    if state_path and state_path.exists():
-                        # 标记为已完成 (Mark as completed)
-                        completed_state = {
-                            "function": func.__name__,
-                            "status": "completed",
-                            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                        }
-                        save_state(state_path, completed_state)
-
+                    # Save "completed" state
+                    _save_retry_state(state_path, func.__name__, "completed", attempt, args, kwargs)
+                    
                     return result
 
                 except Exception as e:
                     attempt += 1
                     last_exception = e
 
-                    # 检查是否是需要重试的异常 (Check if exception is in retry list)
                     should_retry = any(isinstance(e, exc_type) for exc_type in retry_on_exceptions)
 
                     if should_retry and attempt <= max_retries:
-                        logger.warning(f"Attempt {attempt}/{max_retries} failed: {e}")
+                        logger.warning(f"Attempt {attempt}/{max_retries} for {func.__name__} failed: {e}")
+                        # State for "running" (next attempt) will be saved at the start of the next loop iteration
                     else:
-                        # 达到最大重试次数或不需要重试的异常 (Max retries reached or exception not in retry list)
-                        if state_path:
-                            # 保存失败状态 (Save failure state)
-                            failure_state = {
-                                "function": func.__name__,
-                                "status": "failed",
-                                "error": str(e),
-                                "attempt": attempt,
-                                "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                            }
-                            save_state(state_path, failure_state)
-
-                        # 重新抛出最后一个异常 (Re-raise the last exception)
-                        logger.error(f"All {attempt} attempts failed, last error: {e}")
+                        logger.error(f"All {attempt-1} attempts for {func.__name__} failed, or exception {type(e).__name__} not in retry list. Last error: {e}")
+                        _save_retry_state(state_path, func.__name__, "failed", attempt -1 , args, kwargs, error_message=str(e))
                         raise
-
-            # 不应该到达这里，但为了完整性 (Should not reach here, but for completeness)
+            
+            # This part should ideally not be reached if max_retries is sensible and exceptions are re-raised.
             if last_exception:
-                raise last_exception
+                # This case might occur if loop finishes due to attempt > max_retries without re-raising inside loop
+                logger.error(f"Exiting retry loop for {func.__name__} after {attempt-1} attempts. Last error: {last_exception}")
+                _save_retry_state(state_path, func.__name__, "failed", attempt -1, args, kwargs, error_message=str(last_exception))
+                raise last_exception # Ensure exception is always raised if function fails
 
-            # 类型检查器需要这一行 (Type checker needs this line)
-            return None  # type: ignore
+            return None # Should be unreachable
 
         return wrapper
-
     return decorator
 
 
-class NetworkClient:
-    """网络客户端基类，提供重试和状态恢复功能。
-    Base network client class providing retry and state recovery functionality.
+def _initialize_retry_state(
+    state_file_name: Optional[str], 
+    func_name: str, 
+    resume_params: bool, 
+    original_kwargs: Dict[str, Any]
+) -> tuple[Optional[Path], Dict[str, Any]]:
+    """
+    Initializes state file path, loads existing state, and restores parameters if requested.
+    Returns the state_path and potentially modified kwargs.
+    """
+    state_path = None
+    loaded_state_data = {}
+    updated_kwargs = original_kwargs.copy()
+
+    if state_file_name:
+        state_dir = Path(utils.get_trades_dir()) / "states"
+        state_path = state_dir / f"{state_file_name}.json"
+        loaded_state_data = load_state(state_path)
+
+        if loaded_state_data.get("status") == "completed":
+            logger.info(f"Function {func_name} for state file {state_file_name} was already completed. Skipping.")
+            # Potentially return a marker or raise a specific exception to skip execution
+            # For now, this will lead to re-execution if not handled by caller or by ensuring 'result' is in state
+        
+        if resume_params and loaded_state_data.get("status") == "running":
+            if "saved_args" in loaded_state_data and "saved_kwargs" in loaded_state_data:
+                logger.info(f"Resuming {func_name} from saved state in {state_path} with saved_kwargs.")
+                # Args are not typically restored this way as they are positional.
+                # Focus on kwargs for named parameter restoration.
+                saved_kwargs_from_state = loaded_state_data["saved_kwargs"]
+                for key, value in saved_kwargs_from_state.items():
+                    if key not in updated_kwargs: # Prioritize kwargs passed directly to the function call
+                        updated_kwargs[key] = value
+            else:
+                logger.info(f"resume_params was True for {func_name}, but no saved_args/saved_kwargs found in state or state was not 'running'.")
+        elif resume_params:
+            logger.info(f"resume_params was True for {func_name}, but state status was not 'running' (was '{loaded_state_data.get('status')}'). Not restoring params.")
+
+
+    return state_path, updated_kwargs
+
+
+def _save_retry_state(
+    state_path: Optional[Path],
+    func_name: str,
+    status: str, # "running", "completed", "failed"
+    attempt: int,
+    args: tuple, # Using tuple for args type hint
+    kwargs: Dict[str, Any],
+    error_message: Optional[str] = None,
+) -> None:
+    """
+    Saves the current state of a function call to a state file.
+    """
+    if not state_path:
+        return
+
+    data_to_save: Dict[str, Any] = {
+        "function": func_name,
+        "status": status,
+        "attempt": attempt,
+        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+    }
+
+    if status == "running":
+        # For "running" state, save current args and kwargs
+        data_to_save["saved_args"] = [str(arg) for arg in args] # Simplified serialization
+        data_to_save["saved_kwargs"] = {k: str(v) for k, v in kwargs.items() if k != "password"}
+    elif status == "failed":
+        data_to_save["error"] = error_message
+        # Optionally, could also save args/kwargs for failed state for debugging
+        data_to_save["saved_args_on_fail"] = [str(arg) for arg in args]
+        data_to_save["saved_kwargs_on_fail"] = {k: str(v) for k, v in kwargs.items() if k != "password"}
+
+
+    # Call the original save_state utility
+    save_state(state_path, data_to_save)
+
     """
 
     def __init__(self, state_dir: Optional[str] = None):
