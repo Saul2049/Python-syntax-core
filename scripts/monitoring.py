@@ -1,196 +1,147 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-监控模块 - Prometheus Exporter
-Monitoring Module - Prometheus Exporter
+Monitoring Module - Backward Compatibility Layer (监控模块 - 向后兼容层)
 
-提供用于 Grafana 可视化和告警的指标收集功能
-Provides metrics collection for Grafana visualization and alerting
+This module maintains backward compatibility while delegating to the new modular monitoring package.
+For new code, prefer importing from src.monitoring package directly.
 """
 
-import time
+import warnings
+import sys
+import os
 import logging
-import threading
-from typing import Dict, Any, Optional
-from prometheus_client import start_http_server, Gauge, Counter
+import time
 
-# 设置日志记录器
-logger = logging.getLogger("monitoring")
+# Add project root to path for imports
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
-class PrometheusExporter:
-    """Prometheus指标导出器类"""
+# Import new monitoring classes
+from src.monitoring import PrometheusExporter as NewPrometheusExporter
+from src.monitoring import MetricsCollector, HealthChecker, AlertManager
+
+# Set up logger
+logger = logging.getLogger(__name__)
+
+# Issue deprecation warning
+warnings.warn(
+    "Importing from scripts.monitoring is deprecated. "
+    "Please use 'from src.monitoring import PrometheusExporter' instead.",
+    DeprecationWarning,
+    stacklevel=2
+)
+
+
+# Backward compatibility alias
+class PrometheusExporter(NewPrometheusExporter):
+    """
+    Legacy PrometheusExporter class for backward compatibility
     
-    def __init__(self, port: int = 9090):
-        """
-        初始化Prometheus导出器
-        
-        参数:
-            port: 监听端口号
-        """
-        self.port = port
-        self.server_started = False
-        
-        # 创建监控指标
-        # 交易次数指标
-        self.trade_count = Counter(
-            'trading_trade_count_total', 
-            '交易总次数 (Total number of trades)',
-            ['symbol', 'action']  # 标签: 交易对和操作类型
-        )
-        
-        # 错误计数器
-        self.error_count = Counter(
-            'trading_error_count_total', 
-            '错误总次数 (Total number of errors)',
-            ['type']  # 标签: 错误类型
-        )
-        
-        # 心跳时间
-        self.heartbeat_age = Gauge(
-            'trading_heartbeat_age_seconds', 
-            '上次心跳距现在的秒数 (Seconds since last heartbeat)'
-        )
-        
-        # 数据源状态指标
-        self.data_source_status = Gauge(
-            'trading_data_source_status', 
-            '数据源状态 (Data source status: 1=active, 0=inactive)',
-            ['source_name']  # 标签: 数据源名称
-        )
-        
-        # 内存使用量
-        self.memory_usage = Gauge(
-            'trading_memory_usage_mb', 
-            '内存使用量 (Memory usage in MB)'
-        )
-        
-        # 交易对价格
-        self.price = Gauge(
-            'trading_price', 
-            '交易对价格 (Current price)',
-            ['symbol']  # 标签: 交易对
-        )
-        
-        # 最后心跳时间
-        self.last_heartbeat = time.time()
-        
-        # 启动心跳更新线程
-        self.heartbeat_thread = threading.Thread(target=self._update_heartbeat, daemon=True)
-        self.stop_heartbeat = False
-        
-        logger.info(f"初始化Prometheus指标导出器，端口: {port}")
+    Delegates to the new src.monitoring.PrometheusExporter
+    """
     
-    def start(self):
-        """启动Prometheus指标导出服务器"""
-        if not self.server_started:
-            try:
-                start_http_server(self.port)
-                self.server_started = True
-                
-                # 启动心跳线程
-                self.heartbeat_thread.start()
-                
-                logger.info(f"Prometheus导出器已启动于端口 {self.port}")
-            except Exception as e:
-                logger.error(f"启动Prometheus服务器失败: {e}")
-        else:
-            logger.warning("Prometheus服务器已经在运行")
-    
-    def _update_heartbeat(self):
-        """更新心跳指标的后台线程"""
-        while not self.stop_heartbeat:
-            now = time.time()
-            self.heartbeat_age.set(now - self.last_heartbeat)
-            time.sleep(1)
+    def __init__(self, port: int = 9090, registry=None):
+        """Initialize with legacy interface"""
+        super().__init__(port=port, registry=registry)
     
     def record_trade(self, symbol: str, action: str):
         """
-        记录交易事件
+        Record a trade (legacy method)
         
-        参数:
-            symbol: 交易对
-            action: 操作类型 (BUY/SELL)
+        Args:
+            symbol: Trading symbol
+            action: Trade action
         """
-        self.trade_count.labels(symbol=symbol, action=action).inc()
+        # Create a metrics collector to handle this
+        if not hasattr(self, '_metrics_collector'):
+            self._metrics_collector = MetricsCollector(self)
+        
+        self._metrics_collector.record_trade(symbol, action)
     
     def record_error(self, error_type: str = "general"):
         """
-        记录错误事件
+        Record an error (legacy method)
         
-        参数:
-            error_type: 错误类型
+        Args:
+            error_type: Type of error
         """
-        self.error_count.labels(type=error_type).inc()
+        if not hasattr(self, '_metrics_collector'):
+            self._metrics_collector = MetricsCollector(self)
+        
+        self._metrics_collector.record_error(error_type)
     
     def update_heartbeat(self):
-        """更新心跳时间"""
-        self.last_heartbeat = time.time()
+        """Update heartbeat (legacy method)"""
+        if not hasattr(self, '_metrics_collector'):
+            self._metrics_collector = MetricsCollector(self)
+        
+        self._metrics_collector.update_heartbeat()
     
     def update_data_source_status(self, source_name: str, is_active: bool):
         """
-        更新数据源状态
+        Update data source status (legacy method)
         
-        参数:
-            source_name: 数据源名称
-            is_active: 是否活跃
+        Args:
+            source_name: Name of data source
+            is_active: Whether source is active
         """
-        self.data_source_status.labels(source_name=source_name).set(1 if is_active else 0)
+        if not hasattr(self, '_metrics_collector'):
+            self._metrics_collector = MetricsCollector(self)
+        
+        self._metrics_collector.update_data_source_status(source_name, is_active)
     
     def update_memory_usage(self, memory_mb: float):
         """
-        更新内存使用量
+        Update memory usage (legacy method)
         
-        参数:
-            memory_mb: 内存使用量(MB)
+        Args:
+            memory_mb: Memory usage in MB
         """
-        self.memory_usage.set(memory_mb)
+        if not hasattr(self, '_metrics_collector'):
+            self._metrics_collector = MetricsCollector(self)
+        
+        self._metrics_collector.update_memory_usage(memory_mb)
     
     def update_price(self, symbol: str, price: float):
         """
-        更新交易对价格
+        Update price (legacy method)
         
-        参数:
-            symbol: 交易对
-            price: 价格
+        Args:
+            symbol: Trading symbol
+            price: Current price
         """
-        self.price.labels(symbol=symbol).set(price)
-    
-    def stop(self):
-        """停止心跳线程"""
-        self.stop_heartbeat = True
-        if self.heartbeat_thread.is_alive():
-            self.heartbeat_thread.join(timeout=2)
-            logger.info("心跳线程已停止")
+        if not hasattr(self, '_metrics_collector'):
+            self._metrics_collector = MetricsCollector(self)
+        
+        self._metrics_collector.update_price(symbol, price)
 
-
-# 全局导出器实例
-_exporter = None
 
 def get_exporter(port: int = 9090) -> PrometheusExporter:
     """
-    获取全局Prometheus导出器实例
+    Get singleton Prometheus exporter instance (legacy function)
     
-    参数:
-        port: 监听端口
-    
-    返回:
-        PrometheusExporter实例
+    Args:
+        port: Port number for metrics server
+        
+    Returns:
+        PrometheusExporter instance
     """
-    global _exporter
-    if _exporter is None:
-        _exporter = PrometheusExporter(port=port)
-    return _exporter
+    return PrometheusExporter(port=port)
+
+
+# Export for backward compatibility
+__all__ = ['PrometheusExporter', 'get_exporter']
 
 
 if __name__ == "__main__":
-    # 测试代码
+    # Test code
     logging.basicConfig(level=logging.INFO)
     
-    # 创建导出器
+    # Create exporter
     exporter = get_exporter(port=9091)
     exporter.start()
     
-    # 记录一些测试数据
+    # Record some test data
     exporter.record_trade("BTC/USDT", "BUY")
     exporter.record_trade("ETH/USDT", "SELL")
     exporter.record_error("network")
@@ -199,15 +150,15 @@ if __name__ == "__main__":
     exporter.update_memory_usage(42.5)
     exporter.update_price("BTC/USDT", 30123.45)
     
-    # 保持程序运行一段时间
-    logger.info("测试导出器已启动，访问 http://localhost:9091/metrics 查看指标")
-    logger.info("按 Ctrl+C 停止")
+    # Keep program running for a while
+    logger.info("Test exporter started, visit http://localhost:9091/metrics to view metrics")
+    logger.info("Press Ctrl+C to stop")
     
     try:
         while True:
-            # 每5秒更新一次心跳
+            # Update heartbeat every 5 seconds
             exporter.update_heartbeat()
             time.sleep(5)
     except KeyboardInterrupt:
-        logger.info("停止测试")
+        logger.info("Stopping test")
         exporter.stop() 

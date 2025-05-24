@@ -9,7 +9,7 @@ import pytest
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 # Import the module to execute grid search on import
-from optimize_ma import df  # 执行后 df 在模块级
+from scripts.utilities.optimize_ma import df  # 修改为正确的导入路径
 
 
 def test_grid_non_empty():

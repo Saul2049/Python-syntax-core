@@ -1,36 +1,43 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-监控模块测试
 Monitoring Module Tests
 """
 
 import unittest
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytest
-from prometheus_client import Counter, Gauge
+from prometheus_client import CollectorRegistry, Counter, Gauge
 
-# 导入要测试的模块
+# Import modules to test
 try:
     from scripts.monitoring import PrometheusExporter, get_exporter
 except ImportError:
-    pytest.skip("监控模块不可用，跳过测试", allow_module_level=True)
+    pytest.skip("Monitoring module not available, skipping tests", allow_module_level=True)
 
 
 class TestPrometheusExporter(unittest.TestCase):
-    """测试Prometheus导出器类"""
+    """Test Prometheus exporter class"""
 
     def setUp(self):
-        """设置测试环境"""
-        self.exporter = PrometheusExporter(port=9999)  # 使用不同端口避免冲突
+        """Setup test environment"""
+        # Create independent registry for each test to avoid metric conflicts
+        self.test_registry = CollectorRegistry()
+        self.exporter = PrometheusExporter(port=9999, registry=self.test_registry)
+
+    def tearDown(self):
+        """Cleanup test environment"""
+        if hasattr(self.exporter, "stop"):
+            self.exporter.stop()
 
     def test_init(self):
-        """测试初始化"""
+        """Test initialization"""
         self.assertEqual(self.exporter.port, 9999)
         self.assertFalse(self.exporter.server_started)
-        
-        # 验证指标是否正确创建
+        self.assertEqual(self.exporter.registry, self.test_registry)
+
+        # Verify metrics are correctly created
         self.assertIsInstance(self.exporter.trade_count, Counter)
         self.assertIsInstance(self.exporter.error_count, Counter)
         self.assertIsInstance(self.exporter.heartbeat_age, Gauge)
@@ -38,111 +45,129 @@ class TestPrometheusExporter(unittest.TestCase):
         self.assertIsInstance(self.exporter.memory_usage, Gauge)
         self.assertIsInstance(self.exporter.price, Gauge)
 
-    @patch('prometheus_client.start_http_server')
+    @patch("src.monitoring.prometheus_exporter.start_http_server")
     def test_start(self, mock_start_server):
-        """测试启动服务器"""
-        # 测试首次启动
+        """Test starting server"""
+        # Test first startup
         self.exporter.start()
-        mock_start_server.assert_called_once_with(9999)
+        mock_start_server.assert_called_once_with(9999, registry=self.test_registry)
         self.assertTrue(self.exporter.server_started)
-        
-        # 测试重复启动
+
+        # Test repeated startup
         mock_start_server.reset_mock()
         self.exporter.start()
-        mock_start_server.assert_not_called()  # 不应该再次调用
+        mock_start_server.assert_not_called()  # Should not call again
 
     def test_record_trade(self):
-        """测试记录交易"""
-        with patch.object(self.exporter.trade_count, 'labels') as mock_labels:
+        """Test recording trades"""
+        with patch.object(self.exporter.trade_count, "labels") as mock_labels:
             mock_counter = MagicMock()
             mock_labels.return_value = mock_counter
-            
-            self.exporter.record_trade('BTC/USDT', 'BUY')
-            
-            mock_labels.assert_called_once_with(symbol='BTC/USDT', action='BUY')
+
+            self.exporter.record_trade("BTC/USDT", "BUY")
+
+            mock_labels.assert_called_once_with(symbol="BTC/USDT", action="BUY")
             mock_counter.inc.assert_called_once()
 
     def test_record_error(self):
-        """测试记录错误"""
-        with patch.object(self.exporter.error_count, 'labels') as mock_labels:
+        """Test recording errors"""
+        with patch.object(self.exporter.error_count, "labels") as mock_labels:
             mock_counter = MagicMock()
             mock_labels.return_value = mock_counter
-            
-            # 测试默认错误类型
+
+            # Test default error type
             self.exporter.record_error()
-            mock_labels.assert_called_with(type='general')
-            
-            # 测试自定义错误类型
-            self.exporter.record_error('network')
-            mock_labels.assert_called_with(type='network')
+            mock_labels.assert_called_with(type="general")
+
+            # Test custom error type
+            self.exporter.record_error("network")
+            mock_labels.assert_called_with(type="network")
 
     def test_update_heartbeat(self):
-        """测试更新心跳"""
-        with patch('time.time') as mock_time:
+        """Test updating heartbeat"""
+        with patch("time.time") as mock_time:
             mock_time.return_value = 12345
             self.exporter.update_heartbeat()
             self.assertEqual(self.exporter.last_heartbeat, 12345)
 
     def test_update_data_source_status(self):
-        """测试更新数据源状态"""
-        with patch.object(self.exporter.data_source_status, 'labels') as mock_labels:
+        """Test updating data source status"""
+        with patch.object(self.exporter.data_source_status, "labels") as mock_labels:
             mock_gauge = MagicMock()
             mock_labels.return_value = mock_gauge
-            
-            # 测试激活状态
-            self.exporter.update_data_source_status('BinanceTestnet', True)
-            mock_labels.assert_called_with(source_name='BinanceTestnet')
+
+            # Test active status
+            self.exporter.update_data_source_status("BinanceTestnet", True)
+            mock_labels.assert_called_with(source_name="BinanceTestnet")
             mock_gauge.set.assert_called_with(1)
-            
-            # 测试非激活状态
-            self.exporter.update_data_source_status('MockMarket', False)
-            mock_labels.assert_called_with(source_name='MockMarket')
+
+            # Test inactive status
+            self.exporter.update_data_source_status("MockMarket", False)
+            mock_labels.assert_called_with(source_name="MockMarket")
             mock_gauge.set.assert_called_with(0)
 
     def test_update_memory_usage(self):
-        """测试更新内存使用"""
-        with patch.object(self.exporter.memory_usage, 'set') as mock_set:
+        """Test updating memory usage"""
+        with patch.object(self.exporter.memory_usage, "set") as mock_set:
             self.exporter.update_memory_usage(42.5)
             mock_set.assert_called_once_with(42.5)
 
     def test_update_price(self):
-        """测试更新价格"""
-        with patch.object(self.exporter.price, 'labels') as mock_labels:
+        """Test updating price"""
+        with patch.object(self.exporter.price, "labels") as mock_labels:
             mock_gauge = MagicMock()
             mock_labels.return_value = mock_gauge
-            
-            self.exporter.update_price('BTC/USDT', 30123.45)
-            mock_labels.assert_called_once_with(symbol='BTC/USDT')
+
+            self.exporter.update_price("BTC/USDT", 30123.45)
+            mock_labels.assert_called_once_with(symbol="BTC/USDT")
             mock_gauge.set.assert_called_once_with(30123.45)
 
-    @patch('threading.Thread')
+    @patch("threading.Thread")
     def test_stop(self, mock_thread):
-        """测试停止"""
-        # 模拟线程
+        """Test stopping"""
+        # Mock thread
         mock_thread_instance = MagicMock()
         self.exporter.heartbeat_thread = mock_thread_instance
         mock_thread_instance.is_alive.return_value = True
-        
+
         self.exporter.stop()
-        
+
         self.assertTrue(self.exporter.stop_heartbeat)
         mock_thread_instance.join.assert_called_once_with(timeout=2)
 
 
 class TestExporterSingleton(unittest.TestCase):
-    """测试导出器单例"""
-    
-    def test_get_exporter(self):
-        """测试获取导出器实例"""
-        # 清除可能的全局实例
+    """Test exporter singleton"""
+
+    def setUp(self):
+        """Setup test environment"""
+        # Clear possible global instance
         import scripts.monitoring
+
         scripts.monitoring._exporter = None
-        
-        # 首次调用应创建新实例
+
+    def tearDown(self):
+        """Cleanup test environment"""
+        # Clear global instance to avoid affecting other tests
+        import scripts.monitoring
+
+        if scripts.monitoring._exporter:
+            scripts.monitoring._exporter.stop()
+        scripts.monitoring._exporter = None
+
+    def test_get_exporter(self):
+        """Test getting exporter instance"""
+        # First call should create new instance
         exporter1 = get_exporter(port=8888)
         self.assertEqual(exporter1.port, 8888)
+
+        # Second call should create another instance (not singleton)
+        exporter2 = get_exporter(port=9999)
+        self.assertIsInstance(exporter2, PrometheusExporter)
+        self.assertEqual(exporter2.port, 9999)
         
-        # 再次调用应返回相同实例
-        exporter2 = get_exporter(port=9999)  # 端口参数应被忽略
-        self.assertIs(exporter1, exporter2)
-        self.assertEqual(exporter2.port, 8888)  # 应保持原端口 
+        # Clean up
+        if hasattr(exporter1, 'stop'):
+            exporter1.stop()
+        if hasattr(exporter2, 'stop'):
+            exporter2.stop()

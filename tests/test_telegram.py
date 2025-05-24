@@ -15,6 +15,10 @@ class TestTelegramBot:
 
     def setup_method(self):
         """Setup test environment."""
+        # Skip setup if token is not available
+        if "TG_TOKEN" not in os.environ:
+            pytest.skip("TG_TOKEN not available in environment")
+        
         self.token = os.environ["TG_TOKEN"]
         self.bot = TelegramBot(self.token)
 

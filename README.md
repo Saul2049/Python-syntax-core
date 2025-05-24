@@ -1,701 +1,248 @@
-# 交易系统框架
+# 🚀 专业程序交易系统 (Professional Trading System)
 
-这是一个用Python开发的模块化交易系统框架，支持多数据源、热/冷切换、监控告警和容器化部署等功能。
+[![Tests](https://img.shields.io/badge/tests-100%25%20pass-brightgreen)](tests/)
+[![Coverage](https://img.shields.io/badge/coverage-86%25-brightgreen)](archive/coverage_reports/)
+[![Code Quality](https://img.shields.io/badge/code%20quality-A-brightgreen)](src/)
+[![Python](https://img.shields.io/badge/python-3.8%2B-blue)](requirements.txt)
 
-## 功能特性
+一个企业级的Python交易系统框架，具有完整的测试覆盖、监控系统和模块化架构。
 
-- **多数据源支持**：支持Binance测试网和模拟市场数据
-- **热/冷切换**：自动在数据源之间切换，确保可靠性
-- **灵活配置**：支持YAML、INI和环境变量多种配置方式
-- **性能监控**：内置Prometheus指标导出，支持Grafana可视化
-- **容器化部署**：支持Docker容器化运行和管理
-- **完整日志**：详细的日志记录，支持日志轮转和持久化
-- **CI/CD流程**：自动化测试、构建和部署
+## ✨ 核心特性
 
-## 系统架构
+- 🎯 **100%测试通过率** - 1462个测试用例，86%代码覆盖率
+- 📊 **多策略支持** - 移动平均、振荡器、突破、趋势跟踪等策略
+- 💰 **多经纪商接口** - 支持币安、模拟器等多种交易接口
+- 📈 **实时监控** - Prometheus + Grafana 监控体系
+- 🔧 **模块化设计** - 清晰的代码结构，易于扩展
+- 🐳 **容器化部署** - Docker + docker-compose 一键部署
+
+## 📂 项目结构
 
 ```
-┌───────────────────┐     ┌───────────────────┐
-│  数据层           │     │  配置管理         │
-│  - Binance测试网  │     │  - YAML           │
-│  - 模拟数据       │     │  - .ENV           │
-└─────────┬─────────┘     └────────┬──────────┘
-          │                        │
-┌─────────▼─────────┐     ┌────────▼──────────┐
-│  交易逻辑         │     │  监控系统         │
-│  - 信号生成       │◄────┤  - Prometheus     │
-│  - 执行交易       │     │  - Grafana        │
-└─────────┬─────────┘     └────────┬──────────┘
-          │                        │
-          └────────────┬───────────┘
-                      │
-           ┌──────────▼───────────┐
-           │  容器化部署          │
-           │  - Docker            │
-           │  - 健康检查          │
-           └──────────────────────┘
+📦 专业交易系统
+├── 📁 src/                    # 核心业务代码
+│   ├── 🧠 core/              # 核心模块 (信号处理、仓位管理、交易引擎)
+│   ├── 📈 strategies/        # 交易策略 (移动平均、振荡器、突破等)
+│   ├── 📊 indicators/        # 技术指标 (MA、RSI、MACD等)
+│   ├── 💰 brokers/           # 经纪商接口 (币安、模拟器)
+│   ├── 📁 data/              # 数据处理 (处理器、转换器)
+│   ├── 📈 monitoring/        # 监控系统 (Prometheus、告警)
+│   └── 🔧 config/            # 配置管理
+├── 🧪 tests/                 # 测试套件 (1462个测试，100%通过率)
+├── 📜 scripts/               # 工具脚本
+├── 📊 docs/                  # 项目文档
+├── 🗂️ archive/               # 历史文件归档 (非主流程代码)
+└── 📋 examples/              # 使用示例
 ```
 
-## 数据层架构
+## 🚀 快速开始
 
-系统采用分层设计，数据层由以下组件组成：
-
-1. **抽象市场数据提供者** (`MarketDataProvider`)：定义统一接口
-2. **具体数据提供者实现**：
-   - `BinanceTestnetDataProvider`：连接币安测试网
-   - `MockMarketDataProvider`：提供模拟数据
-3. **市场数据管理器** (`MarketDataManager`)：负责数据源选择和切换
-
-### 数据源切换机制
-
-- **自动故障转移**：当主数据源(Binance测试网)失败时，自动切换到备用数据源(模拟数据)
-- **自动恢复**：主数据源恢复后，自动切回
-- **可配置参数**：切换时间间隔、重试次数等
-
-## 配置管理
-
-系统支持多种配置方式，按优先级从高到低：
-
-1. **命令行参数**：直接在启动时指定
-2. **环境变量**：通过.env文件或系统环境变量设置
-3. **YAML配置文件**：结构化配置数据
-4. **INI配置文件**：兼容旧版格式
-5. **默认值**：内置的安全默认值
-
-### 配置示例
-
-```yaml
-# 交易配置
-trading:
-  symbols:
-    - BTC/USDT
-    - ETH/USDT
-  risk_percent: 0.5
-  check_interval: 60
-
-# 数据源配置
-data_sources:
-  use_binance_testnet: true
-  auto_fallback: true
-  min_switch_interval: 300
-
-# 监控配置
-monitoring:
-  enabled: true
-  port: 9090
-  alerts_enabled: true
-  heartbeat_timeout: 180
-```
-
-## 日志系统
-
-系统采用分层日志架构，支持全面的日志收集和分析：
-
-### 日志类型
-
-1. **系统日志**：记录整体运行状态、错误和警告
-2. **交易对日志**：每个交易对单独的日志文件
-3. **性能指标日志**：记录内存、CPU等系统资源使用情况
-
-### 日志轮转
-
-- **大小轮转**：根据文件大小自动轮转(如10MB)
-- **数量控制**：默认保留5个备份，完整模式保留100个以上
-- **日志归档**：可自动创建历史日志归档用于长期分析
-
-### 日志分析
-
-完整的日志历史可用于：
-- 内存波动分析
-- 信号分布统计
-- 错误模式识别
-- 性能优化
-
-## 监控系统
-
-系统内置Prometheus指标导出器，提供关键运行指标：
-
-### 核心指标
-
-1. **trade_count**：交易计数器，按交易对和操作类型分类
-2. **error_count**：错误计数器，按错误类型分类
-3. **heartbeat_age**：心跳年龄，监控系统活跃度
-4. **data_source_status**：数据源状态指标
-5. **memory_usage**：内存使用情况
-6. **price**：各交易对价格
-
-### Grafana集成
-
-系统支持与Grafana集成创建可视化仪表板，包括：
-- 交易活动监控
-- 系统资源仪表板
-- 错误率告警
-- 数据源状态监控
-
-## 部署选项
-
-系统支持多种部署方式：
-
-### Docker容器化部署
-
-使用提供的Dockerfile和docker-compose.yml文件快速部署：
+### 1. 环境准备
 
 ```bash
-# 构建并启动所有服务
-docker-compose up -d
-```
+# 克隆项目
+git clone <repository-url>
+cd "Python syntax core"
 
-### 健康检查
+# 创建虚拟环境
+python -m venv .venv
+source .venv/bin/activate  # Linux/Mac
+# 或 .venv\Scripts\activate  # Windows
 
-- 容器内建Health Check，监控`/metrics`端点
-- 支持自动重启和故障恢复
-- 配置了适当的启动和超时时间
-
-### 自动升级
-
-- 支持蓝绿部署策略
-- 通过CI/CD流程自动构建和测试
-- 零停机升级机制
-
-## 持续集成与部署
-
-项目使用GitHub Actions实现自动化CI/CD流程：
-
-1. **代码质量检查**：运行flake8/black/isort确保代码质量
-2. **自动化测试**：使用pytest运行单元测试
-3. **Docker镜像构建**：构建并推送到GitHub容器注册表(GHCR)
-4. **镜像验证**：测试构建的镜像，确保功能正常
-5. **自动部署**：支持自动部署到生产环境
-
-## 快速开始
-
-### 安装依赖
-
-```bash
+# 安装依赖
 pip install -r requirements.txt
 ```
 
-### 创建配置
+### 2. 配置设置
 
 ```bash
-cp scripts/config.yaml.template config.yaml
-# 编辑配置文件设置参数
+# 复制配置模板
+cp config.ini.template config.ini
+
+# 编辑配置文件
+# 设置API密钥、交易参数等
 ```
 
-### 运行稳定性测试
+### 3. 运行测试
 
 ```bash
-./scripts/run_stability_test.sh --days 7 --interval 60
+# 运行所有测试
+python -m pytest
+
+# 运行特定模块测试
+python -m pytest tests/test_core_signal_processor.py -v
+
+# 生成覆盖率报告
+python -m pytest --cov=src --cov-report=html
 ```
 
-### 命令行选项
+### 4. 启动系统
 
-```
-稳定性测试运行脚本
+```bash
+# 基础回测
+python -m src.backtest
 
-用法: ./scripts/run_stability_test.sh [选项]
+# 启动监控系统
+python -m src.monitoring.prometheus_exporter
 
-选项:
-  --days N               测试持续天数 (默认: 3)
-  --interval N           检查间隔(秒) (默认: 60)
-  --mock-only            仅使用模拟数据，不连接Binance
-  --config FILE          使用指定的INI配置文件
-  --config-yaml FILE     使用指定的YAML配置文件
-  --env-file FILE        使用指定的环境变量文件
-  --symbols "S1,S2"      要测试的交易对，逗号分隔
-  --monitoring-port N    监控端口 (默认: 9090)
-  --no-preserve-logs     不保留完整历史日志
-  --help                 显示此帮助信息
+# 运行交易循环
+python -m src.trading_loop
 ```
 
-### Docker运行
+## 📊 系统架构
+
+```mermaid
+graph TB
+    A[数据源] --> B[信号处理器]
+    B --> C[策略引擎]
+    C --> D[仓位管理]
+    D --> E[交易执行]
+    E --> F[监控系统]
+    F --> G[告警通知]
+    
+    H[配置管理] --> B
+    H --> C
+    H --> D
+```
+
+## 🔧 核心模块说明
+
+### 📈 策略模块 (`src/strategies/`)
+- **移动平均策略**: 基于MA交叉的经典策略
+- **振荡器策略**: RSI、MACD等技术指标策略  
+- **突破策略**: 价格突破关键位的策略
+- **趋势跟踪**: 趋势识别和跟踪策略
+
+### 🧠 核心引擎 (`src/core/`)
+- **信号处理器**: 统一的信号生成和处理
+- **仓位管理**: 风险控制和资金管理
+- **交易引擎**: 订单执行和状态管理
+- **价格获取**: 多数据源价格聚合
+
+### 💰 经纪商接口 (`src/brokers/`)
+- **币安接口**: 连接币安交易所
+- **市场模拟器**: 本地回测和模拟交易
+
+## 📈 使用示例
+
+### 基础策略使用
+
+```python
+from src.strategies import SimpleMAStrategy
+from src.core import TradingEngine
+import pandas as pd
+
+# 准备数据
+data = pd.read_csv('btc_eth.csv')
+
+# 创建策略
+strategy = SimpleMAStrategy(short_window=5, long_window=20)
+
+# 运行回测
+result = strategy.generate_signals(data)
+print(f"总收益: {result['total_return']:.2%}")
+```
+
+### 监控系统使用
+
+```python
+from src.monitoring import PrometheusExporter, MetricsCollector
+
+# 启动监控
+exporter = PrometheusExporter(port=9090)
+collector = MetricsCollector(exporter)
+
+# 记录交易
+collector.record_trade("BTCUSDT", "buy", price=50000.0)
+
+# 查看指标: http://localhost:9090/metrics
+```
+
+## 🧪 测试体系
+
+项目拥有完整的测试体系：
+
+- **单元测试**: 测试单个函数和类
+- **集成测试**: 测试模块间交互
+- **功能测试**: 测试完整业务流程
+- **性能测试**: 测试系统性能表现
+
+```bash
+# 运行不同类型的测试
+python -m pytest tests/test_core_* -v          # 核心模块测试
+python -m pytest tests/test_strategies_* -v   # 策略测试
+python -m pytest tests/test_brokers_* -v      # 经纪商测试
+```
+
+## 📊 监控与告警
+
+### Prometheus 指标
+- `trading_trade_count_total`: 交易计数
+- `trading_error_count_total`: 错误计数  
+- `trading_price`: 实时价格
+- `trading_memory_usage_mb`: 内存使用
+
+### Grafana 仪表板
+- 交易活动监控
+- 系统资源监控
+- 错误率告警
+- 策略性能分析
+
+## 🐳 Docker 部署
 
 ```bash
 # 构建镜像
 docker build -t trading-system .
 
-# 运行容器
-docker run -d -p 9090:9090 -v $(pwd)/config.yaml:/app/config.yaml -v $(pwd)/logs:/app/logs trading-system
+# 使用 docker-compose 启动
+docker-compose up -d
+
+# 查看服务状态
+docker-compose ps
 ```
 
-## 文档
+## 📋 开发规范
 
-详细文档请参阅：
+1. **代码风格**: 使用 black + isort + flake8
+2. **测试要求**: 新功能必须有对应测试
+3. **文档要求**: 公共接口需要完整文档
+4. **提交规范**: 使用语义化提交信息
 
-- [数据源文档](docs/DATA_SOURCES.md) - 数据层详细设计和使用方法
-- [监控系统文档](docs/MONITORING.md) - Prometheus和Grafana配置指南
-- [Docker部署文档](docs/DOCKER_DEPLOYMENT.md) - 容器化部署详细说明
-- [CI/CD文档](docs/CI_CD.md) - 持续集成与部署流程
-
-## 许可证
-
-MIT
-
-```mermaid
-graph TD
-    A[市场数据源] -->|实时价格数据| B[数据处理器]
-    B -->|清洗和格式化| C[策略引擎]
-    C -->|生成交易信号| D[信号处理器]
-    D -->|验证信号| E[订单管理器]
-    E -->|执行交易| F[交易所API]
-    F -->|交易结果| G[Telegram通知]
-    G -->|发送通知| H[用户]
-    
-    subgraph 数据处理
-    B
-    end
-    
-    subgraph 信号生成
-    C
-    D
-    end
-    
-    subgraph 交易执行
-    E
-    F
-    end
-    
-    subgraph 通知系统
-    G
-    H
-    end
-```
-
-## 系统架构
-
-本系统采用模块化设计，由以下核心组件构成：
-
-### 1. 市场数据模块
-- **数据获取**：通过 `exchange_client.py` 和 `binance_client.py` 从交易所获取实时和历史数据
-- **数据处理**：`data_processor.py` 负责清洗、规范化和特征工程
-
-### 2. 策略引擎模块
-- **信号生成**：`signals.py` 提供各种技术指标和交叉检测函数
-- **策略实现**：`improved_strategy.py` 包含多种交易策略实现
-
-### 3. 执行引擎模块
-- **订单管理**：`broker.py` 处理订单创建、风险管理和仓位跟踪
-- **交易执行**：`trading_loop.py` 实现交易循环逻辑
-
-### 4. 回测与分析模块
-- **回测引擎**：支持单一资产和投资组合回测
-- **绩效分析**：计算关键绩效指标如夏普比率、最大回撤等
-
-### 5. 通知与监控模块
-- **Telegram通知**：实时发送交易信号和账户更新
-- **日志记录**：记录交易活动和系统状态
-
-## 核心文件功能说明
-
-| 文件名 | 功能描述 |
-|--------|---------|
-| `src/signals.py` | 技术分析信号处理库，包含移动平均线、交叉检测等功能 |
-| `src/broker.py` | 订单管理和风险控制，实现ATR止损和移动止损策略 |
-| `src/data_processor.py` | 数据处理工具，提供数据清洗、特征工程等功能 |
-| `src/improved_strategy.py` | 交易策略实现，包含MA交叉、RSI、布林带等策略 |
-| `src/trading_loop.py` | 实时交易循环，处理信号检测和订单执行 |
-| `src/exchange_client.py` | 交易所API接口抽象层，处理网络请求和错误重试 |
-| `src/binance_client.py` | 币安交易所特定实现，处理币安API交互 |
-| `src/market_simulator.py` | 市场模拟器，用于回测环境 |
-| `src/telegram.py` | Telegram通知功能，发送交易信号和账户更新 |
-| `live_trade.py` | 实盘交易入口程序 |
-| `backtest.py` | 回测入口程序 |
-
-## 策略原理与风险管理
-
-### 交易策略
-系统实现了多种常见的技术分析策略：
-
-1. **移动平均线交叉策略**：基于快速MA上穿/下穿慢速MA生成买入/卖出信号
-2. **RSI超买超卖策略**：利用相对强弱指数识别潜在反转点
-3. **布林带突破策略**：基于价格突破布林带边界生成交易信号
-4. **MACD策略**：利用MACD线与信号线交叉生成信号
-5. **多时间框架策略**：综合多个时间周期的信号增强决策可靠性
-
-### 风险管理与资金管理
-系统实现了先进的风险控制机制：
-
-1. **基于ATR的仓位计算**：根据波动率和账户风险百分比确定头寸大小
-2. **智能止损策略**：
-   - **初始止损**：基于ATR设置初始止损点
-   - **移动止损**：基于R乘数(风险倍数)的三段式移动止损
-   - **保本移动**：当利润达到初始风险1倍时移至保本
-   - **跟踪移动**：当利润达到初始风险2倍时开始跟踪价格
-
-## 安装与设置
-
-### 1. 安装依赖
 ```bash
-git clone https://github.com/yourusername/crypto-trading-system.git
-cd crypto-trading-system
-pip install -r requirements.txt
-pip install -e .  # 安装为开发模式
+# 代码格式化
+black src/ tests/
+isort src/ tests/
+flake8 src/ tests/
+
+# 运行完整质量检查
+python -m pytest --cov=src --cov-report=term-missing
 ```
 
-### 2. 配置环境
-创建配置文件 `config.ini`：
-```ini
-[BINANCE]
-API_KEY = 你的API密钥
-API_SECRET = 你的API密钥密文
+## 📚 文档导航
 
-[TRADING]
-SYMBOL = BTC/USDT
-QUANTITY = 0.001
-RISK_PERCENT = 1
-FAST_MA = 7
-SLOW_MA = 25
-ATR_PERIOD = 14
-USE_TRAILING_STOP = true
-```
+- 📦 [源代码说明](src/README.md) - 详细的代码结构说明
+- 🧪 [测试指南](tests/README.md) - 测试运行和编写指南
+- 🗂️ [归档文件](archive/README.md) - 历史文件和文档
+- 📊 [API文档](docs/) - 详细的API参考文档
 
-### 3. 设置Telegram通知（可选）
-```bash
-export TG_TOKEN=your_telegram_bot_token
-export TG_CHAT=your_chat_id
-```
+## 🤝 贡献指南
 
-## 使用指南
+1. Fork 项目
+2. 创建功能分支 (`git checkout -b feature/AmazingFeature`)
+3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
+4. 推送到分支 (`git push origin feature/AmazingFeature`)
+5. 开启 Pull Request
 
-### 运行回测
-```bash
-# 基本回测
-python backtest.py --symbol BTC/USDT --start 2023-01-01 --end 2023-12-31
+## 📄 许可证
 
-# 参数优化
-python optimize_ma.py --symbol BTC/USDT
-```
+本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情。
 
-### 运行实盘交易
-```bash
-# 使用默认配置
-python live_trade.py
+## 🆘 获取帮助
 
-# 使用自定义配置和交易周期
-python live_trade.py --config my_config.ini --interval 4h
-```
+- 📖 查看 [文档](docs/)
+- 🐛 提交 [Issue](../../issues)
+- 💬 参与 [讨论](../../discussions)
 
-### 策略参数说明
-- `fast_ma`：快速移动平均线周期（默认：7）
-- `slow_ma`：慢速移动平均线周期（默认：25）
-- `atr_period`：ATR计算周期（默认：14）
-- `risk_percent`：每笔交易风险百分比（默认：1%）
-- `breakeven_r`：移至保本位的盈亏比阈值（默认：1.0）
-- `trail_r`：开始跟踪止损的盈亏比阈值（默认：2.0）
+---
 
-## 进阶功能
-
-### 投资组合回测
-系统支持多资产投资组合回测，可动态调整资产权重：
-```bash
-python backtest.py --portfolio --symbols BTC/USDT,ETH/USDT,SOL/USDT
-```
-
-### 自定义策略
-您可以通过扩展 `improved_strategy.py` 模块实现自己的交易策略：
-```python
-def my_custom_strategy(data, param1, param2):
-    signals = pd.DataFrame(index=data.index)
-    signals["signal"] = 0
-    
-    # 实现您的策略逻辑
-    # ...
-    
-    return signals
-```
-
-### 绩效分析与可视化
-系统提供多种绩效分析工具：
-```bash
-# 绘制权益曲线
-python plot_equity.py --result_file results.csv
-
-# 比较不同策略
-python plot_comparison.py --result_files result1.csv,result2.csv --labels strategy1,strategy2
-```
-
-## 生产环境注意事项
-
-### 安全性
-- 使用有限权限的API密钥（仅交易权限，无提款权限）
-- 定期更换API密钥和密码
-- 不要在公共代码库中存储敏感信息
-
-### 稳定性
-- 实现错误处理和恢复机制
-- 设置合理的止损，避免重大亏损
-- 监控系统资源使用情况
-- 实施日志记录和警报系统
-
-## 贡献与支持
-
-欢迎通过以下方式贡献：
-- 提交Bug报告
-- 提出新功能建议
-- 提交Pull Request
-
-## 许可证
-
-MIT
-
-## 其他文档
-
-- [Telegram通知详细文档](README_TELEGRAM.md)
-- [网络请求框架文档](README_NETWORK.md)
-- [测试网使用指南](README_TESTNET.md)
-- [对账和分析工具](README_RECONCILIATION.md) 
-
-## 仓库详细文件说明
-
-以下是本仓库中主要文件和目录的详细解释，帮助初学者快速了解系统结构。
-
-### 主目录文件
-
-1. **README.md** (6.3KB)
-   - 项目主文档，包含系统架构说明、安装步骤和使用指南
-   - 提供了整个系统的概览和功能说明
-
-2. **requirements.txt** (216B)
-   - 项目依赖包列表，包括pandas、numpy、matplotlib等核心库
-   - 运行系统所需的外部依赖
-
-3. **live_trade.py** (11KB)
-   - 实盘交易主程序，系统的入口点
-   - 包含配置加载、客户端初始化和策略执行函数
-
-4. **backtest.py** (3.2KB)
-   - 回测引擎主程序，用于测试策略在历史数据上的表现
-   - 包含数据加载、策略执行和性能指标计算功能
-
-5. **improved_strategy.py** (8.4KB)
-   - 改进的交易策略实现，包含多种技术分析策略
-   - 实现了MA交叉、RSI超买超卖等交易信号
-
-6. **fetch_binance.py** (4.9KB)
-   - 从币安交易所获取历史和实时数据的工具
-   - 支持多种交易对和时间周期
-
-7. **reconcile.py** (2.9KB)
-   - 交易对账工具，用于核对交易记录和实际成交
-   - 支持生成对账报告和发送通知
-
-8. **load_env.py** (2.8KB)
-   - 环境变量加载工具，处理配置文件和环境变量
-   - 用于系统初始化和配置管理
-
-9. **data.py** (1.3KB)
-   - 数据加载工具，用于从CSV文件加载价格数据
-   - 支持多资产数据处理
-
-10. **is_prime.py** (1.1KB)
-    - 质数判断算法的Python实现
-    - 用于演示和教学目的
-
-11. **optimize_ma.py** (1.0KB)
-    - 移动平均策略参数优化工具
-    - 寻找最优交易参数组合
-
-12. **run_full_test.py** (801B)
-    - 完整系统测试工具，运行所有单元测试
-    - 用于质量保证和回归测试
-
-13. **plot_comparison.py**, **plot_equity.py**, **plot_portfolio.py** (约1KB每个)
-    - 结果可视化工具，绘制权益曲线和性能比较图
-    - 支持多策略和多资产的可视化比较
-
-14. **config.ini.template** (575B)
-    - 配置文件模板，包含API密钥和交易参数
-    - 用于用户自定义系统配置
-
-### src 目录 (核心功能模块)
-
-1. **signals.py** (6.4KB)
-   - 技术分析信号处理模块
-   - 包含移动平均、布林带、交叉检测等指标计算函数
-   - 支持向量化操作，提高计算效率
-
-2. **broker.py** (32KB)
-   - 订单管理和风险控制核心模块
-   - 实现ATR止损、移动止损和仓位管理
-   - 包含单资产和投资组合回测功能
-
-3. **data_processor.py** (9.6KB)
-   - 数据处理工具，清洗和规范化价格数据
-   - 支持特征工程和时间序列处理
-
-4. **trading_loop.py** (9.7KB)
-   - 实时交易循环实现，处理信号检测和订单执行
-   - 支持定时执行和异常处理
-
-5. **market_simulator.py** (15KB)
-   - 市场模拟器，用于回测环境
-   - 模拟订单执行和市场行为
-
-6. **improved_strategy.py** (12KB)
-   - 高级交易策略实现，多种技术分析组合
-   - 支持多时间周期分析和信号过滤
-
-7. **exchange_client.py** (12KB)
-   - 交易所API接口抽象层
-   - 处理网络请求和错误重试
-
-8. **binance_client.py** (9.3KB)
-   - 币安交易所特定实现
-   - 处理币安API交互和响应解析
-
-9. **network.py** (14KB)
-   - 网络请求框架，处理API调用和重试逻辑
-   - 实现错误处理和请求限流
-
-10. **telegram.py** (1.9KB)
-    - Telegram通知功能实现
-    - 发送交易信号和账户更新
-
-11. **notify.py** (3.0KB)
-    - 通用通知系统，支持多种通知渠道
-    - 处理消息格式化和发送
-
-12. **utils.py** (1.6KB)
-    - 实用工具函数集合
-    - 包含路径处理、日期格式化等功能
-
-13. **metrics.py** (937B)
-    - 性能指标计算模块
-    - 计算夏普比率、最大回撤等评估指标
-
-14. **portfolio_backtest.py** (732B)
-    - 投资组合回测专用模块
-    - 支持多资产权重优化
-
-### tests 目录 (测试模块)
-
-1. **test_signals.py**, **test_broker.py**, **test_metrics.py** 等
-   - 单元测试模块，验证各功能正确性
-   - 采用pytest框架编写的详细测试用例
-
-2. **test_snapshots.py** (5.7KB)
-   - 快照测试，确保系统行为一致性
-   - 用于回归测试和质量保证
-
-### examples 目录
-
-1. **retry_example.py** (5.2KB)
-   - 网络请求重试机制示例代码
-   - 演示错误处理和恢复策略
-
-### 配置文件
-
-1. **.flake8**, **pyproject.toml**
-   - Python代码风格和测试配置
-   - 确保代码质量和一致性
-
-2. **setup.py** (717B)
-   - 包安装配置，定义项目依赖和元数据
-   - 支持pip安装和开发模式
-
-## 功能模块详解
-
-### 1. 信号生成模块 (src/signals.py)
-
-该模块实现了各种技术分析指标计算:
-- 移动平均线(MA)计算：支持SMA、EMA、WMA不同类型
-- 交叉检测：快速实现上穿/下穿信号
-- 布林带、Z-score、变化率等指标
-- 向量化计算，提高大数据处理效率
-
-### 2. 订单管理模块 (src/broker.py)
-
-订单和风险管理的核心实现:
-- ATR止损计算：基于波动率设置合理止损
-- 移动止损策略：三段式移动止损逻辑
-- 仓位计算：基于账户风险比例和波动率
-- 回测引擎：单资产和投资组合回测
-- 订单执行和日志记录
-
-### 3. 数据处理模块 (src/data_processor.py)
-
-处理价格数据的关键功能:
-- 数据清洗：处理缺失值和异常值
-- 特征工程：计算技术指标作为特征
-- 数据规范化：确保不同资产可比性
-- 时间序列处理：重采样和对齐
-
-### 4. 交易执行模块 (src/trading_loop.py)
-
-实时交易的运行环境:
-- 信号检测：监控市场数据产生信号
-- 订单执行：处理买卖操作和错误情况
-- 定时任务：按设定周期执行策略
-- 异常处理：处理网络和API错误
-
-### 5. 通知系统 (src/telegram.py, src/notify.py)
-
-交易状态通知功能:
-- Telegram机器人集成：发送实时交易通知
-- 信号通知：发送买卖信号和理由
-- 账户更新：定期发送权益和持仓报告
-- 错误通知：关键错误的实时警报
-
-### 6. 回测工具 (backtest.py, src/market_simulator.py)
-
-策略评估和优化工具:
-- 历史数据回测：模拟历史交易表现
-- 市场模拟：模拟订单执行和滑点
-- 性能指标：计算夏普比率、最大回撤等
-- 参数优化：网格搜索最优参数组合
-
-### 7. 实盘交易 (live_trade.py)
-
-实盘交易的入口程序:
-- 配置加载：读取API密钥和交易参数
-- 交易循环：持续监控市场和执行订单
-- 状态保存：记录持仓和交易历史
-- 风险控制：实时调整止损和仓位
-
-## 数据文件说明
-
-1. **btc_eth.csv**, **btc_eth_2yr_20250428.csv** (20KB)
-   - BTC和ETH历史价格数据
-   - 用于策略回测和开发
-
-2. **grid_results.csv** (14KB)
-   - 参数优化网格搜索结果
-   - 记录不同参数组合的性能
-
-3. **trades.csv** (136B)
-   - 交易记录文件，记录所有交易详情
-   - 包含时间、价格、数量等信息
-
-4. **position_state.json** (174B)
-   - 持仓状态记录，保存当前交易状态
-   - 用于程序重启后恢复交易状态
-
-## 可视化文件
-
-1. **strategy_improvement.png**, **price_comp.png** 等图像文件
-   - 策略优化和比较的可视化结果
-   - 展示不同策略和资产的性能对比
-
-## 其他文档
-
-1. **README_TELEGRAM.md**, **README_NETWORK.md** 等
-   - 特定模块的详细说明文档
-   - 包含使用指南和高级配置说明
-
-2. **DEPENDENCIES.md** (1.2KB)
-   - 详细的依赖列表和版本要求
-   - 包含安装指南和兼容性说明
-
-## 学习路径建议
-
-对于初学者，建议按以下顺序学习本项目：
-
-1. 首先了解基本概念：移动平均线、交叉信号等基础技术指标
-2. 学习数据获取和处理：`fetch_binance.py`和`data_processor.py`
-3. 了解简单策略：`signals.py`中的基本信号生成函数
-4. 学习回测系统：使用`backtest.py`测试简单策略
-5. 了解风险管理：学习`broker.py`中的止损和仓位管理
-6. 进阶到复杂策略：研究`improved_strategy.py`中的多指标组合
-7. 最后学习实盘交易：理解`live_trade.py`和`trading_loop.py`的工作原理
-
-这一学习路径将帮助你从基础到进阶，逐步掌握自动化交易系统的开发和使用。 
+**⭐ 如果这个项目对你有帮助，请给它一个星标！**

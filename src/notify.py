@@ -20,10 +20,12 @@ class Notifier:
         self.token = token or os.getenv("TG_TOKEN")
         if not self.token:
             raise ValueError("Telegram token not found in environment")
-        self.bot = TelegramBot(self.token)
-        self.chat_id = os.getenv("TG_CHAT_ID")
+
+        self.chat_id = os.getenv("TG_CHAT_ID") or os.getenv("TG_CHAT")
         if not self.chat_id:
             raise ValueError("Telegram chat ID not found in environment")
+
+        self.bot = TelegramBot(self.token, self.chat_id)
 
     def _format_message(self, message: str, level: str = "INFO") -> str:
         """

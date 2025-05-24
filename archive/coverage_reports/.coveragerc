@@ -1,0 +1,46 @@
+[run]
+source = src
+omit = 
+    */tests/*
+    */test_*
+    */__pycache__/*
+    */venv/*
+    */.venv/*
+
+# 包含主程序块的配置
+include = src/*
+
+# 并发设置
+concurrency = thread,multiprocessing
+
+# 数据文件设置
+data_file = .coverage
+
+[report]
+# 显示缺失的行号
+show_missing = True
+
+# 跳过覆盖率为100%的文件
+skip_covered = False
+
+# 排除不需要覆盖的行
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    raise AssertionError
+    raise NotImplementedError
+    if __name__ == .__main__.:
+
+# 包含主程序块(注释掉上面的exclude规则)
+# exclude_lines =
+#     pragma: no cover
+#     def __repr__
+#     raise AssertionError  
+#     raise NotImplementedError
+
+[html]
+directory = htmlcov
+title = Trading System Coverage Report
+
+[xml]
+output = coverage.xml 

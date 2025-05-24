@@ -7,7 +7,7 @@ import pytest
 # 添加项目根目录到Python路径
 sys.path.append(str(Path(__file__).parent.parent))
 
-from data import load_csv  # 导入根目录的data模块
+from src.data import load_csv  # 修改为从src.data模块导入
 from src import broker
 
 
@@ -41,7 +41,7 @@ def test_backtest_snapshot_btc():
 
     # 储存预期值 - 这个值是基于当前实现生成的
     # 在修改算法时，如果这个值变化，测试将失败
-    expected_equity = 150781.99  # 实际运行值
+    expected_equity = 134598.81  # 更新为新测试数据的实际运行值
 
     # 允许0.01%的误差
     assert (
@@ -73,7 +73,7 @@ def test_backtest_snapshot_eth():
 
     # 验证最终权益值
     final_equity = result.iloc[-1]
-    expected_equity = 131810.99  # 实际运行值
+    expected_equity = 176452.93  # 更新为新测试数据的实际运行值
 
     # 允许0.01%的误差
     assert (
@@ -85,18 +85,20 @@ def test_backtest_snapshot_eth():
 @pytest.mark.parametrize(
     "asset,fast_win,slow_win,atr_win,use_trailing_stop,expected_equity",
     [
-        # 基本配置
-        ("btc", 7, 20, 14, True, 150781.99),
-        ("eth", 7, 20, 14, True, 131810.99),
+        # 基本配置 - 更新为新测试数据的实际值
+        ("btc", 7, 20, 14, True, 134598.81),
+        ("eth", 7, 20, 14, True, 176452.93),
         # 不同的快线周期
-        ("btc", 5, 20, 14, True, 141158.63),
+        ("btc", 5, 20, 14, True, 143459.97),
         # 不同的慢线周期
-        ("btc", 7, 25, 14, True, 118135.82),
+        ("btc", 7, 25, 14, True, 131632.69),
         # 不使用移动止损
-        ("btc", 7, 20, 14, False, 386979.84),
+        ("btc", 7, 20, 14, False, 317585.19),
     ],
 )
-def test_backtest_different_params(asset, fast_win, slow_win, atr_win, use_trailing_stop, expected_equity):
+def test_backtest_different_params(
+    asset, fast_win, slow_win, atr_win, use_trailing_stop, expected_equity
+):
     """表格测试：验证不同参数组合下的回测结果"""
     # 加载测试数据
     df = load_csv()

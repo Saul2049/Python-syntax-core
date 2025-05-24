@@ -1,19 +1,31 @@
-# 运行依赖 - 项目运行必须的包
-pandas==2.0.3
-numpy==1.25.1
-matplotlib==3.7.2
-tqdm>=4.66.1
-requests==2.31.0
-python-dateutil>=2.9.0
-python-binance>=1.0.16
-schedule>=1.1.0
-aiohttp>=3.8.4
-python-dotenv>=1.0.0
-prometheus-client>=0.16.0
+# Trading Framework Dependencies
+pandas>=1.3.0
+numpy>=1.21.0
+matplotlib>=3.5.0
+seaborn>=0.11.0
+requests>=2.25.0
+python-binance>=1.0.15
 
-# 配置管理所需依赖
+# Notification and Communication
+python-telegram-bot>=20.0
+
+# Configuration Management
 pyyaml>=6.0
 
-# 测试依赖
-pytest>=7.4.0,<8.0.0
-psutil==5.9.5
+# Monitoring and Metrics
+prometheus-client>=0.16.0
+
+# Testing
+pytest>=6.2.0
+pytest-cov>=2.12.0
+
+# Code Quality
+flake8>=3.9.0
+black>=21.0.0
+isort>=5.9.0
+
+# Data Validation
+cerberus>=1.3.4
+
+# Additional dependencies for system monitoring
+psutil>=5.8.0

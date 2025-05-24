@@ -19,6 +19,14 @@ from typing import Dict, List, Optional, Tuple, Union
 # 确保将项目根目录添加到Python路径
 sys.path.insert(0, os.path.abspath(os.path.dirname(os.path.dirname(__file__))))
 
+# 先设置基础日志
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    handlers=[logging.FileHandler("stability_test.log"), logging.StreamHandler()],
+)
+logger = logging.getLogger("stability_test")
+
 # 导入配置管理器
 try:
     # 尝试导入增强配置管理器
@@ -36,15 +44,6 @@ except ImportError:
         logger.warning("无法导入配置管理器，将使用默认值")
         get_config = None
         setup_logging = None
-
-# 设置日志
-logging_config = get_config().get_log_level() if get_config() else "INFO"
-logging.basicConfig(
-    level=getattr(logging, logging_config),
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    handlers=[logging.FileHandler("stability_test.log"), logging.StreamHandler()],
-)
-logger = logging.getLogger("stability_test")
 
 # 导入市场数据管理器
 from scripts.market_data import create_market_data_manager, MarketDataManager
@@ -554,16 +553,19 @@ def main():
     args = parser.parse_args()
 
     # 初始化配置
+    get_config = None  # 声明变量
+    
     try:
         # 优先使用增强配置管理器
         if 'setup_logging' in globals() and setup_logging is not None:
             # 初始化配置
-            global get_config
-            get_config = lambda: get_config(
-                config_yaml=args.config_yaml, 
-                env_file=args.env_file,
-                config_ini=args.config
-            )
+            def create_enhanced_config():
+                return get_enhanced_config(
+                    config_yaml=args.config_yaml, 
+                    env_file=args.env_file,
+                    config_ini=args.config
+                )
+            get_config = create_enhanced_config
             
             # 设置日志
             setup_logging()
@@ -571,7 +573,6 @@ def main():
         elif args.config:
             # 如果使用旧版配置管理器且指定了配置文件
             from scripts.config_manager import ConfigManager
-            global get_config
             get_config = lambda: ConfigManager(args.config)
             logger.info(f"使用旧版配置系统，配置文件: {args.config}")
     except Exception as e:

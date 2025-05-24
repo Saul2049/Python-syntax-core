@@ -87,7 +87,9 @@ def test_trailing_stop_with_atr():
     atr = 5.0
 
     # 使用ATR作为跟踪距离
-    stop = broker.compute_trailing_stop(entry, current_price, initial_stop, breakeven_r, trail_r, atr)
+    stop = broker.compute_trailing_stop(
+        entry, current_price, initial_stop, breakeven_r, trail_r, atr
+    )
     assert stop == current_price - atr
 
 
@@ -133,7 +135,9 @@ def test_backtest_with_trailing_stop():
     )
 
     # 不使用移动止损的回测
-    equity_no_trail = broker.backtest_single(price, fast_win=2, slow_win=4, atr_win=3, use_trailing_stop=False)
+    equity_no_trail = broker.backtest_single(
+        price, fast_win=2, slow_win=4, atr_win=3, use_trailing_stop=False
+    )
 
     # 使用移动止损的回测
     equity_with_trail = broker.backtest_single(

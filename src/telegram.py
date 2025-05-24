@@ -28,7 +28,7 @@ class TelegramBot:
 
     def send(self, text: str) -> bool:
         """
-        发送消息
+        发送消息（向后兼容）
 
         参数:
             text: 要发送的消息文本
@@ -36,12 +36,29 @@ class TelegramBot:
         返回:
             是否发送成功
         """
-        if not self.token or not self.chat_id:
+        return self.send_message(self.chat_id, text) if self.chat_id else False
+
+    def send_message(self, chat_id: str, text: str, parse_mode: str = "HTML") -> bool:
+        """
+        发送文本消息
+
+        参数:
+            chat_id: 聊天ID
+            text: 要发送的消息文本
+            parse_mode: 解析模式 (HTML, Markdown, None)
+
+        返回:
+            是否发送成功
+        """
+        if not self.token:
             return False
 
         try:
             url = f"https://api.telegram.org/bot{self.token}/sendMessage"
-            payload = {"chat_id": self.chat_id, "text": text, "parse_mode": "HTML"}
+            payload = {"chat_id": chat_id, "text": text}
+            if parse_mode:
+                payload["parse_mode"] = parse_mode
+
             response = requests.post(url, json=payload)
 
             if response.status_code == 200:
@@ -52,6 +69,42 @@ class TelegramBot:
 
         except Exception as e:
             print(f"发送Telegram消息出错: {str(e)}")
+            return False
+
+    def send_photo(self, chat_id: str, photo_path: str, caption: str = "") -> bool:
+        """
+        发送图片消息
+
+        参数:
+            chat_id: 聊天ID
+            photo_path: 图片文件路径
+            caption: 图片说明文字
+
+        返回:
+            是否发送成功
+        """
+        if not self.token:
+            return False
+
+        try:
+            url = f"https://api.telegram.org/bot{self.token}/sendPhoto"
+
+            with open(photo_path, "rb") as photo_file:
+                files = {"photo": photo_file}
+                data = {"chat_id": chat_id}
+                if caption:
+                    data["caption"] = caption
+
+                response = requests.post(url, files=files, data=data)
+
+            if response.status_code == 200:
+                return True
+            else:
+                print(f"发送Telegram图片失败: {response.status_code} - {response.text}")
+                return False
+
+        except Exception as e:
+            print(f"发送Telegram图片出错: {str(e)}")
             return False
 
 
