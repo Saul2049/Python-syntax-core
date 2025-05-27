@@ -40,7 +40,7 @@ jobs:
       id: benchmark
       run: |
         echo "🚀 Running M4 Performance Benchmark (120s)..."
-        timeout 300 python scripts/m4_simple_benchmark.py || {
+        timeout 300 python scripts/performance/m4_simple_benchmark.py || {
           echo "⚠️ Benchmark timeout or error, continuing with reduced test"
           echo "benchmark_failed=true" >> $GITHUB_OUTPUT
         }
@@ -50,10 +50,10 @@ jobs:
         echo "🔍 Checking P95 latency threshold..."
         if [ "${{ steps.benchmark.outputs.benchmark_failed }}" = "true" ]; then
           echo "⚠️ Benchmark failed, running assertion with fallback"
-          python scripts/assert_p95.py 0.3 --duration 60 --save-results
+          python scripts/health/assert_p95.py 0.3 --duration 60 --save-results
         else
           echo "✅ Running full assertion check"
-          python scripts/assert_p95.py 0.25 --duration 120 --save-results
+          python scripts/health/assert_p95.py 0.25 --duration 120 --save-results
         fi
         
     - name: 📊 Upload Performance Results
@@ -64,6 +64,7 @@ jobs:
         path: |
           output/m4_simple_benchmark_*.json
           output/p95_assertion_*.json
+        if-no-files-found: warn
         retention-days: 30
         
     - name: 💬 Comment PR with Results
@@ -157,7 +158,7 @@ jobs:
     - name: 📊 Generate Performance Baseline
       run: |
         echo "📈 Generating performance baseline for main branch..."
-        python scripts/m4_simple_benchmark.py
+        python scripts/performance/m4_simple_benchmark.py
         
     - name: 💾 Store Baseline Results
       uses: actions/upload-artifact@v3

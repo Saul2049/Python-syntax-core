@@ -17,7 +17,7 @@ from typing import Dict, List, Tuple, Optional
 import logging
 
 # 添加项目根目录到路径
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
 from scripts.memory.mem_snapshot import MemorySnapshot
 from scripts.memory.gc_profiler import GCProfiler

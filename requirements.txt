@@ -71,7 +71,7 @@ stevedore==5.4.1
 tables==3.10.1
 tomli==2.2.1
 tqdm==4.67.1
--e git+ssh://git@github.com/Saul2049/Python-syntax-core.git@ed3fbfd84318cde89ed1382db178cbe8c3e8c366#egg=trading_framework
+# Note: trading_framework is installed via setup.py in CI
 typing_extensions==4.13.2
 tzdata==2025.2
 tzlocal==5.3.1

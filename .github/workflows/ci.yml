@@ -22,10 +22,10 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        # 安装运行依赖和项目本身（开发模式）
-        pip install -e .
         # 安装开发依赖（测试、代码质量工具等）
         pip install -r dev-requirements.txt
+        # 安装运行依赖和项目本身（开发模式）
+        pip install -e .
 
     - name: Run linting
       run: |

@@ -95,3 +95,7 @@ trades.csv
 ~/trades/
 trades/
 *.csv
+
+# Output directory (keep structure, ignore contents)
+output/*
+!output/.gitkeep
