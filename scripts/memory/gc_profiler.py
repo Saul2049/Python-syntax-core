@@ -84,38 +84,46 @@ class GCProfiler:
         
     def _init_prometheus_metrics(self):
         """初始化Prometheus指标"""
-        self.gc_pause_duration = Summary(
-            'gc_pause_seconds',
-            'GC暂停时间',
-            ['generation']
-        )
-        
-        self.gc_collections_total = Counter(
-            'gc_collections_total',
-            'GC回收次数',
-            ['generation']
-        )
-        
-        self.gc_collected_objects = Counter(
-            'gc_collected_objects_total',
-            'GC回收对象数量',
-            ['generation']
-        )
-        
-        self.gc_pause_histogram = Histogram(
-            'gc_pause_duration_seconds',
-            'GC暂停时间分布',
-            ['generation'],
-            buckets=[0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1.0, 5.0]
-        )
-        
-        self.gc_objects_tracked = Gauge(
-            'gc_objects_tracked',
-            '当前追踪的对象数量',
-            ['generation']
-        )
-        
-        self.logger.info("✅ Prometheus GC指标已初始化")
+        try:
+            # 使用唯一的指标名称避免冲突
+            import uuid
+            suffix = str(uuid.uuid4())[:8]
+            
+            self.gc_pause_duration = Summary(
+                f'gc_pause_seconds_{suffix}',
+                'GC暂停时间',
+                ['generation']
+            )
+            
+            self.gc_collections_total = Counter(
+                f'gc_collections_total_{suffix}',
+                'GC回收次数',
+                ['generation']
+            )
+            
+            self.gc_collected_objects = Counter(
+                f'gc_collected_objects_total_{suffix}',
+                'GC回收对象数量',
+                ['generation']
+            )
+            
+            self.gc_pause_histogram = Histogram(
+                f'gc_pause_duration_seconds_{suffix}',
+                'GC暂停时间分布',
+                ['generation'],
+                buckets=[0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1.0, 5.0]
+            )
+            
+            self.gc_objects_tracked = Gauge(
+                f'gc_objects_tracked_{suffix}',
+                '当前追踪的对象数量',
+                ['generation']
+            )
+            
+            self.logger.info("✅ Prometheus GC指标已初始化")
+        except Exception as e:
+            self.logger.warning(f"⚠️ Prometheus指标初始化失败: {e}")
+            self.enable_prometheus = False
     
     def _gc_callback(self, phase: str, info: Dict[str, Any]):
         """GC回调函数 - 优化版"""

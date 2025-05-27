@@ -180,16 +180,24 @@ class M5AssertionValidator:
             profiler = GCProfiler()
             
             # 短期监控GC性能
-            await profiler.monitor_gc_performance(duration=30)  # 30秒监控
+            profiler.start_monitoring()
+            await asyncio.sleep(30)  # 30秒监控
+            profiler.stop_monitoring()
             
             # 分析结果
-            stats = profiler.get_pause_statistics()
+            stats = profiler.get_statistics()
             
-            if not stats or 'p95_pause_time' not in stats:
-                self.logger.warning("⚠️ 无法获取GC统计数据")
+            # 从分代统计中获取最高的P95暂停时间
+            max_p95_pause = 0
+            for gen, gen_stats in stats.get('by_generation', {}).items():
+                if 'p95_pause' in gen_stats:
+                    max_p95_pause = max(max_p95_pause, gen_stats['p95_pause'])
+            
+            if max_p95_pause == 0:
+                self.logger.warning("⚠️ 无法获取GC P95统计数据")
                 return False
             
-            p95_pause_ms = stats['p95_pause_time'] * 1000  # 转换为毫秒
+            p95_pause_ms = max_p95_pause * 1000  # 转换为毫秒
             passed = p95_pause_ms <= max_p95_pause_ms
             
             result = {
