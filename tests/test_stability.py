@@ -203,11 +203,11 @@ class TestStabilityTest(unittest.TestCase):
         # 模拟时间流逝，提供足够的时间戳避免StopIteration
         start_time = 1000.0
         end_time = start_time + self.stability_test.duration_seconds + 1
-        
+
         # 创建一个可调用对象来提供时间戳
         time_values = [start_time, start_time + 0.5, end_time]
         time_counter = [0]  # 使用列表来让闭包可以修改
-        
+
         def time_side_effect():
             if time_counter[0] < len(time_values):
                 result = time_values[time_counter[0]]
@@ -216,7 +216,7 @@ class TestStabilityTest(unittest.TestCase):
             else:
                 # 如果超出预期调用，返回结束时间
                 return end_time
-        
+
         mock_time.side_effect = time_side_effect
 
         # 模拟交易循环

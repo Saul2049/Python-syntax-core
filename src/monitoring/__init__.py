@@ -6,14 +6,29 @@ Monitoring Package (监控包)
 Provides comprehensive monitoring and metrics collection for trading systems
 """
 
-from .alerting import AlertManager
-from .health_checker import HealthChecker
-from .metrics_collector import MetricsCollector
-from .prometheus_exporter import PrometheusExporter
+from .metrics_collector import TradingMetricsCollector, get_metrics_collector, init_monitoring
+
+# 向后兼容别名
+MetricsCollector = TradingMetricsCollector
+
+try:
+    from .alerting import AlertManager
+except ImportError:
+    AlertManager = None
+
+try:
+    from .health_checker import HealthChecker
+except ImportError:
+    HealthChecker = None
+
+try:
+    from .prometheus_exporter import PrometheusExporter
+except ImportError:
+    PrometheusExporter = None
 
 
 # Convenience function for quick setup
-def get_monitoring_system(port: int = 9090, enable_alerts: bool = True):
+def get_monitoring_system(port: int = 8000, enable_alerts: bool = False):
     """
     Get a complete monitoring system setup
 
@@ -24,23 +39,19 @@ def get_monitoring_system(port: int = 9090, enable_alerts: bool = True):
     Returns:
         Dictionary with monitoring components
     """
-    exporter = PrometheusExporter(port=port)
-    collector = MetricsCollector(exporter)
-    health_checker = HealthChecker(collector)
+    collector = get_metrics_collector()
 
-    components = {"exporter": exporter, "collector": collector, "health_checker": health_checker}
-
-    if enable_alerts:
-        alert_manager = AlertManager(collector)
-        components["alert_manager"] = alert_manager
+    components = {
+        "collector": collector,
+    }
 
     return components
 
 
 __all__ = [
-    "PrometheusExporter",
-    "MetricsCollector",
-    "HealthChecker",
-    "AlertManager",
+    "TradingMetricsCollector",
+    "MetricsCollector",  # 向后兼容
+    "get_metrics_collector",
+    "init_monitoring",
     "get_monitoring_system",
 ]

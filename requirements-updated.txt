@@ -1,0 +1,62 @@
+# 现代化依赖 - 最新稳定版本 (2024年12月)
+# 核心科学计算
+numpy==2.1.3
+pandas==2.2.3  
+scipy==1.15.3
+matplotlib==3.10.0
+
+# 机器学习
+scikit-learn==1.6.1
+
+# 数据处理
+openpyxl==3.1.5
+fastparquet==2024.11.0
+
+# 开发工具
+pytest==8.3.5
+pytest-cov==6.1.1
+black==25.1.0
+isort==6.0.1
+flake8==7.2.0
+mypy==1.14.1
+
+# 监控和性能
+psutil==7.0.0
+tqdm==4.67.1
+
+# 网络和API
+requests==2.32.3
+aiohttp==3.11.18
+
+# 加密和安全
+pycryptodome==3.23.0
+
+# 配置和环境
+python-dotenv==1.1.0
+PyYAML==6.0.2
+schedule==1.2.2
+
+# 富文本输出
+rich==14.0.0
+
+# 日期处理
+python-dateutil==2.9.0.post0
+pytz==2025.2
+
+# 数据分析可视化
+plotly==5.24.1
+seaborn==0.13.2
+
+# 异步编程
+asyncio-throttle==1.0.2
+
+# 类型检查
+typing_extensions==4.13.2
+
+# 金融数据
+yfinance==0.2.38
+python-binance==1.0.29
+
+# Jupyter支持  
+ipython==8.31.0
+jupyter==1.1.1 

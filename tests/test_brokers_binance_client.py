@@ -9,7 +9,7 @@ import hmac
 import json
 import tempfile
 import time
-from unittest.mock import Mock, patch, mock_open
+from unittest.mock import Mock, mock_open, patch
 from urllib.parse import urlencode
 
 import pandas as pd
@@ -24,6 +24,7 @@ class TestRateLimitRetry:
 
     def test_rate_limit_retry_success_first_attempt(self):
         """测试第一次尝试就成功"""
+
         @rate_limit_retry(max_retries=3, base_delay=0.1)
         def mock_function():
             return "success"
@@ -54,6 +55,7 @@ class TestRateLimitRetry:
 
     def test_rate_limit_retry_max_retries_exceeded(self):
         """测试超过最大重试次数"""
+
         @rate_limit_retry(max_retries=2, base_delay=0.1)
         def mock_function():
             response = Mock()
@@ -67,6 +69,7 @@ class TestRateLimitRetry:
 
     def test_rate_limit_retry_non_429_error(self):
         """测试非429错误直接抛出"""
+
         @rate_limit_retry(max_retries=3, base_delay=0.1)
         def mock_function():
             response = Mock()
@@ -93,7 +96,7 @@ class TestRateLimitRetry:
             error.response = response
             raise error
 
-        with patch('time.sleep', side_effect=mock_sleep):
+        with patch("time.sleep", side_effect=mock_sleep):
             with pytest.raises(requests.exceptions.HTTPError):
                 mock_function()
 
@@ -107,11 +110,7 @@ class TestBinanceClientInitialization:
 
     def test_init_with_explicit_credentials(self):
         """测试使用显式凭据初始化"""
-        client = BinanceClient(
-            api_key="test_key",
-            api_secret="test_secret",
-            testnet=True
-        )
+        client = BinanceClient(api_key="test_key", api_secret="test_secret", testnet=True)
 
         assert client.api_key == "test_key"
         assert client.api_secret == "test_secret"
@@ -120,20 +119,19 @@ class TestBinanceClientInitialization:
 
     def test_init_with_production_url(self):
         """测试生产环境URL"""
-        client = BinanceClient(
-            api_key="test_key",
-            api_secret="test_secret",
-            testnet=False
-        )
+        client = BinanceClient(api_key="test_key", api_secret="test_secret", testnet=False)
 
         assert client.base_url == "https://api.binance.com/api"
 
     def test_init_from_environment_variables(self):
         """测试从环境变量初始化"""
-        with patch.dict('os.environ', {
-            'BINANCE_TESTNET_API_KEY': 'env_test_key',
-            'BINANCE_TESTNET_API_SECRET': 'env_test_secret'
-        }):
+        with patch.dict(
+            "os.environ",
+            {
+                "BINANCE_TESTNET_API_KEY": "env_test_key",
+                "BINANCE_TESTNET_API_SECRET": "env_test_secret",
+            },
+        ):
             client = BinanceClient(load_from_env=True, testnet=True)
 
             assert client.api_key == "env_test_key"
@@ -141,10 +139,9 @@ class TestBinanceClientInitialization:
 
     def test_init_from_production_env_vars(self):
         """测试从生产环境变量初始化"""
-        with patch.dict('os.environ', {
-            'BINANCE_API_KEY': 'prod_key',
-            'BINANCE_API_SECRET': 'prod_secret'
-        }):
+        with patch.dict(
+            "os.environ", {"BINANCE_API_KEY": "prod_key", "BINANCE_API_SECRET": "prod_secret"}
+        ):
             client = BinanceClient(load_from_env=True, testnet=False)
 
             assert client.api_key == "prod_key"
@@ -157,8 +154,8 @@ class TestBinanceClientInitialization:
 API_KEY = config_key
 API_SECRET = config_secret
 """
-        
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.ini', delete=False) as f:
+
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".ini", delete=False) as f:
             f.write(config_content)
             f.flush()
 
@@ -179,14 +176,12 @@ API_SECRET = config_secret
 
     def test_init_priority_explicit_over_env(self):
         """测试显式参数优先级高于环境变量"""
-        with patch.dict('os.environ', {
-            'BINANCE_TESTNET_API_KEY': 'env_key',
-            'BINANCE_TESTNET_API_SECRET': 'env_secret'
-        }):
+        with patch.dict(
+            "os.environ",
+            {"BINANCE_TESTNET_API_KEY": "env_key", "BINANCE_TESTNET_API_SECRET": "env_secret"},
+        ):
             client = BinanceClient(
-                api_key="explicit_key",
-                api_secret="explicit_secret",
-                load_from_env=True
+                api_key="explicit_key", api_secret="explicit_secret", load_from_env=True
             )
 
             assert client.api_key == "explicit_key"
@@ -209,9 +204,7 @@ class TestBinanceClientSignature:
         # 手动计算期望的签名
         query_string = urlencode(params)
         expected_signature = hmac.new(
-            "test_secret".encode("utf-8"),
-            query_string.encode("utf-8"),
-            hashlib.sha256
+            "test_secret".encode("utf-8"), query_string.encode("utf-8"), hashlib.sha256
         ).hexdigest()
 
         assert signature == expected_signature
@@ -222,9 +215,7 @@ class TestBinanceClientSignature:
         signature = client._generate_signature(params)
 
         expected_signature = hmac.new(
-            "test_secret".encode("utf-8"),
-            "".encode("utf-8"),
-            hashlib.sha256
+            "test_secret".encode("utf-8"), "".encode("utf-8"), hashlib.sha256
         ).hexdigest()
 
         assert signature == expected_signature
@@ -237,13 +228,13 @@ class TestBinanceClientSignature:
             "type": "LIMIT",
             "quantity": "0.001",
             "price": "50000",
-            "timestamp": 1234567890
+            "timestamp": 1234567890,
         }
         signature = client._generate_signature(params)
 
         # 验证签名是64字符的十六进制字符串
         assert len(signature) == 64
-        assert all(c in '0123456789abcdef' for c in signature)
+        assert all(c in "0123456789abcdef" for c in signature)
 
 
 class TestBinanceClientPublicMethods:
@@ -254,7 +245,7 @@ class TestBinanceClientPublicMethods:
         """创建测试客户端"""
         return BinanceClient(api_key="test_key", api_secret="test_secret")
 
-    @patch('requests.get')
+    @patch("requests.get")
     def test_get_server_time_success(self, mock_get, client):
         """测试获取服务器时间成功"""
         expected_response = {"serverTime": 1234567890000}
@@ -265,12 +256,24 @@ class TestBinanceClientPublicMethods:
         assert result == expected_response
         mock_get.assert_called_once_with(f"{client.base_url}/v3/time")
 
-    @patch('requests.get')
+    @patch("requests.get")
     def test_get_klines_success(self, mock_get, client):
         """测试获取K线数据成功"""
         mock_data = [
-            [1609459200000, "29000.0", "30000.0", "28000.0", "29500.0", "100.0",
-             1609545599999, "2950000.0", 1000, "50.0", "1475000.0", "0"]
+            [
+                1609459200000,
+                "29000.0",
+                "30000.0",
+                "28000.0",
+                "29500.0",
+                "100.0",
+                1609545599999,
+                "2950000.0",
+                1000,
+                "50.0",
+                "1475000.0",
+                "0",
+            ]
         ]
         mock_response = Mock()
         mock_response.json.return_value = mock_data
@@ -291,10 +294,10 @@ class TestBinanceClientPublicMethods:
         # 验证请求参数
         mock_get.assert_called_once_with(
             f"{client.base_url}/v3/klines",
-            params={"symbol": "BTCUSDT", "interval": "1d", "limit": 1}
+            params={"symbol": "BTCUSDT", "interval": "1d", "limit": 1},
         )
 
-    @patch('requests.get')
+    @patch("requests.get")
     def test_get_klines_with_custom_params(self, mock_get, client):
         """测试自定义参数获取K线数据"""
         mock_response = Mock()
@@ -306,10 +309,10 @@ class TestBinanceClientPublicMethods:
 
         mock_get.assert_called_once_with(
             f"{client.base_url}/v3/klines",
-            params={"symbol": "ETHUSDT", "interval": "1h", "limit": 24}
+            params={"symbol": "ETHUSDT", "interval": "1h", "limit": 24},
         )
 
-    @patch('requests.get')
+    @patch("requests.get")
     def test_get_klines_http_error(self, mock_get, client):
         """测试K线数据请求HTTP错误"""
         mock_response = Mock()
@@ -319,7 +322,7 @@ class TestBinanceClientPublicMethods:
         with pytest.raises(requests.exceptions.HTTPError):
             client.get_klines("BTCUSDT")
 
-    @patch('requests.get')
+    @patch("requests.get")
     def test_get_klines_retry_on_429(self, mock_get, client):
         """测试K线数据请求遇到429自动重试"""
         # 第一次请求返回429，第二次成功
@@ -333,7 +336,7 @@ class TestBinanceClientPublicMethods:
 
         mock_get.side_effect = [mock_response_429, mock_response_success]
 
-        with patch('time.sleep'):  # 避免实际睡眠
+        with patch("time.sleep"):  # 避免实际睡眠
             result = client.get_klines("BTCUSDT")
 
         assert isinstance(result, pd.DataFrame)
@@ -348,8 +351,8 @@ class TestBinanceClientPrivateMethods:
         """创建测试客户端"""
         return BinanceClient(api_key="test_key", api_secret="test_secret")
 
-    @patch('requests.get')
-    @patch('time.time')
+    @patch("requests.get")
+    @patch("time.time")
     def test_get_account_info_success(self, mock_time, mock_get, client):
         """测试获取账户信息成功"""
         mock_time.return_value = 1234567890
@@ -358,8 +361,8 @@ class TestBinanceClientPrivateMethods:
             "takerCommission": 15,
             "balances": [
                 {"asset": "BTC", "free": "0.001", "locked": "0.0"},
-                {"asset": "USDT", "free": "100.0", "locked": "0.0"}
-            ]
+                {"asset": "USDT", "free": "100.0", "locked": "0.0"},
+            ],
         }
         mock_get.return_value.json.return_value = expected_response
 
@@ -374,28 +377,19 @@ class TestBinanceClientPrivateMethods:
         assert "timestamp" in call_args[1]["params"]
         assert "signature" in call_args[1]["params"]
 
-    @patch('requests.post')
-    @patch('time.time')
+    @patch("requests.post")
+    @patch("time.time")
     def test_place_order_limit_success(self, mock_time, mock_post, client):
         """测试限价单下单成功"""
         mock_time.return_value = 1234567890
-        expected_response = {
-            "symbol": "BTCUSDT",
-            "orderId": 123456,
-            "status": "NEW",
-            "code": 0
-        }
+        expected_response = {"symbol": "BTCUSDT", "orderId": 123456, "status": "NEW", "code": 0}
         mock_response = Mock()
         mock_response.json.return_value = expected_response
         mock_response.raise_for_status.return_value = None
         mock_post.return_value = mock_response
 
         result = client.place_order(
-            symbol="BTCUSDT",
-            side="BUY",
-            order_type="LIMIT",
-            quantity="0.001",
-            price="50000"
+            symbol="BTCUSDT", side="BUY", order_type="LIMIT", quantity="0.001", price="50000"
         )
 
         assert result == expected_response
@@ -414,8 +408,8 @@ class TestBinanceClientPrivateMethods:
         assert "timestamp" in params
         assert "signature" in params
 
-    @patch('requests.post')
-    @patch('time.time')
+    @patch("requests.post")
+    @patch("time.time")
     def test_place_order_market_success(self, mock_time, mock_post, client):
         """测试市价单下单成功"""
         mock_time.return_value = 1234567890
@@ -426,10 +420,7 @@ class TestBinanceClientPrivateMethods:
         mock_post.return_value = mock_response
 
         result = client.place_order(
-            symbol="BTCUSDT",
-            side="SELL",
-            order_type="MARKET",
-            quantity="0.001"
+            symbol="BTCUSDT", side="SELL", order_type="MARKET", quantity="0.001"
         )
 
         assert result == expected_response
@@ -439,8 +430,8 @@ class TestBinanceClientPrivateMethods:
         params = call_args[1]["params"]
         assert "price" not in params
 
-    @patch('requests.post')
-    @patch('time.time')
+    @patch("requests.post")
+    @patch("time.time")
     def test_place_order_stop_loss_success(self, mock_time, mock_post, client):
         """测试止损单下单成功"""
         mock_time.return_value = 1234567890
@@ -456,7 +447,7 @@ class TestBinanceClientPrivateMethods:
             order_type="STOP_LOSS_LIMIT",
             quantity="0.001",
             price="48000",
-            stop_price="49000"
+            stop_price="49000",
         )
 
         assert result == expected_response
@@ -466,15 +457,12 @@ class TestBinanceClientPrivateMethods:
         params = call_args[1]["params"]
         assert params["stopPrice"] == "49000"
 
-    @patch('requests.post')
-    @patch('time.time')
+    @patch("requests.post")
+    @patch("time.time")
     def test_place_order_failure(self, mock_time, mock_post, client):
         """测试下单失败"""
         mock_time.return_value = 1234567890
-        error_response = {
-            "code": -1013,
-            "msg": "Filter failure: LOT_SIZE"
-        }
+        error_response = {"code": -1013, "msg": "Filter failure: LOT_SIZE"}
         mock_response = Mock()
         mock_response.json.return_value = error_response
         mock_response.raise_for_status.return_value = None
@@ -483,8 +471,8 @@ class TestBinanceClientPrivateMethods:
         with pytest.raises(Exception, match="下单失败: Filter failure: LOT_SIZE"):
             client.place_order("BTCUSDT", "BUY", "LIMIT", "0.001", "50000")
 
-    @patch('requests.delete')
-    @patch('time.time')
+    @patch("requests.delete")
+    @patch("time.time")
     def test_cancel_order_by_id(self, mock_time, mock_delete, client):
         """测试通过订单ID取消订单"""
         mock_time.return_value = 1234567890
@@ -502,8 +490,8 @@ class TestBinanceClientPrivateMethods:
         assert params["orderId"] == 123456
         assert "signature" in params
 
-    @patch('requests.delete')
-    @patch('time.time')
+    @patch("requests.delete")
+    @patch("time.time")
     def test_cancel_order_by_client_id(self, mock_time, mock_delete, client):
         """测试通过客户端订单ID取消订单"""
         mock_time.return_value = 1234567890
@@ -524,14 +512,14 @@ class TestBinanceClientPrivateMethods:
         with pytest.raises(ValueError, match="必须提供order_id或orig_client_order_id"):
             client.cancel_order("BTCUSDT")
 
-    @patch('requests.get')
-    @patch('time.time')
+    @patch("requests.get")
+    @patch("time.time")
     def test_get_open_orders_all_symbols(self, mock_time, mock_get, client):
         """测试获取所有交易对的挂单"""
         mock_time.return_value = 1234567890
         expected_response = [
             {"symbol": "BTCUSDT", "orderId": 123456, "status": "NEW"},
-            {"symbol": "ETHUSDT", "orderId": 789012, "status": "NEW"}
+            {"symbol": "ETHUSDT", "orderId": 789012, "status": "NEW"},
         ]
         mock_get.return_value.json.return_value = expected_response
 
@@ -544,8 +532,8 @@ class TestBinanceClientPrivateMethods:
         params = call_args[1]["params"]
         assert "symbol" not in params
 
-    @patch('requests.get')
-    @patch('time.time')
+    @patch("requests.get")
+    @patch("time.time")
     def test_get_open_orders_specific_symbol(self, mock_time, mock_get, client):
         """测试获取特定交易对的挂单"""
         mock_time.return_value = 1234567890
@@ -570,14 +558,14 @@ class TestBinanceClientBalance:
         """创建测试客户端"""
         return BinanceClient(api_key="test_key", api_secret="test_secret")
 
-    @patch.object(BinanceClient, 'get_account_info')
+    @patch.object(BinanceClient, "get_account_info")
     def test_get_balance_specific_asset(self, mock_get_account, client):
         """测试获取特定资产余额"""
         mock_account_info = {
             "balances": [
                 {"asset": "BTC", "free": "0.001", "locked": "0.0"},
                 {"asset": "USDT", "free": "100.0", "locked": "0.0"},
-                {"asset": "ETH", "free": "0.5", "locked": "0.0"}
+                {"asset": "ETH", "free": "0.5", "locked": "0.0"},
             ]
         }
         mock_get_account.return_value = mock_account_info
@@ -588,39 +576,31 @@ class TestBinanceClientBalance:
         assert btc_balance == 0.001
         assert usdt_balance == 100.0
 
-    @patch.object(BinanceClient, 'get_account_info')
+    @patch.object(BinanceClient, "get_account_info")
     def test_get_balance_nonexistent_asset(self, mock_get_account, client):
         """测试获取不存在资产的余额"""
-        mock_account_info = {
-            "balances": [
-                {"asset": "BTC", "free": "0.001", "locked": "0.0"}
-            ]
-        }
+        mock_account_info = {"balances": [{"asset": "BTC", "free": "0.001", "locked": "0.0"}]}
         mock_get_account.return_value = mock_account_info
 
         balance = client.get_balance("NONEXISTENT")
 
         assert balance == 0.0
 
-    @patch.object(BinanceClient, 'get_account_info')
+    @patch.object(BinanceClient, "get_account_info")
     def test_get_balance_all_assets(self, mock_get_account, client):
         """测试获取所有资产余额"""
         mock_account_info = {
             "balances": [
                 {"asset": "BTC", "free": "0.001", "locked": "0.0"},
                 {"asset": "USDT", "free": "100.0", "locked": "0.0"},
-                {"asset": "ETH", "free": "0.5", "locked": "0.0"}
+                {"asset": "ETH", "free": "0.5", "locked": "0.0"},
             ]
         }
         mock_get_account.return_value = mock_account_info
 
         all_balances = client.get_balance()
 
-        expected_balances = {
-            "BTC": 0.001,
-            "USDT": 100.0,
-            "ETH": 0.5
-        }
+        expected_balances = {"BTC": 0.001, "USDT": 100.0, "ETH": 0.5}
 
         assert all_balances == expected_balances
 
@@ -633,10 +613,12 @@ class TestBinanceClientIntegration:
         client = BinanceClient(api_key="test_key", api_secret="test_secret")
 
         # 模拟各种API调用
-        with patch('requests.get') as mock_get, \
-             patch('requests.post') as mock_post, \
-             patch('requests.delete') as mock_delete, \
-             patch('time.time', return_value=1234567890):
+        with (
+            patch("requests.get") as mock_get,
+            patch("requests.post") as mock_post,
+            patch("requests.delete") as mock_delete,
+            patch("time.time", return_value=1234567890),
+        ):
 
             # 1. 获取服务器时间
             mock_get.return_value.json.return_value = {"serverTime": 1234567890000}
@@ -673,13 +655,14 @@ class TestBinanceClientIntegration:
         client = BinanceClient(api_key="test_key", api_secret="test_secret")
 
         # 测试网络错误
-        with patch('requests.get', side_effect=requests.exceptions.ConnectionError("Network error")):
+        with patch(
+            "requests.get", side_effect=requests.exceptions.ConnectionError("Network error")
+        ):
             with pytest.raises(requests.exceptions.ConnectionError):
                 client.get_server_time()
 
         # 测试API错误响应
-        with patch('requests.post') as mock_post, \
-             patch('time.time', return_value=1234567890):
+        with patch("requests.post") as mock_post, patch("time.time", return_value=1234567890):
 
             mock_response = Mock()
             mock_response.json.return_value = {"code": -1013, "msg": "Invalid quantity"}
@@ -692,18 +675,16 @@ class TestBinanceClientIntegration:
     def test_configuration_priority(self):
         """测试配置优先级"""
         # 测试显式参数 > 环境变量 > 配置文件
-        with patch.dict('os.environ', {
-            'BINANCE_TESTNET_API_KEY': 'env_key',
-            'BINANCE_TESTNET_API_SECRET': 'env_secret'
-        }):
+        with patch.dict(
+            "os.environ",
+            {"BINANCE_TESTNET_API_KEY": "env_key", "BINANCE_TESTNET_API_SECRET": "env_secret"},
+        ):
             # 显式参数应该优先
             client1 = BinanceClient(
-                api_key="explicit_key",
-                api_secret="explicit_secret",
-                load_from_env=True
+                api_key="explicit_key", api_secret="explicit_secret", load_from_env=True
             )
             assert client1.api_key == "explicit_key"
 
             # 只有环境变量时使用环境变量
             client2 = BinanceClient(load_from_env=True)
-            assert client2.api_key == "env_key" 
+            assert client2.api_key == "env_key"

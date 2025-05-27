@@ -25,7 +25,7 @@ class TestNotifier(unittest.TestCase):
         # Mock environment variables
         self.token = "test_token_123"
         self.chat_id = "123456789"
-        
+
         # Set environment variables for testing
         os.environ["TG_TOKEN"] = self.token
         os.environ["TG_CHAT_ID"] = self.chat_id
@@ -69,10 +69,10 @@ class TestNotifier(unittest.TestCase):
     def test_notify_success(self, mock_send):
         """Test successful notification"""
         mock_send.return_value = True
-        
+
         notifier = Notifier(self.token)
         notifier.notify("Test message", "INFO")
-        
+
         mock_send.assert_called_once()
         call_args = mock_send.call_args[0]
         self.assertEqual(call_args[0], self.chat_id)
@@ -83,10 +83,10 @@ class TestNotifier(unittest.TestCase):
     def test_notify_trade(self, mock_send):
         """Test trade notification"""
         mock_send.return_value = True
-        
+
         notifier = Notifier(self.token)
         notifier.notify_trade("BUY", "BTCUSDT", 30000.0, 0.001, "MA crossover")
-        
+
         mock_send.assert_called_once()
         call_args = mock_send.call_args[0]
         message = call_args[1]
@@ -100,11 +100,11 @@ class TestNotifier(unittest.TestCase):
     def test_notify_error(self, mock_send):
         """Test error notification"""
         mock_send.return_value = True
-        
+
         notifier = Notifier(self.token)
         error = Exception("Test error")
         notifier.notify_error(error, "Test context")
-        
+
         mock_send.assert_called_once()
         call_args = mock_send.call_args[0]
         message = call_args[1]
@@ -115,7 +115,7 @@ class TestNotifier(unittest.TestCase):
     def test_notify_with_exception(self, mock_send):
         """Test notification with telegram exception"""
         mock_send.side_effect = Exception("Network error")
-        
+
         notifier = Notifier(self.token)
         # Should not raise exception
         notifier.notify("Test message")
@@ -124,7 +124,7 @@ class TestNotifier(unittest.TestCase):
         """Test message formatting"""
         notifier = Notifier(self.token)
         formatted = notifier._format_message("Test message", "WARNING")
-        
+
         self.assertIn("WARNING", formatted)
         self.assertIn("Test message", formatted)
         # Should contain timestamp
@@ -150,21 +150,21 @@ class TestNotifierIntegration(unittest.TestCase):
     def test_full_notification_workflow(self, mock_send):
         """Test complete notification workflow"""
         mock_send.return_value = True
-        
+
         notifier = Notifier()
-        
+
         # Test different notification types
         notifier.notify("System started", "INFO")
         notifier.notify_trade("BUY", "ETHUSDT", 2000.0, 0.5)
         notifier.notify_error(ValueError("Invalid parameter"), "config_validation")
-        
+
         # Should have been called 3 times
         self.assertEqual(mock_send.call_count, 3)
 
     def test_notification_without_setup(self):
         """Test notifications fail gracefully without proper setup"""
         del os.environ["TG_TOKEN"]
-        
+
         with self.assertRaises(ValueError):
             Notifier()
 

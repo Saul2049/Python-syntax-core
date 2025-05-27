@@ -165,9 +165,9 @@ class TestExporterSingleton(unittest.TestCase):
         exporter2 = get_exporter(port=9999)
         self.assertIsInstance(exporter2, PrometheusExporter)
         self.assertEqual(exporter2.port, 9999)
-        
+
         # Clean up
-        if hasattr(exporter1, 'stop'):
+        if hasattr(exporter1, "stop"):
             exporter1.stop()
-        if hasattr(exporter2, 'stop'):
+        if hasattr(exporter2, "stop"):
             exporter2.stop()

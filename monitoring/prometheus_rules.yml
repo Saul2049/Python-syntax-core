@@ -1,0 +1,526 @@
+groups:
+  - name: trading_performance_baseline
+    interval: 10s
+    rules:
+      # M3阶段性能基线记录规则
+      - record: signal_latency_p95_1d
+        expr: histogram_quantile(0.95, rate(trading_signal_latency_seconds_bucket[1d]))
+        labels:
+          phase: "m3_baseline"
+          
+      - record: signal_latency_p99_1d  
+        expr: histogram_quantile(0.99, rate(trading_signal_latency_seconds_bucket[1d]))
+        labels:
+          phase: "m3_baseline"
+          
+      - record: order_latency_p95_1d
+        expr: histogram_quantile(0.95, rate(trading_order_latency_seconds_bucket[1d]))
+        labels:
+          phase: "m3_baseline"
+          
+      # 吞吐量指标
+      - record: trading_throughput_cps
+        expr: rate(trading_signal_latency_seconds_count[5m])
+        labels:
+          phase: "m3_baseline"
+          
+      # 错误率指标  
+      - record: trading_error_rate_5m
+        expr: rate(trading_exceptions_total[5m])
+        labels:
+          phase: "m3_baseline"
+
+  - name: trading_performance_alerts
+    rules:
+      # 性能回归告警规则
+      - alert: HighSignalLatency
+        expr: signal_latency_p95_1d > 0.010  # 10ms阈值
+        for: 5m
+        labels:
+          severity: warning
+          team: trading
+        annotations:
+          summary: "交易信号延迟过高"
+          description: "P95信号延迟 {{ $value }}s 超过10ms阈值"
+          
+      - alert: PerformanceRegression
+        expr: (signal_latency_p95_1d / signal_latency_p95_1d offset 1d) > 1.2
+        for: 15m
+        labels:
+          severity: critical
+          team: trading
+        annotations:
+          summary: "性能回归检测"
+          description: "P95延迟相比昨天增加了 {{ printf \"%.1f\" (($value - 1) * 100) }}%"
+          
+      - alert: LowThroughput
+        expr: trading_throughput_cps < 0.1  # 低于0.1 cycles/sec
+        for: 10m
+        labels:
+          severity: warning
+          team: trading
+        annotations:
+          summary: "交易吞吐量过低"
+          description: "当前吞吐量 {{ $value }} cycles/sec 过低" 
+
+# 🔥 W2 GC优化告警规则
+- name: w2_gc_optimization_alerts
+  rules:
+  # W2 GC配置偏离检测
+  - alert: W2_GC_Config_Drift
+    expr: gc_threshold_gen0 != 900 or gc_threshold_gen1 != 20 or gc_threshold_gen2 != 10
+    for: 1m
+    labels:
+      severity: warning
+      component: gc_config
+      phase: w2
+    annotations:
+      summary: "GC配置偏离W2最优值"
+      description: "当前GC阈值不是W2验证的最优配置(900,20,10)"
+      
+  # W2 GC性能回退检测
+  - alert: W2_GC_Performance_Regression
+    expr: histogram_quantile(0.95, gc_pause_duration_seconds) > 0.05
+    for: 2m
+    labels:
+      severity: critical
+      component: gc_performance
+      phase: w2
+    annotations:
+      summary: "GC性能回退，超过W2阈值"
+      description: "GC暂停P95 {{ $value }}s 超过50ms，W2优化效果消失"
+      
+  # Gen0触发频率异常
+  - alert: W2_Gen0_Frequency_High
+    expr: rate(gc_collections_total{generation="0"}[5m]) > 0.05
+    for: 5m
+    labels:
+      severity: warning
+      component: gc_gen0
+      phase: w2
+    annotations:
+      summary: "Gen0 GC触发频率异常"
+      description: "Gen0触发率 {{ $value }}/5min 超过W2预期，应接近0"
+      
+  # Gen2触发频率异常 
+  - alert: W2_Gen2_Frequency_High
+    expr: rate(gc_collections_total{generation="2"}[5m]) > 0.05
+    for: 5m
+    labels:
+      severity: warning  
+      component: gc_gen2
+      phase: w2
+    annotations:
+      summary: "Gen2 GC触发频率异常"
+      description: "Gen2触发率 {{ $value }}/5min 超过W2预期，应接近0"
+
+- name: m5_memory_alerts
+  rules:
+  # RSS Memory Alerts
+  - alert: MemoryUsageHigh
+    expr: process_memory_rss_bytes > 60 * 1024 * 1024
+    for: 5m
+    labels:
+      severity: warning
+      component: memory
+      phase: m5
+    annotations:
+      summary: "内存使用过高"
+      description: "RSS内存使用量 {{ $value | humanize1024 }}B 超过60MB阈值，持续5分钟"
+      
+  - alert: MemoryUsageCritical
+    expr: process_memory_rss_bytes > 80 * 1024 * 1024
+    for: 1m
+    labels:
+      severity: critical
+      component: memory
+      phase: m5
+    annotations:
+      summary: "内存使用严重超标"
+      description: "RSS内存使用量 {{ $value | humanize1024 }}B 超过80MB，立即需要关注"
+      
+  # 🔥 W2: GC Performance Alerts (更新阈值)
+  - alert: GCGen2FrequencyHigh
+    expr: rate(gc_collections_total{generation="2"}[10m]) > 1  # 降低阈值，W2后应几乎无Gen2
+    for: 5m
+    labels:
+      severity: critical  # 提升严重级别
+      component: gc_gen2
+      phase: m5_w2
+    annotations:
+      summary: "GC Gen2回收频率过高(W2后)"
+      description: "Gen2回收频率 {{ $value }}/10min，W2优化后应接近0"
+      
+  - alert: GCGen0FrequencyExtreme  
+    expr: rate(gc_collections_total{generation="0"}[1m]) > 1  # 降低阈值，W2后应几乎无Gen0
+    for: 3m
+    labels:
+      severity: critical
+      component: gc_gen0
+      phase: m5_w2
+    annotations:
+      summary: "GC Gen0回收频率异常(W2后)"
+      description: "Gen0回收频率 {{ $value }}/min，W2优化后应接近0"
+      
+  - alert: GCCollectionEfficiencyLow
+    expr: (rate(gc_collected_objects_total[5m]) / rate(gc_collections_total[5m])) < 5
+    for: 10m
+    labels:
+      severity: warning
+      component: gc_efficiency  
+      phase: m5_w2
+    annotations:
+      summary: "GC回收效率低下"
+      description: "平均每次GC回收对象数 {{ $value }} < 5，可能存在内存泄漏"
+      
+  # Memory Allocation Rate Alerts  
+  - alert: MemoryAllocationRateHigh
+    expr: memory_allocation_rate_per_second > 100
+    for: 5m
+    labels:
+      severity: warning
+      component: memory_allocation
+      phase: m5_w2
+    annotations:
+      summary: "内存分配率过高"
+      description: "内存分配率 {{ $value }}/sec 超过100，优化效果退化"
+      
+  # Cache Performance Degradation
+  - alert: CacheHitRateDropped
+    expr: cache_hit_rate{cache_type="ma"} < 80 
+    for: 5m
+    labels:
+      severity: critical
+      component: cache_regression
+      phase: m5_w2  
+    annotations:
+      summary: "缓存命中率下降"
+      description: "MA缓存命中率 {{ $value }}% 低于80%，W1优化效果退化"
+      
+  # 🔥 W2: 更严格的GC暂停时间告警
+  - alert: GCPauseTimeHigh
+    expr: histogram_quantile(0.95, gc_pause_duration_seconds) > 0.05  # 50ms，W2后的严格阈值
+    for: 1m  # 更快响应
+    labels:
+      severity: critical
+      component: gc
+      phase: m5_w2
+    annotations:
+      summary: "GC暂停时间超过W2阈值"
+      description: "GC暂停时间P95 {{ $value }}s 超过50ms W2阈值，优化失效"
+      
+  - alert: GCPauseTimeWarning
+    expr: histogram_quantile(0.95, gc_pause_duration_seconds) > 0.01  # 10ms警告阈值
+    for: 5m
+    labels:
+      severity: warning
+      component: gc
+      phase: m5_w2
+    annotations:
+      summary: "GC暂停时间警告"
+      description: "GC暂停时间P95 {{ $value }}s 超过10ms，接近W2阈值"
+      
+  # File Descriptor Leak Detection
+  - alert: FDLeakDetected
+    expr: increase(process_open_fds[5m]) > 50
+    for: 3m
+    labels:
+      severity: warning
+      component: fd_leak
+      phase: m5
+    annotations:
+      summary: "检测到文件描述符泄漏"
+      description: "5分钟内文件描述符增长 {{ $value }}个，可能存在泄漏"
+      
+  - alert: FDCountHigh
+    expr: process_open_fds > 800
+    for: 1m
+    labels:
+      severity: critical
+      component: fd_leak
+      phase: m5
+    annotations:
+      summary: "文件描述符数量过高"
+      description: "当前文件描述符数量 {{ $value }}个，超过800阈值"
+      
+  # Memory Growth Rate Alerts
+  - alert: MemoryGrowthHigh
+    expr: memory_growth_rate_mb_per_minute > 0.5
+    for: 10m
+    labels:
+      severity: warning
+      component: memory_leak
+      phase: m5
+    annotations:
+      summary: "内存增长率过高"
+      description: "内存增长率 {{ $value }}MB/分钟，可能存在内存泄漏"
+      
+  # Trading System Performance
+  - alert: TradingLatencyHigh
+    expr: histogram_quantile(0.95, task_latency_seconds{task_type="trading_cycle"}) > 0.0055
+    for: 5m
+    labels:
+      severity: warning
+      component: performance
+      phase: m5
+    annotations:
+      summary: "交易延迟过高"
+      description: "交易处理延迟P95 {{ $value }}s 超过5.5ms W4阈值"
+      
+  # WebSocket Health
+  - alert: WebSocketReconnectHigh
+    expr: rate(ws_reconnects_total[5m]) > 0.1
+    for: 3m
+    labels:
+      severity: warning
+      component: websocket
+      phase: m5
+    annotations:
+      summary: "WebSocket重连频率过高"
+      description: "WebSocket重连频率 {{ $value }}/秒，可能存在连接问题"
+
+- name: m5_business_alerts
+  rules:
+  # Cache Performance
+  - alert: CacheHitRateLow
+    expr: (trading_api_calls_total{endpoint="cache_ma_hit_rate"} / 100) < 0.8
+    for: 10m
+    labels:
+      severity: warning
+      component: cache
+      phase: m5
+    annotations:
+      summary: "缓存命中率过低"
+      description: "MA缓存命中率 {{ $value }}% 低于80%，影响性能"
+      
+  # Signal Processing Rate
+  - alert: SignalProcessingSlowed
+    expr: rate(trading_signal_latency_seconds_count[5m]) < 10
+    for: 5m
+    labels:
+      severity: warning
+      component: signal_processing
+      phase: m5
+    annotations:
+      summary: "信号处理速度下降"
+      description: "信号处理速度 {{ $value }}/秒 低于预期"
+
+- name: m5_system_health
+  rules:
+  # CPU Usage
+  - alert: CPUUsageHigh
+    expr: process_cpu_percent > 80
+    for: 5m
+    labels:
+      severity: warning
+      component: cpu
+      phase: m5
+    annotations:
+      summary: "CPU使用率过高"
+      description: "进程CPU使用率 {{ $value }}% 超过80%"
+      
+  # System Memory Pressure
+  - alert: SystemMemoryPressure
+    expr: process_memory_percent > 10
+    for: 10m
+    labels:
+      severity: warning
+      component: system_memory
+      phase: m5
+    annotations:
+      summary: "系统内存压力"
+      description: "进程占用系统内存 {{ $value }}%，可能影响其他进程"
+      
+  # Thread Count
+  - alert: ThreadCountHigh
+    expr: thread_count > 50
+    for: 5m
+    labels:
+      severity: warning
+      component: threading
+      phase: m5
+    annotations:
+      summary: "线程数量过多"
+      description: "当前线程数量 {{ $value }}个，可能存在线程泄漏"
+
+- name: m5_prometheus_health
+  rules:
+  # Prometheus Metrics Availability
+  - alert: PrometheusMetricsMissing
+    expr: up{job="trading_system"} == 0
+    for: 1m
+    labels:
+      severity: critical
+      component: monitoring
+      phase: m5
+    annotations:
+      summary: "Prometheus指标不可用"
+      description: "交易系统Prometheus指标端点不可达"
+      
+  # Metric Collection Rate
+  - alert: MetricCollectionSlowed
+    expr: rate(prometheus_notifications_total[5m]) < 1
+    for: 5m
+    labels:
+      severity: warning
+      component: monitoring
+      phase: m5
+    annotations:
+      summary: "指标收集速度下降"
+      description: "Prometheus指标收集速度异常"
+
+- name: m5_w4_validation
+  rules:
+  # W4 Validation Rules for 24h Stress Test
+  - alert: W4_RSS_Threshold_Exceeded
+    expr: process_memory_rss_bytes > 40 * 1024 * 1024
+    for: 1m
+    labels:
+      severity: critical
+      component: w4_validation
+      phase: m5
+      test_type: stress_canary
+    annotations:
+      summary: "W4验收失败 - RSS超过40MB"
+      description: "24小时压力测试期间RSS {{ $value | humanize1024 }}B 超过40MB阈值"
+      
+  - alert: W4_GC_Pause_Exceeded
+    expr: histogram_quantile(0.95, gc_pause_duration_seconds) > 0.05
+    for: 1m
+    labels:
+      severity: critical
+      component: w4_validation
+      phase: m5
+      test_type: stress_canary
+    annotations:
+      summary: "W4验收失败 - GC暂停超过50ms"
+      description: "24小时压力测试期间GC暂停P95 {{ $value }}s 超过50ms阈值"
+      
+  - alert: W4_Latency_Regression
+    expr: histogram_quantile(0.95, task_latency_seconds{task_type="trading_cycle"}) > 0.0055
+    for: 2m
+    labels:
+      severity: warning
+      component: w4_validation
+      phase: m5
+      test_type: stress_canary
+    annotations:
+      summary: "W4验收警告 - 延迟反弹"
+      description: "交易延迟P95 {{ $value }}s 超过5.5ms，可能发生性能回退"
+      
+  - alert: W4_FD_Leak_Critical
+    expr: process_open_fds > 500
+    for: 1m
+    labels:
+      severity: critical
+      component: w4_validation
+      phase: m5
+      test_type: stress_canary
+    annotations:
+      summary: "W4验收失败 - FD数量超标"
+      description: "文件描述符数量 {{ $value }}个 超过500阈值"
+
+- name: m5_leak_detection
+  rules:
+  # Continuous Leak Detection for W3
+  - alert: W3_Memory_Leak_Detected
+    expr: memory_growth_rate_mb_per_minute > 0.1
+    for: 30m
+    labels:
+      severity: critical
+      component: w3_validation
+      phase: m5
+      test_type: leak_sentinel
+    annotations:
+      summary: "W3验收失败 - 检测到内存泄漏"
+      description: "连续30分钟内存增长率 {{ $value }}MB/分钟，超过阈值"
+      
+  - alert: W3_FD_Leak_Detected
+    expr: fd_growth_rate_per_minute > 0.1
+    for: 20m
+    labels:
+      severity: warning
+      component: w3_validation
+      phase: m5
+      test_type: leak_sentinel
+    annotations:
+      summary: "W3警告 - FD增长异常"
+      description: "文件描述符增长率 {{ $value }}/分钟，需要关注"
+      
+  - alert: W3_Clean_Hours_Reset
+    expr: increase(clean_hours_counter[1h]) == 0 and clean_hours_counter > 0
+    for: 5m
+    labels:
+      severity: warning
+      component: w3_validation
+      phase: m5
+      test_type: leak_sentinel
+    annotations:
+      summary: "W3清洁小时数重置"
+      description: "清洁小时计数器被重置，泄漏检测发现问题"
+
+- name: m5_cache_optimization
+  rules:
+  # W1 Cache Performance Validation
+  - alert: W1_Cache_Hit_Rate_Low
+    expr: (trading_api_calls_total{endpoint="cache_ma_hit_rate"} / 100) < 0.6
+    for: 15m
+    labels:
+      severity: warning
+      component: w1_validation
+      phase: m5
+      test_type: cache_optimization
+    annotations:
+      summary: "W1缓存命中率低于预期"
+      description: "MA缓存命中率 {{ $value }}% 低于60%，缓存效果不佳"
+      
+  - alert: W1_Memory_Allocation_High
+    expr: rate(memory_allocations_total[5m]) > 100
+    for: 10m
+    labels:
+      severity: warning
+      component: w1_validation
+      phase: m5
+      test_type: cache_optimization
+    annotations:
+      summary: "W1内存分配率仍然过高"
+      description: "内存分配率 {{ $value }}/秒 高于预期，缓存优化可能不充分"
+
+- name: m5_automation_alerts
+  rules:
+  # Automated Response Triggers
+  - alert: AutoRestart_Memory_Critical
+    expr: process_memory_rss_bytes > 100 * 1024 * 1024
+    for: 30s
+    labels:
+      severity: critical
+      component: automation
+      phase: m5
+      action: restart_required
+    annotations:
+      summary: "内存使用严重超标 - 需要自动重启"
+      description: "RSS内存 {{ $value | humanize1024 }}B 超过100MB，触发自动重启"
+      
+  - alert: AutoFallback_WebSocket_Failed
+    expr: rate(ws_reconnects_total[2m]) > 1
+    for: 1m
+    labels:
+      severity: warning
+      component: automation
+      phase: m5
+      action: fallback_rest
+    annotations:
+      summary: "WebSocket连接持续失败 - 自动切换REST"
+      description: "WebSocket重连频率过高，自动切换到REST API模式"
+      
+  - alert: AutoOptimize_GC_Performance
+    expr: histogram_quantile(0.95, gc_pause_duration_seconds) > 0.2
+    for: 5m
+    labels:
+      severity: warning
+      component: automation
+      phase: m5
+      action: gc_optimize
+    annotations:
+      summary: "GC性能异常 - 触发自动优化"
+      description: "GC暂停时间过长，触发自动GC参数优化" 

@@ -15,6 +15,12 @@ help:
 	@echo "  health-check      Quick system health scan"
 	@echo "  metrics           Collect and display system metrics"
 	@echo ""
+	@echo "🛠️ Git推送前检查:"
+	@echo "  pre-push-check    Complete pre-push validation (test + lint + health)"
+	@echo "  pre-push-quick    Fast pre-push check (minimal validation)"
+	@echo "  pre-push-demo     Interactive demo of push workflow"
+	@echo "  pre-push-demo-quick  Quick demo of essential checks"
+	@echo ""
 	@echo "📦 Setup & Dependencies:"
 	@echo "  install           Install dependencies"
 	@echo "  clean             Clean temporary files"
@@ -78,7 +84,11 @@ dev:
 # Fast unit tests for development
 test-quick:
 	@echo "🧪 Running quick unit tests..."
-	python -m pytest tests/ -v -x --tb=short -q --durations=10
+	@if [ -f ".venv/bin/python" ]; then \
+		.venv/bin/python -m pytest tests/ -v -x --tb=short -q --durations=10; \
+	else \
+		python -m pytest tests/ -v -x --tb=short -q --durations=10; \
+	fi
 
 # Comprehensive linting
 lint:
@@ -103,6 +113,51 @@ docs:
 		echo "💡 Consider adding mkdocs.yml for documentation"; \
 	fi
 
+# Documentation tools
+doc-lint:
+	@echo "📝 Linting documentation..."
+	@if command -v mdformat >/dev/null 2>&1; then \
+		mdformat docs/**/*.md; \
+	else \
+		echo "⚠️ mdformat not installed, skipping format"; \
+	fi
+	@if command -v codespell >/dev/null 2>&1; then \
+		codespell docs/; \
+	else \
+		echo "⚠️ codespell not installed, skipping spell check"; \
+	fi
+
+doc-link-check:
+	@echo "🔗 Checking documentation links..."
+	@if command -v markdown-link-check >/dev/null 2>&1; then \
+		find docs -name "*.md" -exec markdown-link-check {} \; ; \
+	else \
+		echo "⚠️ markdown-link-check not installed"; \
+		echo "💡 Install with: npm install -g markdown-link-check"; \
+	fi
+
+doc-preview:
+	@echo "👀 Starting documentation preview..."
+	@make docs
+
+doc-build:
+	@echo "🏗️ Building documentation..."
+	@if [ -f "mkdocs.yml" ]; then \
+		mkdocs build; \
+	else \
+		echo "❌ mkdocs.yml not found"; \
+	fi
+
+doc-archive:
+	@echo "📦 Archiving documentation..."
+	@if [ -z "$(FILE)" ]; then \
+		echo "❌ Usage: make doc-archive FILE=docs/old_file.md"; \
+	else \
+		mkdir -p docs/archives/$$(date +%Y); \
+		mv $(FILE) docs/archives/$$(date +%Y)/; \
+		echo "✅ Archived $(FILE) to docs/archives/$$(date +%Y)/"; \
+	fi
+
 # M1 Health Check Integration
 health-check:
 	@echo "🏥 Quick System Health Check..."
@@ -113,6 +168,45 @@ metrics:
 	@echo "📊 Collecting System Metrics..."
 	python scripts/monitoring/metrics_collector.py --format json | jq -r '.metrics[] | select(.name | contains("memory") or contains("cpu")) | "\(.name): \(.value)"' 2>/dev/null || python scripts/monitoring/metrics_collector.py
 
+# 🛠️ Git推送前检查 (新增)
+pre-push-check:
+	@echo "🛠️ Git推送前完整检查..."
+	@echo "📋 执行推送前最佳实践清单"
+	@echo "=================================="
+	@echo "1️⃣ 快速单元测试..."
+	@make test-quick
+	@echo "2️⃣ 代码质量检查..."
+	@make lint
+	@echo "3️⃣ 内存健康检查..."
+	@make mem-health
+	@echo "✅ 推送前检查完成！可以安全推送。"
+
+# 🚀 快速推送检查 (最小化版本)
+pre-push-quick:
+	@echo "⚡ 快速推送检查 (最小化版本)..."
+	@echo "=================================="
+	@make test-quick FAST=1
+	@make lint
+	@echo "✅ 快速检查完成！"
+
+# 📚 推送前检查演示
+pre-push-demo:
+	@echo "📚 Git推送前最佳实践演示..."
+	@if [ -f ".venv/bin/python" ]; then \
+		.venv/bin/python scripts/git_push_demo.py; \
+	else \
+		python scripts/git_push_demo.py; \
+	fi
+
+# ⚡ 快速推送演示
+pre-push-demo-quick:
+	@echo "⚡ 快速推送检查演示..."
+	@if [ -f ".venv/bin/python" ]; then \
+		.venv/bin/python scripts/git_push_demo.py --quick; \
+	else \
+		python scripts/git_push_demo.py --quick; \
+	fi
+
 # Dependencies
 install:
 	pip install -r requirements.txt
@@ -120,10 +214,18 @@ install:
 
 # Testing
 test:
-	python -m pytest tests/ -v
+	@if [ -f ".venv/bin/python" ]; then \
+		.venv/bin/python -m pytest tests/ -v; \
+	else \
+		python -m pytest tests/ -v; \
+	fi
 
 coverage:
-	python -m pytest tests/ --cov=src --cov-report=html --cov-report=term
+	@if [ -f ".venv/bin/python" ]; then \
+		.venv/bin/python -m pytest tests/ --cov=src --cov-report=html --cov-report=term; \
+	else \
+		python -m pytest tests/ --cov=src --cov-report=html --cov-report=term; \
+	fi
 
 # Code quality
 format:

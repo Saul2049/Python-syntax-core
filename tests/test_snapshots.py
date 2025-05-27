@@ -7,8 +7,8 @@ import pytest
 # 添加项目根目录到Python路径
 sys.path.append(str(Path(__file__).parent.parent))
 
-from src.data import load_csv  # 修改为从src.data模块导入
 from src import broker
+from src.data import load_csv  # 修改为从src.data模块导入
 
 
 def test_backtest_snapshot_btc():

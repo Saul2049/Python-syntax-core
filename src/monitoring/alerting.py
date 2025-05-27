@@ -1,33 +1,32 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Alert Manager (告警管理器)
-
-Manages alerts based on metrics and health checks
+告警管理模块 (Alert Manager Module)
+提供交易系统的告警和通知功能
 """
 
 import logging
 from typing import Any, Callable, Dict, List, Optional
 
-from .metrics_collector import MetricsCollector
+from .metrics_collector import TradingMetricsCollector
 
 logger = logging.getLogger(__name__)
 
 
 class AlertManager:
-    """
-    Alert manager for monitoring system (监控系统告警管理器)
+    """告警管理器"""
 
-    Manages alert rules and notifications based on metrics
-    """
-
-    def __init__(self, metrics_collector: Optional[MetricsCollector] = None):
+    def __init__(
+        self, metrics_collector: Optional[TradingMetricsCollector] = None, enabled: bool = True
+    ):
         """
         Initialize alert manager
 
         Args:
             metrics_collector: Metrics collector instance
+            enabled: Whether alerting is enabled
         """
+        self.enabled = enabled
         self.metrics_collector = metrics_collector
         self.logger = logging.getLogger(f"{__name__}.AlertManager")
 
@@ -40,6 +39,22 @@ class AlertManager:
         self._register_default_rules()
 
         self.logger.info("Alert manager initialized")
+
+    def send_alert(self, message: str, level: str = "INFO") -> bool:
+        """发送告警"""
+        if not self.enabled:
+            return False
+
+        self.logger.info(f"告警[{level}]: {message}")
+        return True
+
+    def configure_webhook(self, webhook_url: str) -> bool:
+        """配置Webhook告警"""
+        if not self.enabled:
+            return False
+
+        self.logger.info(f"配置Webhook: {webhook_url}")
+        return True
 
     def _register_default_rules(self):
         """Register default alert rules"""

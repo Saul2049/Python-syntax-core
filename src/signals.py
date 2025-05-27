@@ -8,14 +8,6 @@
 
 import warnings
 
-# 发出弃用警告
-warnings.warn(
-    "直接从 src.signals 导入已弃用。请使用 src.indicators 中的模块化导入。\n"
-    "例如: from src.indicators import crossover, moving_average",
-    DeprecationWarning,
-    stacklevel=2,
-)
-
 # 从新的模块化实现导入所有功能，保持向后兼容
 from src.indicators.cross_signals import (
     bearish_cross_indices,
@@ -32,6 +24,14 @@ from src.indicators.moving_averages import (
 )
 from src.indicators.volatility_indicators import (
     bollinger_bands,
+)
+
+# 发出弃用警告
+warnings.warn(
+    "直接从 src.signals 导入已弃用。请使用 src.indicators 中的模块化导入。\n"
+    "例如: from src.indicators import crossover, moving_average",
+    DeprecationWarning,
+    stacklevel=2,
 )
 
 # 为了完全兼容，保留所有原有的函数名

@@ -435,7 +435,7 @@ def backtest_portfolio(
 
     # 创建权益DataFrame
     equity_df = pd.DataFrame(equity_curves)
-    equity_df = equity_df.fillna(method="ffill").fillna(init_equity)
+    equity_df = equity_df.ffill().fillna(init_equity)
 
     if use_dynamic_weights:
         # 计算动态权重
