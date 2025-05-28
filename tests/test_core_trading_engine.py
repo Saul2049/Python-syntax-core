@@ -3,10 +3,8 @@
 测试核心交易引擎模块 (Test Core Trading Engine Module)
 """
 
-import os
-import time
 from datetime import datetime, timedelta
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import Mock, patch
 
 import pandas as pd
 import pytest
@@ -73,9 +71,9 @@ class TestTradingEngine:
         result = trading_engine.calculate_position_size(current_price, atr, symbol)
 
         # 计算预期值
-        risk_amount = 10000.0 * 0.01  # 100
-        stop_price = 100.0 - (2.0 * 2.0)  # 96
-        risk_per_unit = 100.0 - 96.0  # 4
+        _ = 10000.0 * 0.01  # 100
+        _ = 100.0 - (2.0 * 2.0)  # 96
+        _ = 100.0 - 96.0  # 4
         expected_quantity = 100.0 / 4.0  # 25
 
         assert result == round(expected_quantity, 3)

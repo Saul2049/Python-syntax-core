@@ -10,7 +10,6 @@ import os
 import sys
 import tempfile
 import unittest
-from pathlib import Path
 
 # Add project root to path
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
@@ -269,7 +268,7 @@ class TestConfigPerformance(unittest.TestCase):
         start_time = time.time()
         for _ in range(100):
             reset_config()
-            config = get_config()
+            get_config()
         end_time = time.time()
 
         # Should complete 100 config loads in under 1 second

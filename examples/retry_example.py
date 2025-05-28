@@ -88,7 +88,9 @@ def run_historical_trades_example(client):
         # Query historical trades with automatic resumption of fetched data
         end_time = datetime.now()
         start_time = end_time - timedelta(days=1)
-        trades = client.get_historical_trades(symbol="BTCUSDT", start_time=start_time, end_time=end_time)
+        trades = client.get_historical_trades(
+            symbol="BTCUSDT", start_time=start_time, end_time=end_time
+        )
         logger.info(f"获取到 {len(trades)} 条交易记录 (Got {len(trades)} trade records)")
         return trades
     except Exception as e:
@@ -98,7 +100,9 @@ def run_historical_trades_example(client):
 
 def main():
     """主函数 (Main function)"""
-    logger.info("====== 开始网络重试和状态恢复演示 (Starting network retry and state recovery demo) ======")
+    logger.info(
+        "====== 开始网络重试和状态恢复演示 (Starting network retry and state recovery demo) ======"
+    )
 
     # 创建交易所客户端 (Create exchange client)
     client = ExchangeClient(

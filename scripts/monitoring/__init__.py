@@ -11,4 +11,4 @@ try:
 except ImportError:
     PrometheusExporter = None
 
-__all__ = ['PrometheusExporter'] 
+__all__ = ["PrometheusExporter"]

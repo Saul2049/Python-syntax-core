@@ -158,7 +158,7 @@ SYMBOLS=BTCUSDT,ADAUSDT
         with open(env_file, "w") as f:
             f.write(env_content)
 
-        config = TradingConfig(env_file=str(env_file))
+        _ = TradingConfig(env_file=str(env_file))
 
         # Check that environment variables were set
         self.assertEqual(os.environ.get("API_KEY"), "env_test_key")

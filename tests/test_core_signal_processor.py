@@ -3,8 +3,8 @@
 测试核心信号处理器模块 (Test Core Signal Processor Module)
 """
 
-from datetime import datetime, timedelta
-from unittest.mock import Mock, patch
+from datetime import datetime
+from unittest.mock import patch
 
 import numpy as np
 import pandas as pd
@@ -152,7 +152,7 @@ class TestGetTradingSignals:
             pd.Series(slow_ma_values, index=sample_price_data.index),
         ]
 
-        result = get_trading_signals(sample_price_data, fast_win=10, slow_win=30)
+        _ = get_trading_signals(sample_price_data, fast_win=10, slow_win=30)
 
         # 验证使用了自定义参数 - 使用call_args_list检查参数
         call_args_list = mock_ma.call_args_list
@@ -776,7 +776,6 @@ class TestSignalProcessorIntegration:
         )
 
         import concurrent.futures
-        import threading
 
         def process_signals():
             with patch("src.core.signal_processor.moving_average") as mock_ma:

@@ -136,11 +136,13 @@ def get_formatted_messages(format_type):
     if format_type.lower() == "html":
         return [
             # 买入信号
-            "🟢 <b>买入信号</b>\n0.123 BTC @ 50123.45 USDT\n" "止损价: 49500.00 USDT\n账户余额: 12345.67 USDT",
+            "🟢 <b>买入信号</b>\n0.123 BTC @ 50123.45 USDT\n"
+            "止损价: 49500.00 USDT\n账户余额: 12345.67 USDT",
             # 等待2秒
             None,
             # 止损更新
-            "🔶 <b>止损更新</b>\n0.123 BTC 持仓\n" "新止损价: 49800.00 USDT\n账户余额: 12345.67 USDT",
+            "🔶 <b>止损更新</b>\n0.123 BTC 持仓\n"
+            "新止损价: 49800.00 USDT\n账户余额: 12345.67 USDT",
             # 等待2秒
             None,
             # 卖出信号
@@ -149,7 +151,8 @@ def get_formatted_messages(format_type):
     elif format_type.lower() == "markdown":
         return [
             # 买入信号
-            "🟢 *买入信号*\n0.123 BTC @ 50123.45 USDT\n" "止损价: 49500.00 USDT\n账户余额: 12345.67 USDT",
+            "🟢 *买入信号*\n0.123 BTC @ 50123.45 USDT\n"
+            "止损价: 49500.00 USDT\n账户余额: 12345.67 USDT",
             # 等待2秒
             None,
             # 止损更新
@@ -162,7 +165,8 @@ def get_formatted_messages(format_type):
     else:  # text
         return [
             # 买入信号
-            "🟢 买入信号\n0.123 BTC @ 50123.45 USDT\n" "止损价: 49500.00 USDT\n账户余额: 12345.67 USDT",
+            "🟢 买入信号\n0.123 BTC @ 50123.45 USDT\n"
+            "止损价: 49500.00 USDT\n账户余额: 12345.67 USDT",
             # 等待2秒
             None,
             # 止损更新
@@ -220,7 +224,10 @@ def main():
         print("请通过以下方式之一提供凭据:")
         print("1. 命令行参数: --token YOUR_TOKEN --chat YOUR_CHAT_ID")
         print("2. 环境变量: 设置 TG_TOKEN 和 TG_CHAT")
-        print("3. 使用load_env.py脚本: python load_env.py " "--tg_token=YOUR_TOKEN --tg_chat=YOUR_CHAT_ID --save")
+        print(
+            "3. 使用load_env.py脚本: python load_env.py "
+            "--tg_token=YOUR_TOKEN --tg_chat=YOUR_CHAT_ID --save"
+        )
         return 1
 
     print("Telegram配置:")

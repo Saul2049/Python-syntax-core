@@ -31,12 +31,14 @@ logger = logging.getLogger("stability_test")
 try:
     # 尝试导入增强配置管理器
     from scripts.enhanced_config import get_config, setup_logging
+
     logger.info("使用增强配置管理器")
 except ImportError:
     logger.info("无法导入增强配置管理器，尝试导入旧版配置管理器")
     try:
         # 如果无法导入增强版，则尝试导入旧版
         from scripts.config_manager import get_config
+
         logger.info("使用旧版配置管理器")
         setup_logging = None
     except ImportError:
@@ -51,6 +53,7 @@ from scripts.market_data import create_market_data_manager, MarketDataManager
 # 导入监控模块
 try:
     from scripts.monitoring import get_exporter
+
     logger.info("已导入监控模块")
     MONITORING_ENABLED = True
 except ImportError:
@@ -70,11 +73,11 @@ class MockMarketSimulator:
         # 使用市场数据管理器
         self.market_data = market_data_manager
         logger.info(f"创建模拟市场：{symbols}, 初始余额：{initial_balance}")
-        
+
         # 记录当前使用的数据源
         if self.market_data:
             logger.info(f"使用数据源: {self.market_data.get_current_provider_name()}")
-        
+
     def get_current_price(self, symbol):
         """获取当前价格"""
         if self.market_data:
@@ -82,10 +85,10 @@ class MockMarketSimulator:
             ticker = self.market_data.get_ticker(symbol)
             if ticker and "price" in ticker:
                 return float(ticker["price"])
-        
+
         # 如果没有数据管理器或获取失败，使用随机价格
         return 30000 + random.random() * 1000
-        
+
     def get_recent_klines(self, symbol, interval="1h", limit=24):
         """获取最近K线数据"""
         if self.market_data:
@@ -93,20 +96,20 @@ class MockMarketSimulator:
             klines = self.market_data.get_klines(symbol, interval, limit)
             if klines:
                 return klines
-        
+
         # 如果获取失败，生成模拟数据
         return self._generate_mock_klines(symbol, limit)
-    
+
     def _generate_mock_klines(self, symbol, limit):
         """生成模拟K线数据"""
         now = time.time() * 1000
         base_price = 30000 + random.random() * 1000
         klines = []
-        
+
         for i in range(limit):
             timestamp = now - (limit - i) * 3600 * 1000  # 假设1小时间隔
             price = base_price * (1 + (random.random() - 0.5) * 0.01 * (i + 1))
-            
+
             kline = [
                 int(timestamp),  # 开盘时间
                 str(price * 0.99),  # 开盘价
@@ -119,10 +122,10 @@ class MockMarketSimulator:
                 100,  # 成交笔数
                 str(random.random() * 60),  # 主动买入成交量
                 str(random.random() * 60 * price),  # 主动买入成交额
-                "0"  # 忽略
+                "0",  # 忽略
             ]
             klines.append(kline)
-            
+
         return klines
 
 
@@ -144,10 +147,10 @@ class MockTradingLoop:
         # 随机生成信号
         if random.random() < 0.1:  # 10%概率产生信号
             symbol = self.symbols[random.randint(0, len(self.symbols) - 1)]
-            
+
             # 使用市场对象获取当前价格
             price = self.market.get_current_price(symbol)
-            
+
             signal = {
                 "symbol": symbol,
                 "action": "BUY" if random.random() > 0.5 else "SELL",
@@ -194,20 +197,24 @@ class StabilityTest:
         """
         # 获取配置管理器
         self.config = get_config()
-        
+
         # 使用参数或配置值
         self.symbols = symbols or self.config.get_symbols()
         self.duration_seconds = (duration_days or 3) * 24 * 60 * 60
         self.check_interval = check_interval or self.config.get_check_interval()
         self.test_mode = test_mode if test_mode is not None else self.config.is_test_mode()
         self.risk_percent = risk_percent or self.config.get_risk_percent()
-        self.use_binance_testnet = use_binance_testnet if use_binance_testnet is not None else self.config.use_binance_testnet()
+        self.use_binance_testnet = (
+            use_binance_testnet
+            if use_binance_testnet is not None
+            else self.config.use_binance_testnet()
+        )
         self.preserve_logs = preserve_logs  # 保存是否保留日志的设置
 
         # 创建日志目录
         self.log_dir = Path(log_dir or self.config.get_log_dir())
         self.log_dir.mkdir(parents=True, exist_ok=True)
-        
+
         # 设置日志轮转
         self._setup_log_rotation()
 
@@ -227,54 +234,60 @@ class StabilityTest:
 
         # 初始化监控
         self.init_monitoring(monitoring_port)
-        
+
         # 注册信号处理器
         signal.signal(signal.SIGINT, self.signal_handler)
         signal.signal(signal.SIGTERM, self.signal_handler)
 
-        logger.info(f"初始化稳定性测试: {self.symbols}, 持续{duration_days or 3}天, 保留日志: {self.preserve_logs}")
-        
+        logger.info(
+            f"初始化稳定性测试: {self.symbols}, 持续{duration_days or 3}天, 保留日志: {self.preserve_logs}"
+        )
+
         # 创建市场数据管理器
-        self.market_data_manager = create_market_data_manager(use_binance_testnet=self.use_binance_testnet)
+        self.market_data_manager = create_market_data_manager(
+            use_binance_testnet=self.use_binance_testnet
+        )
 
     def _setup_log_rotation(self):
         """设置日志轮转"""
         try:
             import logging.handlers
-            
+
             # 为每个交易对创建单独的日志文件
             for symbol in self.symbols:
-                symbol_safe = symbol.replace('/', '_')
+                symbol_safe = symbol.replace("/", "_")
                 log_file = self.log_dir / f"{symbol_safe}.log"
-                
+
                 # 创建轮转日志处理器
                 handler = logging.handlers.RotatingFileHandler(
                     log_file,
-                    maxBytes=10*1024*1024,  # 10MB
-                    backupCount=5 if not self.preserve_logs else 100  # 如果保留日志，保存更多备份
+                    maxBytes=10 * 1024 * 1024,  # 10MB
+                    backupCount=5 if not self.preserve_logs else 100,  # 如果保留日志，保存更多备份
                 )
-                
+
                 # 设置格式
-                formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+                formatter = logging.Formatter(
+                    "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+                )
                 handler.setFormatter(formatter)
-                
+
                 # 创建专用日志记录器
                 symbol_logger = logging.getLogger(f"trading.{symbol_safe}")
                 symbol_logger.addHandler(handler)
                 symbol_logger.setLevel(logging.INFO)
-                
+
             # 为系统指标创建单独的日志文件
             metrics_log = self.log_dir / "system_metrics.log"
             metrics_handler = logging.handlers.RotatingFileHandler(
                 metrics_log,
-                maxBytes=50*1024*1024,  # 50MB
-                backupCount=10 if not self.preserve_logs else 200  # 保留更多历史数据用于分析
+                maxBytes=50 * 1024 * 1024,  # 50MB
+                backupCount=10 if not self.preserve_logs else 200,  # 保留更多历史数据用于分析
             )
             metrics_handler.setFormatter(formatter)
             metrics_logger = logging.getLogger("system.metrics")
             metrics_logger.addHandler(metrics_handler)
             metrics_logger.setLevel(logging.INFO)
-            
+
             logger.info(f"日志轮转设置完成，日志目录: {self.log_dir}")
         except Exception as e:
             logger.error(f"设置日志轮转时出错: {e}")
@@ -286,12 +299,12 @@ class StabilityTest:
                 self.exporter = get_exporter(port=port)
                 self.exporter.start()
                 logger.info(f"监控系统已启动，端口：{port}")
-                
+
                 # 设置初始指标
                 for symbol in self.symbols:
                     # 初始化交易对价格为0
                     self.exporter.update_price(symbol, 0)
-                
+
                 # 更新心跳
                 self.exporter.update_heartbeat()
             except Exception as e:
@@ -312,10 +325,10 @@ class StabilityTest:
             # 创建模拟市场对象，传入市场数据管理器
             logger.info("使用市场模拟器进行测试")
             self.market = MarketSimulator(
-                symbols=self.symbols, 
-                initial_balance=10000.0, 
+                symbols=self.symbols,
+                initial_balance=10000.0,
                 fee_rate=0.001,
-                market_data_manager=self.market_data_manager
+                market_data_manager=self.market_data_manager,
             )
 
             # 创建交易循环
@@ -347,15 +360,17 @@ class StabilityTest:
             self.stats["memory_usage"].append(memory_mb)
 
             logger.info(f"系统资源: 内存 {memory_mb:.2f} MB, CPU {cpu_percent:.1f}%")
-            
+
             # 记录详细指标到专用日志
             metrics_logger = logging.getLogger("system.metrics")
-            metrics_logger.info(f"memory={memory_mb:.2f},cpu={cpu_percent:.1f},threads={process.num_threads()}")
+            metrics_logger.info(
+                f"memory={memory_mb:.2f},cpu={cpu_percent:.1f},threads={process.num_threads()}"
+            )
 
             # 如果内存使用超过1GB，发出警告
             if memory_mb > 1000:
                 logger.warning("内存使用量较高!")
-                
+
             # 更新监控指标
             if self.exporter:
                 self.exporter.update_memory_usage(memory_mb)
@@ -377,16 +392,18 @@ class StabilityTest:
             start_time = time.time()
             end_time = start_time + self.duration_seconds
 
-            logger.info(f"开始稳定性测试，计划结束时间: {datetime.datetime.fromtimestamp(end_time)}")
+            logger.info(
+                f"开始稳定性测试，计划结束时间: {datetime.datetime.fromtimestamp(end_time)}"
+            )
 
             # 主循环
             iteration = 0
             last_data_source = self.market_data_manager.get_current_provider_name()
-            
+
             # 如果启用监控，设置初始数据源状态
             if self.exporter:
                 self.exporter.update_data_source_status(last_data_source, True)
-            
+
             while time.time() < end_time and not self.stop_requested:
                 iteration += 1
 
@@ -394,7 +411,7 @@ class StabilityTest:
                     # 更新心跳
                     if self.exporter:
                         self.exporter.update_heartbeat()
-                    
+
                     # 每小时记录一次系统资源
                     if iteration % (3600 // self.check_interval) == 0:
                         self.monitor_system_resources()
@@ -405,7 +422,7 @@ class StabilityTest:
                         logger.info(f"数据源已切换: {last_data_source} -> {current_data_source}")
                         self.stats["data_source_switches"] += 1
                         last_data_source = current_data_source
-                        
+
                         # 更新数据源状态指标
                         if self.exporter:
                             self.exporter.update_data_source_status(last_data_source, False)
@@ -415,17 +432,17 @@ class StabilityTest:
                     signals = self.trading_loop.check_and_execute()
                     if signals:
                         self.stats["total_signals"] += len(signals)
-                        
+
                         # 更新交易指标
                         if self.exporter:
                             for signal in signals:
                                 # 记录交易信号
-                                self.exporter.record_trade(signal['symbol'], signal['action'])
+                                self.exporter.record_trade(signal["symbol"], signal["action"])
                                 # 更新价格
-                                self.exporter.update_price(signal['symbol'], float(signal['price']))
-                                
+                                self.exporter.update_price(signal["symbol"], float(signal["price"]))
+
                                 # 记录信号到专用交易对日志
-                                symbol_safe = signal['symbol'].replace('/', '_')
+                                symbol_safe = signal["symbol"].replace("/", "_")
                                 symbol_logger = logging.getLogger(f"trading.{symbol_safe}")
                                 symbol_logger.info(f"信号: {signal['action']} @ {signal['price']}")
 
@@ -445,7 +462,7 @@ class StabilityTest:
                 except Exception as e:
                     self.stats["errors"] += 1
                     logger.error(f"迭代 {iteration} 出错: {e}")
-                    
+
                     # 更新错误指标
                     if self.exporter:
                         self.exporter.record_error("iteration_error")
@@ -476,11 +493,11 @@ class StabilityTest:
             return False
         except Exception as e:
             logger.critical(f"测试过程中发生严重错误: {e}")
-            
+
             # 记录严重错误
             if self.exporter:
                 self.exporter.record_error("critical")
-            
+
             self.generate_report((time.time() - start_time) / 86400, is_final=True)
             return False
 
@@ -494,7 +511,9 @@ class StabilityTest:
 
         # 计算平均内存使用
         avg_memory = (
-            sum(self.stats["memory_usage"]) / len(self.stats["memory_usage"]) if self.stats["memory_usage"] else 0
+            sum(self.stats["memory_usage"]) / len(self.stats["memory_usage"])
+            if self.stats["memory_usage"]
+            else 0
         )
         max_memory = max(self.stats["memory_usage"]) if self.stats["memory_usage"] else 0
 
@@ -525,7 +544,10 @@ class StabilityTest:
         logger.info(report)
 
         # 将报告写入文件
-        report_file = self.log_dir / f"stability_report_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
+        report_file = (
+            self.log_dir
+            / f"stability_report_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
+        )
         with open(report_file, "w") as f:
             f.write(report)
 
@@ -543,7 +565,9 @@ def main():
     parser.add_argument("--risk", type=float, help="风险百分比")
     parser.add_argument("--log-dir", type=str, help="日志目录")
     parser.add_argument("--production", action="store_true", help="生产模式(警告:将执行实际交易!)")
-    parser.add_argument("--mock-only", action="store_true", help="仅使用模拟数据(不连接Binance测试网)")
+    parser.add_argument(
+        "--mock-only", action="store_true", help="仅使用模拟数据(不连接Binance测试网)"
+    )
     parser.add_argument("--config", type=str, help="配置文件路径(INI格式)")
     parser.add_argument("--config-yaml", type=str, help="YAML配置文件路径")
     parser.add_argument("--env-file", type=str, help="环境变量文件路径")
@@ -554,25 +578,25 @@ def main():
 
     # 初始化配置
     get_config = None  # 声明变量
-    
+
     try:
         # 优先使用增强配置管理器
-        if 'setup_logging' in globals() and setup_logging is not None:
+        if "setup_logging" in globals() and setup_logging is not None:
             # 初始化配置
             def create_enhanced_config():
                 return get_enhanced_config(
-                    config_yaml=args.config_yaml, 
-                    env_file=args.env_file,
-                    config_ini=args.config
+                    config_yaml=args.config_yaml, env_file=args.env_file, config_ini=args.config
                 )
+
             get_config = create_enhanced_config
-            
+
             # 设置日志
             setup_logging()
             logger.info("使用增强配置系统")
         elif args.config:
             # 如果使用旧版配置管理器且指定了配置文件
             from scripts.config_manager import ConfigManager
+
             get_config = lambda: ConfigManager(args.config)
             logger.info(f"使用旧版配置系统，配置文件: {args.config}")
     except Exception as e:

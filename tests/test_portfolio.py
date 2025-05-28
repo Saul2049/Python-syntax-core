@@ -23,7 +23,7 @@ def test_portfolio_custom_allocation():
     eq2 = portfolio_backtest.run_portfolio({"btc": 0.3, "eth": 0.7})
 
     # 打印调试信息
-    print(f"\nDEBUG VALUES:")
+    print("\nDEBUG VALUES:")
     print(f"Portfolio BTC 70%: {eq1.iloc[-1]}")
     print(f"Portfolio BTC 30%: {eq2.iloc[-1]}")
 
@@ -41,7 +41,7 @@ def test_portfolio_metrics():
     sharpe = metrics.sharpe_ratio(eq)
 
     # 打印调试信息
-    print(f"\nDEBUG VALUES:")
+    print("\nDEBUG VALUES:")
     print(f"CAGR: {cagr}")
     print(f"Max Drawdown: {mdd}")
     print(f"Sharpe Ratio: {sharpe}")

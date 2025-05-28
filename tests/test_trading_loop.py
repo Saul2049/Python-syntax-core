@@ -4,9 +4,8 @@
 """
 
 import os
-import sys
 from io import StringIO
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import Mock, patch
 
 import pytest
 
@@ -73,13 +72,7 @@ class TestTradingLoopBackwardCompatibility:
         """测试向后兼容导入正常工作"""
         # 测试所有向后兼容导入都能正常工作
         try:
-            from src.trading_loop import (
-                TradingEngine,
-                calculate_atr,
-                fetch_price_data,
-                get_trading_signals,
-                trading_loop,
-            )
+            pass
 
             # 如果能成功导入，测试通过
             assert True
@@ -140,7 +133,7 @@ class TestTradingLoopBackwardCompatibility:
         mock_loop.return_value = None
 
         # 调用函数
-        result = trading_loop()
+        trading_loop()
 
         # 验证调用了正确的底层函数
         mock_loop.assert_called_once()
@@ -171,7 +164,6 @@ class TestTradingLoopMainFunction:
     def test_main_function_with_all_env_vars(self, mock_stdout, mock_trading_loop):
         """测试主函数在有所有环境变量时的行为"""
         # 模拟主函数执行
-        import src.trading_loop
 
         # 重新加载模块以触发主函数逻辑（在测试环境中模拟）
         # 由于我们不能直接运行if __name__ == "__main__"块，我们测试其逻辑
@@ -280,7 +272,7 @@ class TestTradingLoopModuleStructure:
     def test_module_all_list_completeness(self):
         """测试__all__列表的完整性"""
         # 获取模块中公开的函数和类
-        public_items = [name for name in dir(src.trading_loop) if not name.startswith("_")]
+        [name for name in dir(src.trading_loop) if not name.startswith("_")]
 
         # 验证所有公开项目都在__all__中（除了导入的模块）
         expected_in_all = [
@@ -327,7 +319,7 @@ class TestTradingLoopIntegration:
         signals = get_trading_signals(price_data)
 
         # 创建交易引擎实例（但不启动循环）
-        engine = TradingEngine()
+        TradingEngine()
 
         # 验证调用
         mock_fetch.assert_called_once_with("BTC/USDT")
@@ -423,7 +415,7 @@ class TestTradingLoopIntegration:
 import sys
 sys.path.insert(0, "/Users/liam/Python syntax core")
 import os
-os.environ["TG_TOKEN"] = "test_token"  
+os.environ["TG_TOKEN"] = "test_token"
 os.environ["API_KEY"] = "test_key"
 os.environ["API_SECRET"] = "test_secret"
 

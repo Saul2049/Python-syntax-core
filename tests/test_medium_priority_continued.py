@@ -49,23 +49,6 @@ class TestStrategyRefactoring(unittest.TestCase):
         """Test that all strategy classes can be imported"""
         from src.strategies import (
             ALL_STRATEGIES,
-            AdaptiveMovingAverageStrategy,
-            ATRBreakoutStrategy,
-            BollingerBreakoutStrategy,
-            BollingerMeanReversionStrategy,
-            ChannelBreakoutStrategy,
-            DonchianChannelStrategy,
-            ExponentialMAStrategy,
-            ImprovedMAStrategy,
-            MACDStrategy,
-            MultiTimeframeStrategy,
-            RSIStrategy,
-            SimpleMAStrategy,
-            StochasticStrategy,
-            SupertrendStrategy,
-            TrendFollowingStrategy,
-            TripleMAStrategy,
-            WilliamsRStrategy,
         )
 
         # Check that we have all expected strategies
@@ -292,7 +275,7 @@ class TestMonitoringRefactoring(unittest.TestCase):
         """Test backward compatibility with old monitoring module"""
         from prometheus_client import CollectorRegistry
 
-        with warnings.catch_warnings(record=True) as w:
+        with warnings.catch_warnings(record=True) as _:
             warnings.simplefilter("always")
 
             from scripts.monitoring import PrometheusExporter

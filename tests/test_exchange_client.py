@@ -6,9 +6,8 @@ Exchange Client Module Tests
 
 import unittest
 from datetime import datetime
-from unittest.mock import MagicMock, PropertyMock, patch
+from unittest.mock import MagicMock, patch
 
-import pandas as pd
 import pytest
 
 # Import modules to test
@@ -148,8 +147,12 @@ class TestExchangeClientNetworkHandling(unittest.TestCase):
         self.assertIsInstance(order, dict)
         self.assertEqual(order["status"], "filled")
 
-    def test_unsupported_symbol(self):
+    @patch("src.brokers.exchange.client.random.random")
+    def test_unsupported_symbol(self, mock_random):
         """Test handling of unsupported trading symbols"""
+        # Disable random network errors for this test
+        mock_random.return_value = 0.9  # Above 0.05 threshold
+
         # Should not raise error, but return empty/default data
         result = self.client.get_ticker("INVALID/PAIR")
         self.assertIsInstance(result, dict)
@@ -215,7 +218,7 @@ class TestExchangeClientIntegration(unittest.TestCase):
         # 1. Check account balance
         balance = self.client.get_account_balance()
         self.assertIn("USDT", balance)
-        initial_usdt = balance["USDT"]
+        balance["USDT"]
 
         # 2. Get current price
         ticker = self.client.get_ticker("BTC/USDT")

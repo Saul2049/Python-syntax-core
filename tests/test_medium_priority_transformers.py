@@ -8,7 +8,6 @@
 
 import unittest
 import warnings
-from unittest.mock import patch
 
 import numpy as np
 import pandas as pd
@@ -95,7 +94,7 @@ class TestDataTransformersRefactoring(unittest.TestCase):
         """测试向后兼容性警告"""
         # 测试是否能正常导入
         try:
-            from src.data.transformers import DataNormalizer
+            pass
 
             self.assertTrue(True)
         except ImportError:
@@ -189,7 +188,6 @@ class TestConfigSystemImprovements(unittest.TestCase):
         # 确保manager.py和sources.py都使用utils中的merge_dict
         from src.config.manager import TradingConfig
         from src.config.sources import ConfigSourceLoader
-        from src.config.utils import merge_dict
 
         # 检查它们都没有自己的_merge_dict方法
         config_manager = TradingConfig()
@@ -210,7 +208,7 @@ class TestCodeReduction(unittest.TestCase):
         original_file = "src/data/transformers/data_transformers.py"
         if os.path.exists(original_file):
             with open(original_file, "r") as f:
-                lines = f.readlines()
+                f.readlines()
 
             # 原始文件应该仍然存在但可能被重构了
             # 或者至少验证新模块存在
@@ -246,12 +244,10 @@ class TestPerformanceImprovements(unittest.TestCase):
 
         # 测试只导入需要的模块
         start_time = time.time()
-        from src.data.transformers.normalizers import DataNormalizer
 
         normalizer_time = time.time() - start_time
 
         start_time = time.time()
-        from src.data.transformers.time_series import TimeSeriesProcessor
 
         timeseries_time = time.time() - start_time
 

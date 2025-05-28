@@ -141,12 +141,12 @@ class M5AssertionValidator:
         # 在CI环境中，如果没有实际的性能数据，返回一个合理的模拟值
         # 这应该基于实际的基准测试结果
         import os
-        
+
         # 检查是否在CI环境中
-        if os.getenv('CI') or os.getenv('GITHUB_ACTIONS'):
+        if os.getenv("CI") or os.getenv("GITHUB_ACTIONS"):
             # CI环境中使用更宽松的模拟值
             return 0.003  # 3ms，适合CI环境
-        
+
         # 本地环境使用更严格的值
         return 0.002  # 2ms
 
@@ -267,10 +267,10 @@ class M5AssertionValidator:
     async def assert_prometheus_health(self) -> bool:
         """断言Prometheus监控健康"""
         import os
-        
+
         # 在CI环境中，Prometheus监控是可选的
-        is_ci = os.getenv('CI') or os.getenv('GITHUB_ACTIONS')
-        
+        is_ci = os.getenv("CI") or os.getenv("GITHUB_ACTIONS")
+
         try:
             prometheus_url = "http://localhost:8000/metrics"
 
@@ -278,7 +278,9 @@ class M5AssertionValidator:
 
             if response.status_code != 200:
                 if is_ci:
-                    self.logger.warning(f"⚠️ CI环境中Prometheus不可达，跳过检查: HTTP {response.status_code}")
+                    self.logger.warning(
+                        f"⚠️ CI环境中Prometheus不可达，跳过检查: HTTP {response.status_code}"
+                    )
                     return True  # 在CI中不强制要求Prometheus
                 else:
                     self.failed_assertions.append(f"Prometheus不可达: HTTP {response.status_code}")
