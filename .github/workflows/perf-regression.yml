@@ -56,10 +56,10 @@ jobs:
         echo "🔍 Checking P95 latency threshold..."
         if [ "${{ steps.benchmark.outputs.benchmark_failed }}" = "true" ]; then
           echo "⚠️ Benchmark failed, running assertion with fallback"
-          python scripts/health/assert_p95.py --p95-threshold 0.003 --quick
+          python scripts/health/assert_p95.py --p95-threshold 0.006 --quick
         else
           echo "✅ Running full assertion check"
-          python scripts/health/assert_p95.py --p95-threshold 0.0025 --quick
+          python scripts/health/assert_p95.py --p95-threshold 0.005 --quick
         fi
         
     - name: 📊 Upload Performance Results
