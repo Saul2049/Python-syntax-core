@@ -43,7 +43,8 @@ venv.bak/
 # 日志和数据文件
 logs/
 *.log
-data/
+# 只忽略根目录的data文件夹和数据文件，不忽略src/data/包
+/data/
 *.csv
 *.json
 *.pickle
