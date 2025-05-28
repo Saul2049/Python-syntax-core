@@ -3,13 +3,10 @@
 测试Binance客户端模块 (Test Binance Client Module)
 """
 
-import configparser
 import hashlib
 import hmac
-import json
 import tempfile
-import time
-from unittest.mock import Mock, mock_open, patch
+from unittest.mock import Mock, patch
 from urllib.parse import urlencode
 
 import pandas as pd
@@ -619,7 +616,6 @@ class TestBinanceClientIntegration:
             patch("requests.delete") as mock_delete,
             patch("time.time", return_value=1234567890),
         ):
-
             # 1. 获取服务器时间
             mock_get.return_value.json.return_value = {"serverTime": 1234567890000}
             server_time = client.get_server_time()
@@ -663,7 +659,6 @@ class TestBinanceClientIntegration:
 
         # 测试API错误响应
         with patch("requests.post") as mock_post, patch("time.time", return_value=1234567890):
-
             mock_response = Mock()
             mock_response.json.return_value = {"code": -1013, "msg": "Invalid quantity"}
             mock_response.raise_for_status.return_value = None

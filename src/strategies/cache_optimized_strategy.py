@@ -193,7 +193,6 @@ class CacheOptimizedStrategy(BaseStrategy):
 
             # 使用内存监控上下文
             with self.metrics.monitor_memory_allocation("signal_generation"):
-
                 # 🔥关键: 使用零分配计算
                 ma_short = self.calculate_ma_inplace(symbol, 20)
                 ma_long = self.calculate_ma_inplace(symbol, 50)

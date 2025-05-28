@@ -5,7 +5,7 @@
 
 import os
 import tempfile
-from unittest.mock import MagicMock, Mock, mock_open, patch
+from unittest.mock import Mock, mock_open, patch
 
 import pytest
 import requests
@@ -50,9 +50,7 @@ class TestTelegramBotInitialization:
 
                 assert bot.token is None
                 assert bot.chat_id is None
-                mock_print.assert_called_once_with(
-                    "警告: 缺少TG_TOKEN或TG_CHAT环境变量，Telegram通知将不可用"
-                )
+                mock_print.assert_called_once_with("警告: 缺少TG_TOKEN或TG_CHAT环境变量，Telegram通知将不可用")
 
     def test_init_mixed_params_and_env(self):
         """测试混合参数和环境变量"""

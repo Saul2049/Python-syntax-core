@@ -320,9 +320,7 @@ class LiveBrokerAsync:
                     # 从待处理中移除
                     del self.pending_orders[order_id]
 
-                    print(
-                        f"🏁 订单完成: {order_id} 状态:{status} 延迟:{roundtrip_latency*1000:.1f}ms"
-                    )
+                    print(f"🏁 订单完成: {order_id} 状态:{status} 延迟:{roundtrip_latency*1000:.1f}ms")
                     break
 
                 # 等待后再次检查
