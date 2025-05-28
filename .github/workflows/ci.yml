@@ -13,10 +13,10 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: '3.11'
         cache: 'pip'
@@ -33,16 +33,16 @@ jobs:
 
     - name: Run linting
       run: |
-        # 代码格式检查
-        black --check .
-        isort --check .
-        flake8 .
+        # 代码格式检查 - 只检查核心代码目录
+        black --check src/ tests/
+        isort --check src/ tests/
+        flake8 src/ tests/
 
     - name: Run quick CI tests
       run: |
         # 快速CI测试
         python scripts/ci_test.py
-        
+
     - name: Run test suite
       run: |
         # 使用pip install -e .后不需要设置PYTHONPATH
