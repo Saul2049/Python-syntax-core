@@ -14,7 +14,7 @@ CHAT_ID = os.getenv("TG_CHAT") or "269242161"
 FORMAT = os.getenv("TG_FORMAT") or "html"  # 可选: text, html, markdown
 DEBUG = os.getenv("TG_DEBUG") == "1"  # 设置环境变量 TG_DEBUG=1 启用调试
 
-print(f"开始测试完整的交易通知系列...")
+print("开始测试完整的交易通知系列...")
 print(f"使用格式: {FORMAT}")
 if DEBUG:
     print("调试模式已启用")

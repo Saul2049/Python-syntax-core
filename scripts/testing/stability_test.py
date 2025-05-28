@@ -434,16 +434,22 @@ class StabilityTest:
 
                         # 更新交易指标
                         if self.exporter:
-                            for signal in signals:
+                            for trading_signal in signals:
                                 # 记录交易信号
-                                self.exporter.record_trade(signal["symbol"], signal["action"])
+                                self.exporter.record_trade(
+                                    trading_signal["symbol"], trading_signal["action"]
+                                )
                                 # 更新价格
-                                self.exporter.update_price(signal["symbol"], float(signal["price"]))
+                                self.exporter.update_price(
+                                    trading_signal["symbol"], float(trading_signal["price"])
+                                )
 
                                 # 记录信号到专用交易对日志
-                                symbol_safe = signal["symbol"].replace("/", "_")
+                                symbol_safe = trading_signal["symbol"].replace("/", "_")
                                 symbol_logger = logging.getLogger(f"trading.{symbol_safe}")
-                                symbol_logger.info(f"信号: {signal['action']} @ {signal['price']}")
+                                symbol_logger.info(
+                                    f"信号: {trading_signal['action']} @ {trading_signal['price']}"
+                                )
 
                     # 每天生成一次报告
                     if iteration % (86400 // self.check_interval) == 0:
@@ -580,7 +586,15 @@ def main():
 
     try:
         # 优先使用增强配置管理器
-        if "setup_logging" in globals() and setup_logging is not None:
+        try:
+            from config.enhanced_config import get_enhanced_config, setup_logging
+
+            enhanced_config_available = True
+        except ImportError:
+            enhanced_config_available = False
+            setup_logging = None
+
+        if enhanced_config_available and setup_logging is not None:
             # 初始化配置
             def create_enhanced_config():
                 return get_enhanced_config(
@@ -596,11 +610,28 @@ def main():
             # 如果使用旧版配置管理器且指定了配置文件
             from scripts.config_manager import ConfigManager
 
-            get_config = lambda: ConfigManager(args.config)
+            def create_config_manager():
+                return ConfigManager(args.config)
+
+            get_config = create_config_manager
             logger.info(f"使用旧版配置系统，配置文件: {args.config}")
     except Exception as e:
         logger.error(f"初始化配置系统时出错: {e}")
         logger.warning("使用默认配置")
+
+    # 使用配置（如果可用）
+    if get_config:
+        try:
+            config = get_config()
+            logger.info("配置系统初始化成功")
+            # 记录配置信息
+            if hasattr(config, "get_symbols"):
+                logger.info(f"配置的交易对: {config.get_symbols()}")
+        except Exception as e:
+            logger.warning(f"配置加载失败: {e}")
+            config = None
+    else:
+        config = None
 
     # 安全检查
     if args.production:

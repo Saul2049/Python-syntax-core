@@ -84,6 +84,12 @@ class VectorizationBenchmark:
             end_time = time.perf_counter()
             original_times.append(end_time - start_time)
 
+            # 验证结果有效性
+            if i == 0 and result is not None:
+                print(
+                    f"   原始版本信号数量: {len(result) if hasattr(result, '__len__') else 'N/A'}"
+                )
+
             if (i + 1) % 20 == 0:
                 print(f"   进度: {i+1}/{iterations}")
 
@@ -95,6 +101,12 @@ class VectorizationBenchmark:
             result = get_trading_signals_optimized(self.test_data)
             end_time = time.perf_counter()
             optimized_times.append(end_time - start_time)
+
+            # 验证结果有效性
+            if i == 0 and result is not None:
+                print(
+                    f"   优化版本信号数量: {len(result) if hasattr(result, '__len__') else 'N/A'}"
+                )
 
             if (i + 1) % 20 == 0:
                 print(f"   进度: {i+1}/{iterations}")
@@ -153,6 +165,12 @@ class VectorizationBenchmark:
             end_time = time.perf_counter()
             cache_times.append(end_time - start_time)
 
+            # 验证缓存结果
+            if i == 0 and result is not None:
+                print(
+                    f"   缓存测试信号数量: {len(result) if hasattr(result, '__len__') else 'N/A'}"
+                )
+
         cache_avg = np.mean(cache_times) * 1000
         cache_p95 = np.percentile(cache_times, 95) * 1000
 
@@ -171,27 +189,37 @@ class VectorizationBenchmark:
 
         # 原始ATR计算
         original_atr_times = []
+        original_atr_values = []
         for i in range(iterations):
             start_time = time.perf_counter()
             atr = calculate_atr(self.test_data)
             end_time = time.perf_counter()
             original_atr_times.append(end_time - start_time)
+            if i == 0:
+                original_atr_values.append(atr)
 
         # 向量化ATR计算
         optimized_atr_times = []
+        optimized_atr_values = []
         for i in range(iterations):
             start_time = time.perf_counter()
             atr = processor.compute_atr_optimized(self.test_data)
             end_time = time.perf_counter()
             optimized_atr_times.append(end_time - start_time)
+            if i == 0:
+                optimized_atr_values.append(atr)
 
         original_atr_avg = np.mean(original_atr_times) * 1000
         optimized_atr_avg = np.mean(optimized_atr_times) * 1000
         atr_improvement = ((original_atr_avg - optimized_atr_avg) / original_atr_avg) * 100
 
         print("📊 ATR性能对比:")
-        print(f"   原始: {original_atr_avg:.2f}ms")
-        print(f"   优化: {optimized_atr_avg:.2f}ms")
+        print(
+            f"   原始: {original_atr_avg:.2f}ms (ATR值: {original_atr_values[0] if original_atr_values else 'N/A'})"
+        )
+        print(
+            f"   优化: {optimized_atr_avg:.2f}ms (ATR值: {optimized_atr_values[0] if optimized_atr_values else 'N/A'})"
+        )
         print(f"   提升: {atr_improvement:+.1f}%")
 
         return {

@@ -110,6 +110,12 @@ class M4SimpleBenchmark:
                     signals = self.signal_processor.get_trading_signals_optimized(data)
                     atr = self.signal_processor.compute_atr_optimized(data)
 
+                    # 验证计算结果
+                    if i == 0:
+                        print(
+                            f"   {symbol}信号数量: {len(signals) if signals else 0}, ATR: {atr:.4f}"
+                        )
+
                     end_time = time.perf_counter()
                     processing_time = (end_time - start_time) * 1000  # ms
 
@@ -193,6 +199,12 @@ class M4SimpleBenchmark:
                 # 信号处理
                 signals = self.signal_processor.get_trading_signals_optimized(data)
                 atr = self.signal_processor.compute_atr_optimized(data)
+
+                # 验证计算结果
+                if i == 0:
+                    print(
+                        f"   高频处理{symbol}: 信号{len(signals) if signals else 0}个, ATR{atr:.4f}"
+                    )
 
                 await asyncio.sleep(0.1)  # 100ms间隔
 

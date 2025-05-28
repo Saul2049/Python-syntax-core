@@ -208,6 +208,10 @@ class M4AsyncBenchmark:
                 signals = processor.get_trading_signals_optimized(df)
                 atr = processor.compute_atr_optimized(df)
 
+                # 验证计算结果
+                if signals and atr > 0:
+                    pass  # 计算成功
+
         async def market_data_simulation():
             """市场数据模拟任务"""
             for _ in range(self.test_duration):

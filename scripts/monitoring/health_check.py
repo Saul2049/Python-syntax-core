@@ -20,11 +20,7 @@ from typing import Any, Dict, List
 import psutil
 
 # 导入我们的指标收集器
-try:
-    from .metrics_collector import MetricsCollector
-except ImportError:
-    # 如果作为脚本直接运行
-    sys.path.append(os.path.dirname(__file__))
+# MetricsCollector导入已移除，因为在此脚本中未使用
 
 
 @dataclass

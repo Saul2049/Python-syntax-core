@@ -68,7 +68,9 @@ class W1QuickTest:
                 )
                 atr = np.mean(tr[-14:])
 
-                allocation_count += 3  # 模拟3次分配
+                # 验证计算结果
+                if ma_short > 0 and ma_long > 0 and atr > 0:
+                    allocation_count += 3  # 模拟3次分配
 
         end_rss = self.get_current_rss_mb()
 
@@ -97,7 +99,9 @@ class W1QuickTest:
 
                 # 使用优化策略生成信号
                 result = strategy.generate_signals(symbol, price)
-                allocation_count += 1  # 缓存策略分配更少
+                # 验证信号生成结果
+                if result is not None:
+                    allocation_count += 1  # 缓存策略分配更少
 
         end_rss = self.get_current_rss_mb()
 

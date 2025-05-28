@@ -136,10 +136,10 @@ class DailyHealthChecker:
                     # 尝试提取内存数值
                     import re
 
-                    match = re.search(r"(\d+\.?\d*)\s*MB", line)
+                    match = re.search(r"RSS:\s*(\d+)", line)
                     if match:
                         stats["rss_mb"] = float(match.group(1))
-                except:
+                except (ValueError, AttributeError):
                     pass
             elif "GC counts:" in line:
                 stats["gc_info"] = line.strip()
@@ -147,10 +147,10 @@ class DailyHealthChecker:
                 try:
                     import re
 
-                    match = re.search(r"(\d+)", line)
+                    match = re.search(r"(\d+)\s*open files", line)
                     if match:
                         stats["open_fds"] = int(match.group(1))
-                except:
+                except (ValueError, AttributeError):
                     pass
 
         return stats
@@ -280,9 +280,8 @@ class DailyHealthChecker:
                 duration = result.get("duration_seconds", 0)
 
                 check_icon = "✅" if success else "❌"
-                print(
-                    f"   {check_icon} {check_name}: {'PASS' if success else 'FAIL'} ({duration:.1f}s)"
-                )
+                status_text = "PASS" if success else "FAIL"
+                print(f"   {check_icon} {check_name}: {status_text} ({duration:.1f}s)")
 
         # 失败项目
         if self.health_report["failed_checks"]:
@@ -327,6 +326,7 @@ def main():
 
         # 保存报告
         report_file = checker.save_report()
+        print(f"📄 Report saved to: {report_file}")
 
         # 打印摘要
         if not args.quiet:

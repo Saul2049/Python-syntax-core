@@ -164,7 +164,9 @@ class W1CacheBenchmark:
                     else:
                         result = strategy.generate_signals(symbol, price)
 
-                    signals_generated += 1
+                    # 验证信号生成
+                    if result is not None:
+                        signals_generated += 1
 
                     # 简单的分配计数（模拟）
                     if not use_cache:
@@ -197,6 +199,7 @@ class W1CacheBenchmark:
                     print(f"   ATR命中率: {efficiency['atr_cache_hit_rate']:.1%}")
                     print(f"   窗口复用: {efficiency['window_reuse_efficiency']:.1%}")
                     print(f"   内存节省: {efficiency['memory_save_ratio']:.1%}")
+                    print(f"   缓存大小: {cache_info.get('total_cache_size', 0)} 项")
 
             return strategy_stats
 

@@ -8,7 +8,6 @@ Configuration Manager - Read and manage configuration settings
 import configparser
 import logging
 import os
-from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger("config_manager")
