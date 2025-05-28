@@ -4,10 +4,10 @@
 每小时记录一次W3+W4状态，方便明早查看
 """
 
-import time
-import subprocess
 import datetime
 import os
+import subprocess
+import time
 
 
 def log_status():

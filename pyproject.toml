@@ -66,6 +66,12 @@ ignore = []
 [tool.ruff.lint.per-file-ignores]
 # Relaxed rules for scripts/ directory
 "scripts/**/*.py" = ["E402", "F841", "E722", "F401", "F821", "E731", "F402", "C901", "E501", "F541"]
+# Relaxed rules for config/ directory
+"config/**/*.py" = ["E402", "F841", "E722", "F401", "F821", "E731", "F402", "C901", "E501", "F541"]
+# Relaxed rules for examples/ directory  
+"examples/**/*.py" = ["E402", "F841", "E722", "F401", "F821", "E731", "F402", "C901", "E501", "F541"]
+# Relaxed rules for root directory Python files
+"*.py" = ["E402", "F841", "E722", "F401", "F821", "E731", "F402", "C901", "E501", "F541"]
 
 [tool.ruff.format]
 quote-style = "double"

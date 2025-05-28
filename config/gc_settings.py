@@ -10,8 +10,8 @@ GC 配置设置 - W2 优化版本
 """
 
 import gc
-import os
 import logging
+import os
 from typing import Tuple
 
 logger = logging.getLogger(__name__)

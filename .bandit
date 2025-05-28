@@ -1,0 +1,23 @@
+[bandit]
+# Bandit configuration for trading framework
+# Skip some tests that are acceptable in trading context
+
+# Skip tests for:
+# B101: assert_used - asserts are OK in trading logic
+# B311: random - pseudo-random is OK for non-security purposes like jitter
+# B324: hashlib_new_insecure_functions - MD5 OK for non-security hashing
+# B601: paramiko_calls - if we use paramiko for deployment
+# B602: subprocess_popen_with_shell_equals_true - controlled shell usage
+# B603: subprocess_without_shell_equals_true - controlled subprocess usage
+# B607: start_process_with_partial_path - controlled process starting
+
+skips = B101,B311,B324,B601,B602,B603,B607
+
+# Only scan source code, not tests or scripts
+exclude_dirs = tests,scripts,examples,config
+
+# Confidence levels: LOW, MEDIUM, HIGH
+confidence = MEDIUM
+
+# Severity levels: LOW, MEDIUM, HIGH  
+severity = MEDIUM 

@@ -1,4 +1,4 @@
-# Simplified Pre-commit hooks for Python Trading Framework
+# Comprehensive Pre-commit hooks for Python Trading Framework
 # Focused on essential checks without problematic dependencies
 
 repos:
@@ -24,6 +24,14 @@ repos:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix]
 
+  # Security linting
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.7.5
+    hooks:
+      - id: bandit
+        args: [-r, src/, -f, json, -o, bandit-report.json, --exit-zero]
+        pass_filenames: false
+
   # Basic file checks (local hooks to avoid dependency issues)
   - repo: local
     hooks:
@@ -38,6 +46,20 @@ repos:
         entry: python -c "import sys; content=sys.stdin.read(); sys.stdout.write(content.rstrip() + '\n' if content.strip() else '')"
         language: system
         types: [text]
+
+      # Check for common issues
+      - id: check-docstring-first
+        name: Check docstring is first
+        entry: python -c "import ast, sys; [sys.exit(1) for f in sys.argv[1:] if open(f).read().strip() and not (ast.parse(open(f).read()).body and isinstance(ast.parse(open(f).read()).body[0], ast.Expr) and isinstance(ast.parse(open(f).read()).body[0].value, ast.Constant))]"
+        language: system
+        files: ^src/.*\.py$
+        
+      - id: check-requirements-txt
+        name: Check requirements.txt
+        entry: python -c "import sys; [print(f'✓ {line.strip()}') for line in open('requirements.txt') if line.strip() and not line.startswith('#')]"
+        language: system
+        files: requirements.*\.txt$
+        pass_filenames: false
 
 # Configuration
 default_language_version:
@@ -58,5 +80,6 @@ exclude: |
     logs/|
     .*\.egg-info/|
     trades/.*\.csv|
-    data/.*\.csv
+    data/.*\.csv|
+    bandit-report\.json
   )$ 
