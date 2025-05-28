@@ -6,6 +6,7 @@ Data Module (数据模块)
 Provides data loading utilities for trading system.
 """
 
+import os
 from datetime import datetime, timedelta
 
 import numpy as np
@@ -22,15 +23,32 @@ def load_csv(filepath: str = "btc_eth.csv") -> pd.DataFrame:
     Returns:
         DataFrame with date index and OHLCV columns
     """
-    try:
-        df = pd.read_csv(filepath, parse_dates=["date"], index_col="date")
-        if df.empty:
-            raise FileNotFoundError("CSV file is empty")
-        return df
-    except FileNotFoundError:
-        print(f"❌ 错误: 文件 '{filepath}' 不存在")
-        # Generate fallback synthetic data for testing
-        return _generate_fallback_data()
+    # Try to find the file in multiple possible locations
+    possible_paths = [
+        filepath,  # Current directory
+        os.path.join(os.path.dirname(__file__), "..", filepath),  # Project root from src/
+        os.path.join(os.path.dirname(__file__), "..", "..", filepath),  # Project root from nested
+        os.path.abspath(filepath),  # Absolute path
+    ]
+
+    for path in possible_paths:
+        try:
+            abs_path = os.path.abspath(path)
+            if os.path.exists(abs_path):
+                df = pd.read_csv(abs_path, parse_dates=["date"], index_col="date")
+                if not df.empty:
+                    print(f"✅ 成功加载数据文件: {abs_path}")
+                    return df
+        except (FileNotFoundError, pd.errors.EmptyDataError, pd.errors.ParserError):
+            continue
+
+    print(f"❌ 错误: 在以下路径中都未找到文件 '{filepath}':")
+    for path in possible_paths:
+        print(f"  - {os.path.abspath(path)}")
+    print("🔄 使用合成数据作为fallback...")
+
+    # Generate fallback synthetic data for testing
+    return _generate_fallback_data()
 
 
 def _generate_fallback_data(days: int = 1000) -> pd.DataFrame:
@@ -66,6 +84,7 @@ def _generate_fallback_data(days: int = 1000) -> pd.DataFrame:
         eth_prices.append(eth_prices[-1] * (1 + ret))
 
     df = pd.DataFrame({"btc": btc_prices, "eth": eth_prices}, index=dates)
+    print(f"✅ 生成了 {len(df)} 行合成数据 (BTC: {df['btc'].iloc[0]:.2f} -> {df['btc'].iloc[-1]:.2f})")
 
     return df
 

@@ -15,24 +15,39 @@ FAST = range(3, 11)  # 3…10
 SLOW = range(10, 41, 5)  # 10,15,20,25,30,35,40
 ATR = [10, 14, 20]
 
-results = []
-for f, s, a in tqdm(itertools.product(FAST, SLOW, ATR), total=len(FAST) * len(SLOW) * len(ATR)):
-    if f >= s:  # 保证快线 < 慢线
-        continue
-    equity = backtest.run_backtest(fast_win=f, slow_win=s, atr_win=a)
-    row = dict(
-        fast=f,
-        slow=s,
-        atr=a,
-        cagr=metrics.cagr(equity),
-        sharpe=metrics.sharpe_ratio(equity),
-        mdd=metrics.max_drawdown(equity),
-        final=equity.iloc[-1],
-    )
-    results.append(row)
 
-df = pd.DataFrame(results).sort_values("sharpe", ascending=False)
-df.to_csv("grid_results.csv", index=False)
+def run_optimization() -> pd.DataFrame:
+    """
+    运行移动平均策略参数优化
 
-print(df.head(10)[["fast", "slow", "atr", "cagr", "sharpe", "mdd"]])
-print("\n最佳组合:", df.iloc[0][["fast", "slow", "atr"]].to_dict())
+    Returns:
+        DataFrame: 优化结果，按Sharpe比率降序排列
+    """
+    results = []
+    for f, s, a in tqdm(itertools.product(FAST, SLOW, ATR), total=len(FAST) * len(SLOW) * len(ATR)):
+        if f >= s:  # 保证快线 < 慢线
+            continue
+        equity = backtest.run_backtest(fast_win=f, slow_win=s, atr_win=a)
+        row = dict(
+            fast=f,
+            slow=s,
+            atr=a,
+            cagr=metrics.cagr(equity),
+            sharpe=metrics.sharpe_ratio(equity),
+            mdd=metrics.max_drawdown(equity),
+            final=equity.iloc[-1],
+        )
+        results.append(row)
+
+    df = pd.DataFrame(results).sort_values("sharpe", ascending=False)
+    df.to_csv("grid_results.csv", index=False)
+    return df
+
+
+# 为了向后兼容，提供全局变量（仅在直接运行时）
+df = None
+
+if __name__ == "__main__":
+    df = run_optimization()
+    print(df.head(10)[["fast", "slow", "atr", "cagr", "sharpe", "mdd"]])
+    print("\n最佳组合:", df.iloc[0][["fast", "slow", "atr"]].to_dict())
