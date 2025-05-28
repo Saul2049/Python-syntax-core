@@ -46,7 +46,9 @@ def rate_limit_retry(max_retries=3, base_delay=1):
 
                         # 计算退避时间，使用指数退避
                         delay = base_delay * (2 ** (retries - 1))
-                        logger.warning(f"遇到速率限制，等待 {delay} 秒后重试 (尝试 {retries}/{max_retries})")
+                        logger.warning(
+                            f"遇到速率限制，等待 {delay} 秒后重试 (尝试 {retries}/{max_retries})"
+                        )
                         time.sleep(delay)
                     else:
                         raise

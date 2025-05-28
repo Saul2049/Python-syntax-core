@@ -280,7 +280,9 @@ class TradingMetricsCollector:
             "process_cpu_percent", "进程CPU使用百分比 (Process CPU usage percentage)"
         )
 
-        self.process_threads: Gauge = Gauge("process_threads_count", "进程线程数 (Process thread count)")
+        self.process_threads: Gauge = Gauge(
+            "process_threads_count", "进程线程数 (Process thread count)"
+        )
 
         self.process_fds: Gauge = Gauge(
             "process_file_descriptors", "进程文件描述符数量 (Process file descriptor count)"

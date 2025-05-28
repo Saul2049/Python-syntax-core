@@ -366,7 +366,9 @@ class TestTradingLoopIntegration:
         mock_engine_class.assert_called_once()
 
         # 验证调用了start_trading_loop - 修复参数传递方式
-        mock_engine.start_trading_loop.assert_called_once_with("ETHUSDT", 30)  # 使用位置参数而不是关键字参数
+        mock_engine.start_trading_loop.assert_called_once_with(
+            "ETHUSDT", 30
+        )  # 使用位置参数而不是关键字参数
 
     @patch("src.trading_loop.trading_loop")
     @patch("builtins.print")

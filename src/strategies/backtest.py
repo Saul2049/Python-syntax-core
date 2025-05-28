@@ -240,7 +240,9 @@ class BacktestExecutor:
         self.initial_stop = self.stop_price
 
         if self.verbose:
-            print(f"买入: 价格={current_price:.4f}, 数量={self.position}, 止损={self.stop_price:.4f}")
+            print(
+                f"买入: 价格={current_price:.4f}, 数量={self.position}, 止损={self.stop_price:.4f}"
+            )
 
     def _execute_sell(self, current_price: float, stop_triggered: bool):
         """执行卖出操作"""

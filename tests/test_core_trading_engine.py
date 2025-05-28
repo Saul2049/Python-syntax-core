@@ -198,4 +198,6 @@ class TestTradingLoopFunction:
         mock_engine_class.assert_called_once()
 
         # 验证调用了start_trading_loop - 修复：使用位置参数
-        mock_engine.start_trading_loop.assert_called_once_with("ETHUSDT", 30)  # 位置参数而不是关键字参数
+        mock_engine.start_trading_loop.assert_called_once_with(
+            "ETHUSDT", 30
+        )  # 位置参数而不是关键字参数

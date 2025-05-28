@@ -204,7 +204,9 @@ class GCOptimizer:
 
         self.optimization_results[profile.name] = benchmark_result
 
-        self.logger.info(f"✅ {profile.name}基准测试完成: P95暂停={gc_stats['p95_pause_time']*1000:.1f}ms")
+        self.logger.info(
+            f"✅ {profile.name}基准测试完成: P95暂停={gc_stats['p95_pause_time']*1000:.1f}ms"
+        )
 
         return benchmark_result
 

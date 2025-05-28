@@ -271,7 +271,9 @@ class AsyncTradingEngine:
             del self.positions[symbol]
 
             self.order_count += 1
-            self.logger.info(f"✅ 卖出执行: {symbol} {quantity} @ {current_price:.2f} PnL: {pnl:.2f}")
+            self.logger.info(
+                f"✅ 卖出执行: {symbol} {quantity} @ {current_price:.2f} PnL: {pnl:.2f}"
+            )
 
         except Exception as e:
             self.logger.error(f"❌ 卖出订单失败: {e}")

@@ -320,7 +320,9 @@ class TradingEngine:
                 "signal_strength": market_analysis["signal_strength"],
             }
         else:
-            return self._create_hold_response(market_analysis, position_size, "无可卖持仓，保持观望")
+            return self._create_hold_response(
+                market_analysis, position_size, "无可卖持仓，保持观望"
+            )
 
     def _create_hold_response(
         self,

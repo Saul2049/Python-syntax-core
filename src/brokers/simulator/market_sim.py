@@ -98,9 +98,7 @@ class MarketSimulator:
             lambda x: (
                 x["price"] * (1 + self.slippage)
                 if x["signal"] > 0
-                else x["price"] * (1 - self.slippage)
-                if x["signal"] < 0
-                else x["price"]
+                else x["price"] * (1 - self.slippage) if x["signal"] < 0 else x["price"]
             ),
             axis=1,
         )
