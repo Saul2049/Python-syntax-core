@@ -9,6 +9,7 @@ from unittest.mock import patch
 import numpy as np
 import pandas as pd
 import pytest
+import concurrent.futures
 
 from src.core.signal_processor import (
     filter_signals,
@@ -763,7 +764,7 @@ class TestSignalProcessorIntegration:
             assert execution_time < 1.0, f"处理时间过长: {execution_time:.3f}秒"
 
     def test_concurrent_signal_processing(self):
-        """测试并发信号处理（模拟多线程场景）"""
+        """测试并发信号处理的线程安全性"""
         data = pd.DataFrame(
             {
                 "close": [100, 101, 102, 103, 104],
@@ -775,14 +776,16 @@ class TestSignalProcessorIntegration:
             index=pd.date_range("2023-01-01", periods=5, freq="D"),
         )
 
-        import concurrent.futures
-
         def process_signals():
             with patch("src.core.signal_processor.moving_average") as mock_ma:
-                mock_ma.side_effect = [
-                    data["close"].rolling(2).mean(),
-                    data["close"].rolling(3).mean(),
-                ]
+                # 使用函数来动态生成返回值，避免side_effect耗尽
+                def mock_moving_average(series, window, kind="sma"):
+                    if window == 7:  # fast_win
+                        return series.rolling(2).mean()
+                    else:  # slow_win
+                        return series.rolling(3).mean()
+                
+                mock_ma.side_effect = mock_moving_average
 
                 signals = get_trading_signals(data)
                 is_valid = validate_signal(signals, data)
