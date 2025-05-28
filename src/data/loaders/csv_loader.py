@@ -41,45 +41,84 @@ class CSVDataLoader:
         返回:
             pandas DataFrame
         """
-        # 尝试多个可能的路径位置
+        # 获取所有可能的路径
+        unique_paths = self._get_possible_paths(file_path)
+
+        # 尝试加载数据
+        for abs_path in unique_paths:
+            df = self._try_load_from_path(abs_path, columns, **kwargs)
+            if df is not None:
+                return df
+
+        # 如果所有路径都失败，处理fallback
+        return self._handle_load_failure(file_path, unique_paths, **kwargs)
+
+    def _get_possible_paths(self, file_path: Union[str, Path]) -> List[Path]:
+        """获取所有可能的文件路径"""
         possible_paths = [
             file_path,  # 原始路径
             self.base_path / file_path,  # 基础路径 + 文件路径
             Path.cwd() / file_path,  # 当前工作目录
-            Path(__file__).parent.parent.parent / file_path,  # 项目根目录
+            Path(__file__).parent.parent.parent / file_path,  # 项目根目录 (src/../..)
         ]
 
         # 如果是相对路径，添加更多可能的位置
         if not Path(file_path).is_absolute():
-            possible_paths.extend(
-                [
-                    Path(__file__).parent.parent.parent.parent / file_path,  # 上级目录
-                    Path.cwd().parent / file_path,  # 父目录
-                ]
-            )
+            additional_paths = [
+                Path(__file__).parent.parent.parent.parent / file_path,  # 上级目录
+                Path.cwd().parent / file_path,  # 父目录
+                # 添加data目录的可能位置
+                Path(__file__).parent.parent.parent / "data" / "market_data" / file_path,
+                Path.cwd() / "data" / "market_data" / file_path,
+                # 添加更多项目根目录的可能性
+                Path(__file__).resolve().parents[3] / file_path,  # 使用resolve()和parents
+                Path(__file__).resolve().parents[2] / file_path,
+            ]
+            possible_paths.extend(additional_paths)
 
+        # 去除重复路径并解析为绝对路径
+        unique_paths = []
+        seen_paths = set()
         for path in possible_paths:
             try:
                 abs_path = Path(path).resolve()
-                if abs_path.exists():
-                    if columns:
-                        df = pd.read_csv(abs_path, usecols=columns, **kwargs)
-                    else:
-                        df = pd.read_csv(abs_path, **kwargs)
-
-                    print(f"✅ 成功加载数据: {abs_path} ({len(df)} 行)")
-                    return df
-            except (FileNotFoundError, pd.errors.EmptyDataError, pd.errors.ParserError):
-                continue
-            except Exception as e:
-                print(f"⚠️ 尝试加载 {path} 时出错: {str(e)}")
+                if str(abs_path) not in seen_paths:
+                    unique_paths.append(abs_path)
+                    seen_paths.add(str(abs_path))
+            except Exception:
                 continue
 
-        # 如果所有路径都失败，显示详细错误信息
+        return unique_paths
+
+    def _try_load_from_path(
+        self, abs_path: Path, columns: Optional[List[str]] = None, **kwargs
+    ) -> Optional[pd.DataFrame]:
+        """尝试从指定路径加载数据"""
+        try:
+            if abs_path.exists():
+                if columns:
+                    df = pd.read_csv(abs_path, usecols=columns, **kwargs)
+                else:
+                    df = pd.read_csv(abs_path, **kwargs)
+
+                print(f"✅ 成功加载数据: {abs_path} ({len(df)} 行)")
+                return df
+        except (FileNotFoundError, pd.errors.EmptyDataError, pd.errors.ParserError):
+            pass
+        except Exception as e:
+            print(f"⚠️ 尝试加载 {abs_path} 时出错: {str(e)}")
+
+        return None
+
+    def _handle_load_failure(
+        self, file_path: Union[str, Path], unique_paths: List[Path], **kwargs
+    ) -> pd.DataFrame:
+        """处理加载失败的情况"""
+        # 显示详细错误信息
         print(f"❌ 错误: 在以下路径中都未找到文件 '{file_path}':")
-        for path in possible_paths:
-            abs_path = Path(path).resolve()
-            print(f"  - {abs_path}")
+        for abs_path in unique_paths:
+            exists_status = "存在" if abs_path.exists() else "不存在"
+            print(f"  - {abs_path} ({exists_status})")
 
         # 对于特定的文件名，生成fallback数据
         if str(file_path) == "btc_eth.csv" or Path(file_path).name == "btc_eth.csv":
