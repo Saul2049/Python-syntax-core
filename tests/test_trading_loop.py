@@ -377,11 +377,15 @@ class TestTradingLoopIntegration:
         """测试__main__块执行 - 无环境变量"""
         import subprocess
         import sys
+        from pathlib import Path
+
+        # 动态获取项目根目录
+        project_root = Path(__file__).parent.parent.resolve()
 
         # 运行trading_loop模块作为脚本
         result = subprocess.run(
             [sys.executable, "-m", "src.trading_loop"],
-            cwd="/Users/liam/Python syntax core",
+            cwd=str(project_root),
             capture_output=True,
             text=True,
             env={},  # 清空环境变量
@@ -401,6 +405,10 @@ class TestTradingLoopIntegration:
         import os
         import subprocess
         import sys
+        from pathlib import Path
+
+        # 动态获取项目根目录
+        project_root = Path(__file__).parent.parent.resolve()
 
         # 设置环境变量
         env = os.environ.copy()
@@ -411,9 +419,9 @@ class TestTradingLoopIntegration:
             [
                 sys.executable,
                 "-c",
-                """
+                f"""
 import sys
-sys.path.insert(0, "/Users/liam/Python syntax core")
+sys.path.insert(0, "{project_root}")
 import os
 os.environ["TG_TOKEN"] = "test_token"
 os.environ["API_KEY"] = "test_key"
@@ -427,7 +435,7 @@ with unittest.mock.patch("src.trading_loop.trading_loop") as mock_loop:
     exec(open("src/trading_loop.py").read())
             """,
             ],
-            cwd="/Users/liam/Python syntax core",
+            cwd=str(project_root),
             capture_output=True,
             text=True,
             env=env,
