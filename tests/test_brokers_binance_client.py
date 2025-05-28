@@ -251,7 +251,7 @@ class TestBinanceClientPublicMethods:
         result = client.get_server_time()
 
         assert result == expected_response
-        mock_get.assert_called_once_with(f"{client.base_url}/v3/time")
+        mock_get.assert_called_once_with(f"{client.base_url}/v3/time", timeout=10)
 
     @patch("requests.get")
     def test_get_klines_success(self, mock_get, client):
@@ -292,6 +292,7 @@ class TestBinanceClientPublicMethods:
         mock_get.assert_called_once_with(
             f"{client.base_url}/v3/klines",
             params={"symbol": "BTCUSDT", "interval": "1d", "limit": 1},
+            timeout=10,
         )
 
     @patch("requests.get")
@@ -307,6 +308,7 @@ class TestBinanceClientPublicMethods:
         mock_get.assert_called_once_with(
             f"{client.base_url}/v3/klines",
             params={"symbol": "ETHUSDT", "interval": "1h", "limit": 24},
+            timeout=10,
         )
 
     @patch("requests.get")
