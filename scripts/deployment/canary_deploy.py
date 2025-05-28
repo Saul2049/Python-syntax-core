@@ -122,7 +122,8 @@ class CanaryDeployment:
         }
 
         self.logger.info(
-            f"📈 基线指标: P95={baseline['async_signal_p95']:.1f}ms, 吞吐={baseline['throughput']:.1f}/s"
+            f"📈 基线指标: P95={baseline['async_signal_p95']:.1f}ms, "
+            f"吞吐={baseline['throughput']:.1f}/s"
         )
         return baseline
 
@@ -143,6 +144,8 @@ class CanaryDeployment:
 
         # 启动引擎（在后台任务中）
         engine_task = asyncio.create_task(engine.run())
+        # 将任务存储在引擎对象中，以便后续管理
+        engine._background_task = engine_task
 
         return engine
 

@@ -6,13 +6,11 @@ Market Data Provider - Interface and implementations
 """
 
 import abc
-import datetime
-import json
 import logging
 import os
 import random
 import time
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Optional
 
 import requests
 from requests.exceptions import RequestException
@@ -255,7 +253,8 @@ class MarketDataManager:
         self.last_switch_time = 0
         self.min_switch_interval = min_switch_interval  # 最小切换间隔(秒)
         logger.info(
-            f"初始化市场数据管理器: 主源={primary_provider.get_name()}, 备源={backup_provider.get_name()}"
+            f"初始化市场数据管理器: 主源={primary_provider.get_name()}, "
+            f"备源={backup_provider.get_name()}"
         )
 
     def get_klines(self, symbol: str, interval: str, limit: int = 100) -> List[List]:
