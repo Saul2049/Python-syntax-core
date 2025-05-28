@@ -784,7 +784,7 @@ class TestSignalProcessorIntegration:
                         return series.rolling(2).mean()
                     else:  # slow_win
                         return series.rolling(3).mean()
-                
+
                 mock_ma.side_effect = mock_moving_average
 
                 signals = get_trading_signals(data)
