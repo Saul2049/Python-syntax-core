@@ -27,7 +27,8 @@ class SignalCache:
     def _generate_key(self, data: pd.DataFrame, fast_win: int, slow_win: int) -> str:
         """生成缓存键"""
         # 使用数据的最后几行和参数生成唯一键
-        data_hash = hashlib.md5(
+        # 注意：这里使用哈希仅用于缓存键生成，不涉及安全
+        data_hash = hashlib.sha256(
             str(data.tail(max(fast_win, slow_win) + 10).values).encode()
         ).hexdigest()[:16]
         return f"{data_hash}_{fast_win}_{slow_win}"

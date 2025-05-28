@@ -11,6 +11,7 @@ Async Trading Engine for M4 Phase
 
 import asyncio
 import logging
+import os
 import time
 from datetime import datetime
 from typing import Any, Dict, List, Optional
@@ -472,9 +473,13 @@ async def main():
 
     print("🚀 启动M4异步交易引擎测试")
 
-    # 注意：实际使用时需要真实的API密钥
-    api_key = "test_key"
-    api_secret = "test_secret"
+    # 从环境变量读取API密钥，如果没有则使用占位符
+    api_key = os.getenv("API_KEY", "PLEASE_SET_API_KEY")
+    api_secret = os.getenv("API_SECRET", "PLEASE_SET_API_SECRET")
+
+    if api_key == "PLEASE_SET_API_KEY" or api_secret == "PLEASE_SET_API_SECRET":
+        print("⚠️ 警告: 使用占位符API密钥，请设置环境变量 API_KEY 和 API_SECRET")
+        print("💡 提示: export API_KEY=your_real_key && export API_SECRET=your_real_secret")
 
     try:
         # 创建并运行引擎

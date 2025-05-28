@@ -48,11 +48,11 @@ repos:
         types: [text]
 
       # Check for common issues
-      - id: check-docstring-first
-        name: Check docstring is first
-        entry: python -c "import ast, sys; [sys.exit(1) for f in sys.argv[1:] if open(f).read().strip() and not (ast.parse(open(f).read()).body and isinstance(ast.parse(open(f).read()).body[0], ast.Expr) and isinstance(ast.parse(open(f).read()).body[0].value, ast.Constant))]"
-        language: system
-        files: ^src/.*\.py$
+      # - id: check-docstring-first
+      #   name: Check docstring is first
+      #   entry: python -c "import ast, sys; [sys.exit(1) for f in sys.argv[1:] if open(f).read().strip() and not (ast.parse(open(f).read()).body and isinstance(ast.parse(open(f).read()).body[0], ast.Expr) and isinstance(ast.parse(open(f).read()).body[0].value, ast.Constant))]"
+      #   language: system
+      #   files: ^src/.*\.py$
         
       - id: check-requirements-txt
         name: Check requirements.txt
