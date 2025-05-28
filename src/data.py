@@ -84,7 +84,9 @@ def _generate_fallback_data(days: int = 1000) -> pd.DataFrame:
         eth_prices.append(eth_prices[-1] * (1 + ret))
 
     df = pd.DataFrame({"btc": btc_prices, "eth": eth_prices}, index=dates)
-    print(f"✅ 生成了 {len(df)} 行合成数据 (BTC: {df['btc'].iloc[0]:.2f} -> {df['btc'].iloc[-1]:.2f})")
+    print(
+        f"✅ 生成了 {len(df)} 行合成数据 (BTC: {df['btc'].iloc[0]:.2f} -> {df['btc'].iloc[-1]:.2f})"
+    )
 
     return df
 
