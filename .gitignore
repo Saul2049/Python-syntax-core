@@ -43,9 +43,11 @@ venv.bak/
 # 日志和数据文件
 logs/
 *.log
-# 只忽略根目录的data文件夹和数据文件，不忽略src/data/包
-/data/
+# 忽略大部分CSV文件，但允许测试数据
 *.csv
+# 允许特定的测试数据文件
+!data/market_data/btc_eth.csv
+!data/market_data/btc_eth_2yr_*.csv
 *.json
 *.pickle
 *.db
