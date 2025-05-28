@@ -6,7 +6,6 @@ Git推送前检查流程演示脚本
 
 import subprocess
 import sys
-import time
 from pathlib import Path
 
 

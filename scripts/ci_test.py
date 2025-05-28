@@ -43,12 +43,16 @@ def test_basic_functionality():
         from src.core.signal_processor_vectorized import OptimizedSignalProcessor
 
         processor = OptimizedSignalProcessor()
-        print("✅ 信号处理器创建成功")
+        # 验证处理器功能
+        cache_stats = processor.get_cache_stats()
+        print(f"✅ 信号处理器创建成功 (缓存: {cache_stats.get('enabled', False)})")
 
         # 测试指标收集器
         from src.monitoring.metrics_collector import get_metrics_collector
 
         metrics = get_metrics_collector()
+        # 验证指标收集器功能
+        metrics.update_account_balance(1000.0)
         print("✅ 指标收集器创建成功")
 
         return True
@@ -66,12 +70,20 @@ def test_memory_scripts():
         from scripts.memory.mem_snapshot import MemorySnapshot
 
         snapshot = MemorySnapshot()
-        print("✅ MemorySnapshot 导入成功")
+        # 验证快照功能
+        if hasattr(snapshot, "take_snapshot"):
+            print("✅ MemorySnapshot 导入成功 (支持快照功能)")
+        else:
+            print("✅ MemorySnapshot 导入成功")
 
         from scripts.memory.gc_profiler import GCProfiler
 
         profiler = GCProfiler()
-        print("✅ GCProfiler 导入成功")
+        # 验证分析器功能
+        if hasattr(profiler, "start_profiling"):
+            print("✅ GCProfiler 导入成功 (支持分析功能)")
+        else:
+            print("✅ GCProfiler 导入成功")
 
         return True
     except Exception as e:

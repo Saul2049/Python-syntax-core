@@ -10,6 +10,7 @@ Memory Snapshot Tool for M5 Phase
 """
 
 import argparse
+import asyncio
 import json
 import logging
 import os

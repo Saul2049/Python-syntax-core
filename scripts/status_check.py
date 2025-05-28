@@ -6,9 +6,7 @@
 
 import json
 import os
-import time
 from datetime import datetime
-from pathlib import Path
 
 
 def parse_iso_time(iso_string: str) -> datetime:
@@ -108,15 +106,8 @@ def check_w4_status():
         return {"status": "error", "message": str(e)}
 
 
-def main():
-    """主函数"""
-    print("🕒 W3+W4 并行测试状态检查")
-    print("=" * 60)
-    print(f"⏰ 检查时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    print("")
-
-    # W3 状态
-    w3_status = check_w3_status()
+def print_w3_status(w3_status):
+    """打印W3状态信息"""
     print("🔍 W3 泄漏哨兵:")
     print("-" * 30)
     if w3_status["status"] == "not_found":
@@ -141,10 +132,9 @@ def main():
         if w3_status["clean_hours"]:
             print(f"清洁小时: {w3_status['clean_hours']}h")
 
-    print("")
 
-    # W4 状态
-    w4_status = check_w4_status()
+def print_w4_status(w4_status):
+    """打印W4状态信息"""
     print("🔥 W4 压力测试:")
     print("-" * 30)
     if w4_status["status"] == "not_found":
@@ -166,10 +156,9 @@ def main():
             rss_status = "✅" if w4_status["avg_rss_mb"] <= 40 else "⚠️"
             print(f"RSS内存: {rss_status} {w4_status['avg_rss_mb']:.1f}MB")
 
-    print("")
-    print("=" * 60)
 
-    # 简化的验收状态
+def print_summary_status(w3_status, w4_status):
+    """打印汇总状态"""
     w3_ok = w3_status.get("status") == "running"
     w4_ok = w4_status.get("status") == "running"
 
@@ -179,23 +168,48 @@ def main():
 
     if w3_ok and w4_ok:
         print("🚀 并行测试正常运行中！")
-
-        # 预估完成时间
-        if w3_status.get("runtime_hours", 0) > 0:
-            w3_remaining = w3_status["target_hours"] - w3_status["runtime_hours"]
-            if w3_remaining > 0:
-                print(f"📅 W3 预计剩余: {format_duration(w3_remaining * 3600)}")
-
-        if w4_status.get("runtime_hours", 0) > 0 and w4_status.get("progress_percent", 0) > 0:
-            w4_remaining_pct = 100 - w4_status["progress_percent"]
-            if w4_remaining_pct > 0 and w4_status["progress_percent"] > 0:
-                estimated_total_hours = w4_status["runtime_hours"] / (
-                    w4_status["progress_percent"] / 100
-                )
-                w4_remaining_hours = estimated_total_hours - w4_status["runtime_hours"]
-                print(f"📅 W4 预计剩余: {format_duration(w4_remaining_hours * 3600)}")
+        print_estimated_completion(w3_status, w4_status)
     else:
         print("⚠️ 部分任务未运行，请检查")
+
+
+def print_estimated_completion(w3_status, w4_status):
+    """打印预估完成时间"""
+    # W3预估
+    if w3_status.get("runtime_hours", 0) > 0:
+        w3_remaining = w3_status["target_hours"] - w3_status["runtime_hours"]
+        if w3_remaining > 0:
+            print(f"📅 W3 预计剩余: {format_duration(w3_remaining * 3600)}")
+
+    # W4预估
+    if w4_status.get("runtime_hours", 0) > 0 and w4_status.get("progress_percent", 0) > 0:
+        w4_remaining_pct = 100 - w4_status["progress_percent"]
+        if w4_remaining_pct > 0 and w4_status["progress_percent"] > 0:
+            estimated_total_hours = w4_status["runtime_hours"] / (
+                w4_status["progress_percent"] / 100
+            )
+            w4_remaining_hours = estimated_total_hours - w4_status["runtime_hours"]
+            print(f"📅 W4 预计剩余: {format_duration(w4_remaining_hours * 3600)}")
+
+
+def main():
+    """主函数"""
+    print("🕒 W3+W4 并行测试状态检查")
+    print("=" * 60)
+    print(f"⏰ 检查时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print("")
+
+    # 获取状态
+    w3_status = check_w3_status()
+    w4_status = check_w4_status()
+
+    # 打印状态
+    print_w3_status(w3_status)
+    print("")
+    print_w4_status(w4_status)
+    print("")
+    print("=" * 60)
+    print_summary_status(w3_status, w4_status)
 
 
 if __name__ == "__main__":
