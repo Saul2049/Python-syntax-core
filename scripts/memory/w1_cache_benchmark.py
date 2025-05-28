@@ -13,24 +13,24 @@ Cache Optimization Benchmark Tool for W1
 - 完整模式: 15分钟全面测试
 """
 
-import sys
-import os
-import time
+import argparse
 import asyncio
 import json
-import argparse
-from typing import Dict, List, Any
+import os
+import sys
+import time
 from datetime import datetime
+from typing import Any, Dict
 
 # 添加正确的路径
 current_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.join(current_dir, "..", "..")
 sys.path.insert(0, project_root)
 
-from scripts.memory.mem_baseline import MemoryBaseline
-from src.strategies.cache_optimized_strategy import CacheOptimizedStrategy
-from src.monitoring.metrics_collector import get_metrics_collector
 import numpy as np
+
+from scripts.memory.mem_baseline import MemoryBaseline
+from src.monitoring.metrics_collector import get_metrics_collector
 
 
 class W1CacheBenchmark:
@@ -190,7 +190,7 @@ class W1CacheBenchmark:
 
                 if not self.fast_mode:
                     # 只在非FAST模式打印详细统计
-                    print(f"📊 缓存统计:")
+                    print("📊 缓存统计:")
                     cache_info = cache_stats["cache_info"]
                     efficiency = cache_stats["memory_efficiency"]
                     print(f"   MA命中率: {efficiency['ma_cache_hit_rate']:.1%}")
@@ -313,7 +313,7 @@ class W1CacheBenchmark:
 
         # 内存对比
         mem_comp = comparison["memory_comparison"]
-        report.append(f"\n🧠 内存使用对比:")
+        report.append("\n🧠 内存使用对比:")
         report.append(f"   基线RSS: {mem_comp['baseline_rss_mb']:.1f} MB")
         report.append(f"   优化RSS: {mem_comp['optimized_rss_mb']:.1f} MB")
         report.append(
@@ -322,7 +322,7 @@ class W1CacheBenchmark:
 
         # 分配率对比
         alloc_comp = comparison["allocation_comparison"]
-        report.append(f"\n💾 内存分配率对比:")
+        report.append("\n💾 内存分配率对比:")
         report.append(f"   基线分配率: {alloc_comp['baseline_rate_per_sec']:.1f} 次/秒")
         report.append(f"   优化分配率: {alloc_comp['optimized_rate_per_sec']:.1f} 次/秒")
         report.append(f"   降低程度:   {alloc_comp['reduction_percent']:.1f}%")
@@ -330,13 +330,13 @@ class W1CacheBenchmark:
         # 缓存效率
         if comparison["cache_efficiency"]:
             cache_eff = comparison["cache_efficiency"]
-            report.append(f"\n⚡ 缓存效率:")
+            report.append("\n⚡ 缓存效率:")
             report.append(f"   缓存命中率: {cache_eff.get('ma_cache_hit_rate', 0)*100:.1f}%")
             report.append(f"   窗口复用率: {cache_eff.get('window_reuse_efficiency', 0)*100:.1f}%")
 
         # W1验收结果
         acceptance = comparison["w1_acceptance"]
-        report.append(f"\n🎯 W1验收标准:")
+        report.append("\n🎯 W1验收标准:")
         report.append(f"   RSS增长 < 5MB:     {'✅' if acceptance['rss_delta_pass'] else '❌'}")
         report.append(
             f"   分配率降低 ≥ 20%:   {'✅' if acceptance['allocation_reduction_pass'] else '❌'}"
@@ -347,7 +347,7 @@ class W1CacheBenchmark:
 
         # 性能收益
         gains = comparison["performance_gains"]
-        report.append(f"\n📈 性能收益:")
+        report.append("\n📈 性能收益:")
         report.append(f"   内存效率提升: {gains['memory_efficiency']:.1f}%")
         report.append(f"   CPU节省估计:  {gains['estimated_cpu_savings']:.1f}%")
 

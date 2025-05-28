@@ -3,8 +3,8 @@
 M4优化完成度检查脚本
 """
 
-import os
 import json
+import os
 from datetime import datetime
 
 

@@ -10,24 +10,24 @@ W3 Leak Sentinel - Continuous Leak Monitoring
 - 清洁小时数 ≥ 6
 """
 
+import argparse
 import asyncio
-import gc
+import json
+import logging
 import os
 import sys
 import time
-import json
-import psutil
-import logging
-import argparse
-from typing import Dict, List, Optional
-from datetime import datetime, timedelta
 from dataclasses import dataclass
+from datetime import datetime
+from typing import Dict, List
+
+import psutil
 
 # 添加项目根目录到路径
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../.."))
 
-from scripts.memory.mem_snapshot import MemorySnapshot
 from config.gc_settings import GCSettings
+from scripts.memory.mem_snapshot import MemorySnapshot
 
 
 @dataclass
@@ -82,7 +82,7 @@ class W3LeakSentinel:
         # 应用 W2 GC 配置
         GCSettings.apply_w2_optimal()
 
-        self.logger.info(f"🔍 W3 泄漏哨兵启动")
+        self.logger.info("🔍 W3 泄漏哨兵启动")
         self.logger.info(f"🎯 目标: 连续{self.target_hours}小时无泄漏")
         self.logger.info(f"📊 监控间隔: {self.check_interval}秒")
 
@@ -100,7 +100,7 @@ class W3LeakSentinel:
                 leak_detected = await self._check_for_leaks()
 
                 if leak_detected:
-                    self.logger.warning(f"🚨 检测到泄漏，重置清洁小时计数")
+                    self.logger.warning("🚨 检测到泄漏，重置清洁小时计数")
                     self.clean_hours_count = 0
                     self.last_leak_detected = datetime.now()
                     self.w3_status["last_leak"] = datetime.now().isoformat()
@@ -320,18 +320,18 @@ class W3LeakSentinel:
         )
         print(f"📊 检查次数: {monitoring['total_checkpoints']}次")
 
-        print(f"\n📈 泄漏阈值:")
+        print("\n📈 泄漏阈值:")
         print(f"   内存: ≤{monitoring['leak_threshold_memory_mb_per_min']} MB/min")
         print(f"   文件描述符: ≤{monitoring['leak_threshold_fd_per_min']} FD/min")
 
-        print(f"\n🔍 泄漏统计:")
+        print("\n🔍 泄漏统计:")
         print(f"   当前连续清洁: {leak_analysis['current_clean_streak_hours']}小时")
         print(f"   总泄漏事件: {leak_analysis['total_leak_events']}次")
 
         print(f"\n🎯 W3 验收结果: {'✅ PASS' if acceptance['passed'] else '❌ FAIL'}")
 
         if acceptance["passed"]:
-            print(f"\n🎉 W3 泄漏哨兵验收通过！可以进入W4压力测试")
+            print("\n🎉 W3 泄漏哨兵验收通过！可以进入W4压力测试")
         else:
             remaining = acceptance["target_clean_hours"] - acceptance["achieved_clean_hours"]
             print(f"\n⚠️ 还需要 {remaining} 小时无泄漏才能通过验收")

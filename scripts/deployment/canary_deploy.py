@@ -9,13 +9,13 @@ Canary Deployment Script for M4 Phase
 - 自动化指标收集
 """
 
-import asyncio
 import argparse
+import asyncio
 import json
-import time
 import logging
-from typing import Dict, Any, List
+import time
 from datetime import datetime, timedelta
+from typing import Any, Dict
 
 from src.core.async_trading_engine import AsyncTradingEngine
 from src.monitoring.metrics_collector import get_metrics_collector
@@ -353,7 +353,7 @@ async def main():
         canary = CanaryDeployment(config)
         report = await canary.start_canary_deployment()
 
-        print(f"\n🎊 Canary部署完成!")
+        print("\n🎊 Canary部署完成!")
         print(f"📊 成功率: {report['summary']['success_rate']:.1f}%")
         print(f"💡 建议: {report['summary']['recommendation']}")
 

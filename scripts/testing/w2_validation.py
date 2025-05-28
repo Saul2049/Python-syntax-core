@@ -10,15 +10,15 @@ W2 GC Optimization Validation Script
 - Gen0/Gen2触发率接近0
 """
 
+import asyncio
 import gc
+import json
+import logging
 import os
 import sys
-import json
 import time
-import asyncio
-import logging
-from typing import Dict, List, Tuple
 from datetime import datetime
+from typing import Dict
 
 # 添加项目根目录到路径
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../.."))
@@ -199,7 +199,7 @@ class W2Validator:
         )
 
         # 记录检查结果
-        self.logger.info(f"📈 GC性能检查结果:")
+        self.logger.info("📈 GC性能检查结果:")
         self.logger.info(
             f"   P95暂停: {p95_pause_ms:.1f}ms (标准: ≤{self.w2_standards['max_p95_pause_ms']}ms)"
         )
@@ -319,13 +319,13 @@ class W2Validator:
             f"🎯 W2验收状态: {'✅ PASS' if self.validation_results['w2_compliant'] else '❌ FAIL'}"
         )
 
-        print(f"\n🔧 配置检查:")
+        print("\n🔧 配置检查:")
         print(f"   GC阈值: {config_check.get('current_thresholds', 'N/A')}")
         print(f"   配置正确: {'✅' if config_check.get('thresholds_match') else '❌'}")
         print(f"   gc.freeze(): {'✅' if config_check.get('has_gc_freeze') else '❌'}")
 
         if perf_check:
-            print(f"\n📊 性能检查:")
+            print("\n📊 性能检查:")
             print(
                 f"   P95暂停: {perf_check.get('p95_pause_ms', 0):.1f}ms (≤{self.w2_standards['max_p95_pause_ms']}ms)"
             )
@@ -338,15 +338,15 @@ class W2Validator:
             print(f"   性能达标: {'✅' if perf_check.get('meets_w2_standards') else '❌'}")
 
         if recommendations:
-            print(f"\n💡 改进建议:")
+            print("\n💡 改进建议:")
             for rec in recommendations:
                 priority_icon = {"high": "🔥", "medium": "⚠️", "low": "💡"}.get(rec["priority"], "•")
                 print(f"   {priority_icon} {rec['description']}")
 
         if self.validation_results["w2_compliant"]:
-            print(f"\n🎉 W2 GC优化验证通过！可以继续W3阶段")
+            print("\n🎉 W2 GC优化验证通过！可以继续W3阶段")
         else:
-            print(f"\n⚠️ W2 GC优化需要修复，请参考建议进行调整")
+            print("\n⚠️ W2 GC优化需要修复，请参考建议进行调整")
 
         print("=" * 60)
 
@@ -367,7 +367,7 @@ async def main():
     logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
     print("🔍 W2 GC优化验证工具")
-    print(f"🎯 验证W2调参效果是否持续有效")
+    print("🎯 验证W2调参效果是否持续有效")
 
     # 自动修复配置
     if args.fix_config:

@@ -8,22 +8,23 @@ Automated Assertion Script for M5 Validation
 
 import argparse
 import asyncio
-import time
 import json
+import logging
 import os
 import sys
+import time
 from datetime import datetime
-from typing import Dict, List, Tuple, Optional
-import logging
+from typing import List, Optional, Tuple
 
 # 添加项目根目录到路径
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
-from scripts.memory.mem_snapshot import MemorySnapshot
-from scripts.memory.gc_profiler import GCProfiler
-from src.monitoring.metrics_collector import get_metrics_collector
-import requests
 import psutil
+import requests
+
+from scripts.memory.gc_profiler import GCProfiler
+from scripts.memory.mem_snapshot import MemorySnapshot
+from src.monitoring.metrics_collector import get_metrics_collector
 
 
 class M5AssertionValidator:
@@ -386,20 +387,20 @@ class M5AssertionValidator:
         print(f"📊 通过率: {passed_count}/{total_count} ({passed_count/total_count*100:.1f}%)")
 
         # 详细结果
-        print(f"\n📋 详细验证结果:")
+        print("\n📋 详细验证结果:")
         for name, passed in results:
             status = "✅ PASS" if passed else "❌ FAIL"
             print(f"   {status} {name}")
 
         # 失败原因
         if self.failed_assertions:
-            print(f"\n❌ 失败项目详情:")
+            print("\n❌ 失败项目详情:")
             for i, failure in enumerate(self.failed_assertions, 1):
                 print(f"   {i}. {failure}")
 
         # 详细指标
         if self.validation_results:
-            print(f"\n📈 关键指标:")
+            print("\n📈 关键指标:")
             for metric, data in self.validation_results.items():
                 if isinstance(data["value"], float):
                     if "latency" in metric or "pause" in metric:
@@ -497,7 +498,7 @@ async def main():
             print("\n🎉 M5验收测试全部通过！系统达到生产就绪状态")
             return True
         else:
-            print(f"\n⚠️ M5验收测试发现问题，需要优化后重试")
+            print("\n⚠️ M5验收测试发现问题，需要优化后重试")
             return False
 
     except Exception as e:

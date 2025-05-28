@@ -6,15 +6,15 @@ Daily Automated Health Check Script
 用于CI/CD和定时监控的综合健康检查
 """
 
-import subprocess
-import json
-import sys
-import os
-import time
 import argparse
-from datetime import datetime
-from typing import Dict, List, Optional
+import json
 import logging
+import os
+import subprocess
+import sys
+import time
+from datetime import datetime
+from typing import Dict
 
 # 添加项目根目录到路径
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
@@ -273,7 +273,7 @@ class DailyHealthChecker:
         print(f"\n{icon} Overall Status: {status.upper()}")
 
         # 检查结果
-        print(f"\n📋 Check Results:")
+        print("\n📋 Check Results:")
         for check_name, result in self.health_report["checks"].items():
             if isinstance(result, dict):
                 success = result.get("success", False)
@@ -286,13 +286,13 @@ class DailyHealthChecker:
 
         # 失败项目
         if self.health_report["failed_checks"]:
-            print(f"\n❌ Failed Checks:")
+            print("\n❌ Failed Checks:")
             for check in self.health_report["failed_checks"]:
                 print(f"   - {check}")
 
         # 建议
         if self.health_report["recommendations"]:
-            print(f"\n💡 Recommendations:")
+            print("\n💡 Recommendations:")
             for rec in self.health_report["recommendations"]:
                 print(f"   - {rec}")
 

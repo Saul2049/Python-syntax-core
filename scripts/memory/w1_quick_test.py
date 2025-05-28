@@ -7,19 +7,19 @@ Quick Test for W1 Cache Optimization Fixes
 支持FAST模式用于日常开发
 """
 
+import gc
 import os
 import sys
 import time
-import gc
-import psutil
-import numpy as np
 from typing import Dict
+
+import numpy as np
+import psutil
 
 # 添加项目根目录到路径
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../.."))
 
 from src.strategies.cache_optimized_strategy import CacheOptimizedStrategy
-from scripts.memory.mem_snapshot import MemorySnapshot
 
 
 class W1QuickTest:
@@ -185,15 +185,15 @@ class W1QuickTest:
             print("📊 W1快速验证结果")
             print("=" * 60)
 
-            print(f"🧠 内存对比:")
+            print("🧠 内存对比:")
             print(f"   基线RSS增长: {comparison['baseline_rss_delta']:+.1f} MB")
             print(f"   优化RSS增长: {comparison['optimized_rss_delta']:+.1f} MB")
             print(f"   内存改善:    {comparison['rss_improvement_mb']:+.1f} MB")
 
-            print(f"\n💾 分配率对比:")
+            print("\n💾 分配率对比:")
             print(f"   分配率改善: {comparison['allocation_improvement_pct']:.1f}%")
 
-            print(f"\n🎯 W1验收结果:")
+            print("\n🎯 W1验收结果:")
             acceptance = comparison["w1_acceptance"]
             print(f"   RSS增长 < 5MB:     {'✅' if acceptance['rss_delta_pass'] else '❌'}")
             print(f"   分配率降低 ≥ 20%:   {'✅' if acceptance['allocation_pass'] else '❌'}")
@@ -202,7 +202,7 @@ class W1QuickTest:
             # 缓存效率
             if comparison["cache_efficiency"]:
                 eff = comparison["cache_efficiency"]
-                print(f"\n⚡ 缓存效率:")
+                print("\n⚡ 缓存效率:")
                 print(f"   MA命中率: {eff.get('ma_cache_hit_rate', 0):.1%}")
                 print(f"   ATR命中率: {eff.get('atr_cache_hit_rate', 0):.1%}")
                 print(f"   窗口复用: {eff.get('window_reuse_efficiency', 0):.1%}")

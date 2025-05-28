@@ -10,14 +10,15 @@ M4 Simplified Async Performance Benchmark
 """
 
 import asyncio
-import time
 import json
-import psutil
 import statistics
-import pandas as pd
-import numpy as np
-from typing import Dict, Any, List
+import time
 from datetime import datetime
+from typing import Any, Dict
+
+import numpy as np
+import pandas as pd
+import psutil
 
 from src.core.signal_processor_vectorized import OptimizedSignalProcessor
 from src.monitoring.metrics_collector import get_metrics_collector
@@ -294,13 +295,13 @@ class M4SimpleBenchmark:
         print("🔄 异步信号处理性能测试结果")
         print("=" * 60)
 
-        print(f"📊 信号处理延迟:")
+        print("📊 信号处理延迟:")
         print(f"   平均延迟: {results['avg_latency_ms']:.2f}ms")
         print(f"   P95延迟:  {results['p95_latency_ms']:.2f}ms")
         print(f"   最大延迟: {results['max_latency_ms']:.2f}ms")
         print(f"   最小延迟: {results['min_latency_ms']:.2f}ms")
 
-        print(f"\n📈 处理统计:")
+        print("\n📈 处理统计:")
         print(f"   信号总数: {results['total_signals']}")
         print(f"   交易对数: {results['symbols_processed']}")
         print(f"   最大并发: {results['max_concurrent']}")
@@ -317,14 +318,14 @@ class M4SimpleBenchmark:
         print("💻 并发CPU使用率测试结果")
         print("=" * 60)
 
-        print(f"🖥️ CPU使用率:")
+        print("🖥️ CPU使用率:")
         print(f"   平均CPU: {results['avg_cpu_percent']:.1f}%")
         print(f"   峰值CPU: {results['max_cpu_percent']:.1f}%")
 
-        print(f"\n💾 内存使用率:")
+        print("\n💾 内存使用率:")
         print(f"   平均内存: {results['avg_memory_percent']:.1f}%")
 
-        print(f"\n📊 监控统计:")
+        print("\n📊 监控统计:")
         print(f"   测量次数: {results['measurements']}")
 
         status = "✅ 目标达成" if results["target_met"] else "❌ 未达目标"
@@ -337,12 +338,12 @@ class M4SimpleBenchmark:
         print("⚡ 异步任务调度性能测试结果")
         print("=" * 60)
 
-        print(f"📊 任务延迟:")
+        print("📊 任务延迟:")
         print(f"   平均延迟: {results['avg_task_latency_ms']:.2f}ms")
         print(f"   P95延迟:  {results['p95_task_latency_ms']:.2f}ms")
         print(f"   最大延迟: {results['max_task_latency_ms']:.2f}ms")
 
-        print(f"\n📈 调度统计:")
+        print("\n📈 调度统计:")
         print(f"   完成任务: {results['completed_tasks']}")
         print(f"   总耗时: {results['total_time_s']:.2f}秒")
         print(f"   任务吞吐: {results['task_throughput']:.1f} 任务/秒")
@@ -423,7 +424,7 @@ class M4SimpleBenchmark:
         print(f"🎯 成功率: {summary['success_rate']:.1f}%")
         print(f"🔍 检查项目: {summary['targets_checked']}")
 
-        print(f"\n📋 M4阶段关键指标:")
+        print("\n📋 M4阶段关键指标:")
         print("   ✓ 异步信号P95 ≤ 50ms")
         print("   ✓ 任务调度P95 ≤ 200ms")
         print("   ✓ 并发CPU ≤ 30%")

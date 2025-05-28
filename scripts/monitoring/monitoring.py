@@ -7,18 +7,18 @@ This module maintains backward compatibility while delegating to the new modular
 For new code, prefer importing from src.monitoring package directly.
 """
 
-import warnings
-import sys
-import os
 import logging
+import os
+import sys
 import time
+import warnings
 
 # Add project root to path for imports
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
 # Import new monitoring classes
+from src.monitoring import MetricsCollector
 from src.monitoring import PrometheusExporter as NewPrometheusExporter
-from src.monitoring import MetricsCollector, HealthChecker, AlertManager
 
 # Set up logger
 logger = logging.getLogger(__name__)

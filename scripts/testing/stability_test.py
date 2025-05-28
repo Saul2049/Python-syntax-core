@@ -14,7 +14,6 @@ import signal
 import sys
 import time
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Union
 
 # 确保将项目根目录添加到Python路径
 sys.path.insert(0, os.path.abspath(os.path.dirname(os.path.dirname(__file__))))
@@ -48,7 +47,7 @@ except ImportError:
         setup_logging = None
 
 # 导入市场数据管理器
-from scripts.market_data import create_market_data_manager, MarketDataManager
+from scripts.market_data import create_market_data_manager
 
 # 导入监控模块
 try:

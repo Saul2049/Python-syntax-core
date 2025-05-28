@@ -10,16 +10,16 @@ Vectorization Performance Benchmark for M3 Phase
 """
 
 import time
-import pandas as pd
+from typing import Any, Dict
+
 import numpy as np
-from typing import Dict, Any
+import pandas as pd
 
 # 导入原始和优化版本
-from src.core.signal_processor import get_trading_signals, validate_signal
+from src.core.signal_processor import get_trading_signals
 from src.core.signal_processor_vectorized import (
-    get_trading_signals_optimized,
-    validate_signal_optimized,
     VectorizedSignalProcessor,
+    get_trading_signals_optimized,
 )
 
 
@@ -189,7 +189,7 @@ class VectorizationBenchmark:
         optimized_atr_avg = np.mean(optimized_atr_times) * 1000
         atr_improvement = ((original_atr_avg - optimized_atr_avg) / original_atr_avg) * 100
 
-        print(f"📊 ATR性能对比:")
+        print("📊 ATR性能对比:")
         print(f"   原始: {original_atr_avg:.2f}ms")
         print(f"   优化: {optimized_atr_avg:.2f}ms")
         print(f"   提升: {atr_improvement:+.1f}%")
@@ -206,15 +206,15 @@ class VectorizationBenchmark:
         print("🎯 向量化信号处理性能对比报告")
         print("=" * 60)
 
-        print(f"📊 原始版本:")
+        print("📊 原始版本:")
         print(f"   平均延迟: {results['original_avg_ms']:.2f}ms")
         print(f"   P95延迟:  {results['original_p95_ms']:.2f}ms")
 
-        print(f"\n🚀 优化版本:")
+        print("\n🚀 优化版本:")
         print(f"   平均延迟: {results['optimized_avg_ms']:.2f}ms")
         print(f"   P95延迟:  {results['optimized_p95_ms']:.2f}ms")
 
-        print(f"\n💡 性能改善:")
+        print("\n💡 性能改善:")
         print(f"   平均提升: {results['improvement_avg_percent']:+.1f}%")
         print(f"   P95提升:  {results['improvement_p95_percent']:+.1f}%")
 
@@ -268,7 +268,7 @@ def main():
     with open("output/vectorization_benchmark.json", "w") as f:
         json.dump(results, f, indent=2)
 
-    print(f"\n✅ 测试结果已保存: output/vectorization_benchmark.json")
+    print("\n✅ 测试结果已保存: output/vectorization_benchmark.json")
 
 
 if __name__ == "__main__":

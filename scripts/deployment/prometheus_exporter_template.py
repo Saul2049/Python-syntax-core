@@ -3,10 +3,11 @@
 交易系统Prometheus业务指标导出器
 用于监控实盘关键指标：信号延迟、下单延迟、滑点、异常等
 """
-import time
-from prometheus_client import Counter, Histogram, Gauge, start_http_server
-from contextlib import contextmanager
 import logging
+import time
+from contextlib import contextmanager
+
+from prometheus_client import Counter, Gauge, Histogram, start_http_server
 
 # 业务指标定义
 SIGNAL_LATENCY = Histogram(

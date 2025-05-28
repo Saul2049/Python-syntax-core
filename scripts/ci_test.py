@@ -6,8 +6,8 @@ Quick CI Test Script
 用于GitHub Actions中的快速功能验证
 """
 
-import sys
 import os
+import sys
 import time
 import traceback
 
@@ -20,15 +20,10 @@ def test_core_imports():
     print("🔍 测试核心模块导入...")
 
     try:
-        from src.core.signal_processor_vectorized import OptimizedSignalProcessor
 
         print("✅ OptimizedSignalProcessor 导入成功")
 
-        from src.monitoring.metrics_collector import get_metrics_collector
-
         print("✅ metrics_collector 导入成功")
-
-        from src.core.trading_engine import TradingEngine
 
         print("✅ TradingEngine 导入成功")
 

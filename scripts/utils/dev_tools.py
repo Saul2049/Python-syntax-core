@@ -5,8 +5,8 @@
 """
 
 import os
-import sys
 import subprocess
+import sys
 import time
 from pathlib import Path
 
@@ -19,7 +19,7 @@ def run_command(cmd: str, description: str = "") -> bool:
     try:
         result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
         if result.returncode == 0:
-            print(f"   ✅ 成功")
+            print("   ✅ 成功")
             return True
         else:
             print(f"   ❌ 失败: {result.stderr}")

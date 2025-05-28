@@ -9,22 +9,23 @@ Memory Baseline Collector for M5 Phase
 - 为后续优化提供对比
 """
 
+import argparse
 import asyncio
-import psutil
+import json
+import logging
 import os
 import sys
-import json
 import time
-import argparse
-from typing import Dict, List, Any
-from datetime import datetime, timedelta
-import logging
+from datetime import datetime
+from typing import Any, Dict
+
+import psutil
 
 # 添加项目根目录到Python路径
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../.."))
 
-from scripts.memory.mem_snapshot import MemorySnapshot
 from scripts.memory.gc_profiler import GCProfiler
+from scripts.memory.mem_snapshot import MemorySnapshot
 
 
 class MemoryBaseline:
@@ -220,19 +221,19 @@ class MemoryBaseline:
         print(f"⏱️ 采样时长: {self.baseline_data['metadata']['duration_seconds']}秒")
         print(f"📸 样本数量: {stats['sample_count']}")
 
-        print(f"\n🧠 内存使用 (RSS):")
+        print("\n🧠 内存使用 (RSS):")
         rss = stats["memory_rss"]
         print(f"   范围: {rss['min_mb']:.1f} - {rss['max_mb']:.1f} MB")
         print(f"   平均: {rss['avg_mb']:.1f} MB")
         print(f"   P50:  {rss['p50_mb']:.1f} MB")
         print(f"   P95:  {rss['p95_mb']:.1f} MB")
 
-        print(f"\n🖥️ CPU使用:")
+        print("\n🖥️ CPU使用:")
         cpu = stats["cpu_usage"]
         print(f"   范围: {cpu['min_percent']:.1f}% - {cpu['max_percent']:.1f}%")
         print(f"   平均: {cpu['avg_percent']:.1f}%")
 
-        print(f"\n🗑️ GC统计:")
+        print("\n🗑️ GC统计:")
         gc_summary = stats["gc_summary"]
         print(f"   总回收: {gc_summary['total_collections']}次")
         print(f"   平均暂停: {gc_summary['avg_pause_ms']:.2f}ms")

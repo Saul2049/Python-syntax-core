@@ -4,8 +4,8 @@ M5内存优化完成度检查脚本
 M5 Memory Optimization Completion Check
 """
 
-import os
 import json
+import os
 import subprocess
 from datetime import datetime
 
@@ -117,7 +117,7 @@ def check_m5_completion():
         print(f"   内存健康检查: {'✅' if mem_health_works else '❌'}")
     except:
         mem_health_works = False
-        print(f"   内存健康检查: ❌ (执行失败)")
+        print("   内存健康检查: ❌ (执行失败)")
 
     # 测试快照工具
     try:
@@ -131,7 +131,7 @@ def check_m5_completion():
         print(f"   内存快照工具: {'✅' if snapshot_works else '❌'}")
     except:
         snapshot_works = False
-        print(f"   内存快照工具: ❌ (执行失败)")
+        print("   内存快照工具: ❌ (执行失败)")
 
     checks["memory_tools"] = mem_health_works and snapshot_works
 
@@ -142,7 +142,7 @@ def check_m5_completion():
         output_files = [f for f in os.listdir("output") if f.startswith(("mem_", "gc_"))]
         print(f"   输出文件: {len(output_files)}个 ({'✅' if len(output_files) > 0 else '❌'})")
     else:
-        print(f"   输出目录: ❌ (不存在)")
+        print("   输出目录: ❌ (不存在)")
 
     # 检查6: 文档完整性
     print("\n📚 检查6: 文档完整性")
@@ -188,18 +188,18 @@ def check_m5_completion():
     print(f"{color} 状态: {status}")
 
     # 详细结果
-    print(f"\n📋 详细检查结果:")
+    print("\n📋 详细检查结果:")
     for check_name, passed in checks.items():
         emoji = "✅" if passed else "❌"
         print(f"   {emoji} {check_name}")
 
     if ready_for_optimization:
-        print(f"\n🚀 下一步行动:")
-        print(f"   1. 运行 make mem-baseline --duration 1800")
-        print(f"   2. 开始对象池/LRU优化 (W1)")
-        print(f"   3. 实施GC调参策略 (W2)")
+        print("\n🚀 下一步行动:")
+        print("   1. 运行 make mem-baseline --duration 1800")
+        print("   2. 开始对象池/LRU优化 (W1)")
+        print("   3. 实施GC调参策略 (W2)")
     else:
-        print(f"\n🔧 需要完成的任务:")
+        print("\n🔧 需要完成的任务:")
         for check_name, passed in checks.items():
             if not passed:
                 print(f"   • 修复 {check_name}")

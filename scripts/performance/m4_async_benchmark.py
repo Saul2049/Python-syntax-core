@@ -10,17 +10,16 @@ M4 Async Performance Benchmark
 """
 
 import asyncio
-import time
 import json
-import psutil
 import statistics
-from typing import Dict, Any, List
-from datetime import datetime, timedelta
+import time
+from datetime import datetime
+from typing import Any, Dict
 
-from src.ws.binance_ws_client import BinanceWSClient
-from src.brokers.live_broker_async import LiveBrokerAsync
-from src.core.async_trading_engine import AsyncTradingEngine
+import psutil
+
 from src.monitoring.metrics_collector import get_metrics_collector
+from src.ws.binance_ws_client import BinanceWSClient
 
 
 class M4AsyncBenchmark:
@@ -180,8 +179,8 @@ class M4AsyncBenchmark:
             processor = OptimizedSignalProcessor()
 
             # 生成测试数据
-            import pandas as pd
             import numpy as np
+            import pandas as pd
 
             np.random.seed(42)
             data = []
@@ -255,13 +254,13 @@ class M4AsyncBenchmark:
             print(f"❌ 测试失败: {results['error']}")
             return
 
-        print(f"📊 延迟统计:")
+        print("📊 延迟统计:")
         print(f"   平均延迟: {results['avg_latency_ms']:.1f}ms")
         print(f"   P95延迟:  {results['p95_latency_ms']:.1f}ms")
         print(f"   最大延迟: {results['max_latency_ms']:.1f}ms")
         print(f"   最小延迟: {results['min_latency_ms']:.1f}ms")
 
-        print(f"\n📈 消息统计:")
+        print("\n📈 消息统计:")
         print(f"   消息总数: {results['message_count']}")
         print(f"   错误数量: {results['error_count']}")
 
@@ -282,13 +281,13 @@ class M4AsyncBenchmark:
             print(f"❌ 测试失败: {results['error']}")
             return
 
-        print(f"📊 往返延迟统计:")
+        print("📊 往返延迟统计:")
         print(f"   平均延迟: {results['avg_roundtrip_ms']:.1f}ms")
         print(f"   P95延迟:  {results['p95_roundtrip_ms']:.1f}ms")
         print(f"   最大延迟: {results['max_roundtrip_ms']:.1f}ms")
         print(f"   最小延迟: {results['min_roundtrip_ms']:.1f}ms")
 
-        print(f"\n📈 订单统计:")
+        print("\n📈 订单统计:")
         print(f"   订单总数: {results['order_count']}")
         print(f"   错误数量: {results['error_count']}")
 
@@ -309,14 +308,14 @@ class M4AsyncBenchmark:
             print(f"❌ 测试失败: {results['error']}")
             return
 
-        print(f"🖥️  CPU使用率:")
+        print("🖥️  CPU使用率:")
         print(f"   平均CPU: {results['avg_cpu_percent']:.1f}%")
         print(f"   峰值CPU: {results['max_cpu_percent']:.1f}%")
 
-        print(f"\n💾 内存使用率:")
+        print("\n💾 内存使用率:")
         print(f"   平均内存: {results['avg_memory_percent']:.1f}%")
 
-        print(f"\n📊 测试统计:")
+        print("\n📊 测试统计:")
         print(f"   监控次数: {results['cpu_measurements']}")
 
         # 目标达成检查
@@ -406,7 +405,7 @@ class M4AsyncBenchmark:
         print(f"🔍 检查项目: {summary['targets_checked']}")
         print(f"⏱️  总耗时: {summary['test_duration']:.1f}秒")
 
-        print(f"\n📋 M4阶段目标检查:")
+        print("\n📋 M4阶段目标检查:")
         print("   ✓ WebSocket延迟 ≤ 200ms")
         print("   ✓ 订单往返P95 < 1s")
         print("   ✓ CPU使用率 ≤ 30% at 1Hz")

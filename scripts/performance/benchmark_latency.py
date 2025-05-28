@@ -3,22 +3,22 @@
 信号延迟基准测试脚本
 用于快速迭代和优化信号计算性能
 """
-import sys
 import os
-import time
-import asyncio
 import statistics
+import sys
+import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from typing import List, Dict, Any
+from typing import Any, Dict
+
 import pandas as pd
 
 # 添加src路径
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
-from src.monitoring.metrics_collector import get_metrics_collector
+from src.core.price_fetcher import calculate_atr
 from src.core.signal_processor import get_trading_signals
-from src.core.price_fetcher import fetch_price_data, calculate_atr
 from src.core.signal_processor_optimized import get_trading_signals_optimized
+from src.monitoring.metrics_collector import get_metrics_collector
 
 
 class LatencyBenchmark:

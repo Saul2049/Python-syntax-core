@@ -10,11 +10,10 @@ Performance Regression Test for M3 Phase
 """
 
 import json
-import time
 import sys
 from datetime import datetime
-from typing import Dict, Any, Optional
 from pathlib import Path
+from typing import Any, Dict, Optional
 
 from scripts.performance_profiler import PerformanceProfiler
 
@@ -144,7 +143,7 @@ class PerformanceRegressionTest:
         p95_current = metrics["p95_latency"]["current_ms"]
         p95_change = metrics["p95_latency"]["change_percent"]
 
-        print(f"📊 P95延迟对比:")
+        print("📊 P95延迟对比:")
         print(f"   基线:   {p95_baseline:.1f}ms")
         print(f"   当前:   {p95_current:.1f}ms")
         print(f"   变化:   {p95_change:+.1f}% {'❌' if p95_change > 10 else '✅'}")
@@ -154,7 +153,7 @@ class PerformanceRegressionTest:
         tp_current = metrics["throughput"]["current_cps"]
         tp_change = metrics["throughput"]["change_percent"]
 
-        print(f"\n🚀 吞吐量对比:")
+        print("\n🚀 吞吐量对比:")
         print(f"   基线:   {tp_baseline:.2f} cycles/sec")
         print(f"   当前:   {tp_current:.2f} cycles/sec")
         print(f"   变化:   {tp_change:+.1f}% {'❌' if tp_change < -15 else '✅'}")

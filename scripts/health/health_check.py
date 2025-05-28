@@ -3,14 +3,14 @@
 交易系统健康检查脚本
 验证系统各组件状态和业务指标
 """
+import argparse
+import logging
 import os
 import sys
 import time
-import logging
-import argparse
-from typing import Dict, List, Tuple, Optional
 from dataclasses import dataclass
 from enum import Enum
+from typing import Dict, List, Optional
 
 import requests
 
@@ -18,8 +18,8 @@ import requests
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
 try:
-    from src.monitoring.metrics_collector import get_metrics_collector
     from src.brokers.exchange.client import ExchangeClient
+    from src.monitoring.metrics_collector import get_metrics_collector
 except ImportError as e:
     print(f"导入模块失败: {e}")
     print("请确保在项目根目录运行此脚本")
@@ -223,7 +223,7 @@ class TradingSystemHealthChecker:
 
             if ticker and "price" in ticker:
                 status = HealthStatus.HEALTHY
-                message = f"交易所连接正常 (演示模式)"
+                message = "交易所连接正常 (演示模式)"
                 details = {"btc_price": ticker["price"], "demo_mode": True}
             else:
                 status = HealthStatus.WARNING
@@ -294,9 +294,9 @@ class TradingSystemHealthChecker:
 
         try:
             # 测试导入关键模块
-            from src.core.trading_engine import TradingEngine
-            from src.core.signal_processor import get_trading_signals
             from src.core.price_fetcher import fetch_price_data
+            from src.core.signal_processor import get_trading_signals
+            from src.core.trading_engine import TradingEngine
 
             status = HealthStatus.HEALTHY
             message = "交易组件正常"

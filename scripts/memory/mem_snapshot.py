@@ -9,16 +9,17 @@ Memory Snapshot Tool for M5 Phase
 - 对象分配热点追踪
 """
 
-import tracemalloc
-import psutil
+import argparse
+import json
+import logging
 import os
 import sys
-import json
 import time
-import argparse
-from typing import Dict, List, Any
+import tracemalloc
 from datetime import datetime
-import logging
+from typing import Any, Dict, List
+
+import psutil
 
 # 添加项目根目录到Python路径
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))

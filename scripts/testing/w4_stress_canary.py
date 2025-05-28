@@ -10,26 +10,25 @@ W4 24-Hour Stress Test Canary
 """
 
 import asyncio
-import time
 import json
-import os
-import sys
-import signal
-from datetime import datetime, timedelta
-from typing import Dict, List, Any, Optional
 import logging
+import os
 import random
+import signal
+import sys
+import time
+from typing import Any, Dict, List
 
 # 添加项目根目录到路径
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from scripts.memory.mem_baseline import MemoryBaseline
+import numpy as np
+import psutil
+
 from scripts.testing.w3_leak_sentinel import LeakSentinel
 from src.core.gc_optimizer import GCOptimizer
-from src.strategies.cache_optimized_strategy import CacheOptimizedStrategy
 from src.monitoring.metrics_collector import get_metrics_collector
-import psutil
-import numpy as np
+from src.strategies.cache_optimized_strategy import CacheOptimizedStrategy
 
 
 class W4StressCanary:
@@ -432,7 +431,7 @@ class W4StressCanary:
             signal.signal(signal.SIGINT, self._signal_handler)
             signal.signal(signal.SIGTERM, self._signal_handler)
 
-            self.logger.info(f"🚀 开始W4 24小时压力测试")
+            self.logger.info("🚀 开始W4 24小时压力测试")
 
             # 并行运行各个组件
             tasks = [
@@ -553,7 +552,7 @@ class W4StressCanary:
         # 所有标准都必须满足
         all_passed = all(criteria.values())
 
-        self.logger.info(f"📋 W4验收评估:")
+        self.logger.info("📋 W4验收评估:")
         for criterion, passed in criteria.items():
             status = "✅" if passed else "❌"
             self.logger.info(f"   {status} {criterion}: {passed}")

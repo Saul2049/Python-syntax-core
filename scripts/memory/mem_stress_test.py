@@ -6,20 +6,19 @@ W4 24-Hour Memory Stress Test
 高负载下系统稳定性验证，监控内存使用、GC性能、延迟指标
 """
 
-import os
-import sys
-import gc
-import time
-import json
-import random
-import asyncio
 import argparse
+import asyncio
+import gc
+import json
 import logging
-import threading
+import os
+import random
+import sys
+import time
 import traceback
+from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional
-from dataclasses import dataclass, asdict
+from typing import Dict, List
 
 # uvloop 优化：用C实现的事件循环
 try:
@@ -284,7 +283,7 @@ class W4StressTest:
 
     async def run_stress_test(self):
         """运行压力测试"""
-        self.logger.info(f"🔥 W4 压力测试启动")
+        self.logger.info("🔥 W4 压力测试启动")
         self.logger.info(f"📋 运行名称: {self.run_name}")
         self.logger.info(f"🎯 目标信号: {self.signals_target}")
         self.logger.info(f"⏰ 时长: {self.duration_hours} 小时")
@@ -379,7 +378,7 @@ class W4StressTest:
                     await asyncio.sleep(0.05)
                     self.logger.debug(f"🔄 分片休眠: {self.signals_processed}信号完成")
 
-            self.logger.info(f"✅ W4 压力测试完成")
+            self.logger.info("✅ W4 压力测试完成")
             self.logger.info(f"📊 处理信号: {self.signals_processed}/{self.signals_target}")
             self.logger.info(
                 f"⏰ 用时: {(datetime.now() - self.start_time).total_seconds() / 3600:.1f} 小时"

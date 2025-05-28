@@ -5,12 +5,10 @@
 Enhanced Configuration Manager - Supports .env and YAML configuration files
 """
 
-import os
-import sys
-import logging
 import copy
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+import logging
+import os
+from typing import Any, Dict, List, Optional
 
 # 设置日志
 logger = logging.getLogger("enhanced_config")

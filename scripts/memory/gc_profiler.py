@@ -9,22 +9,22 @@ GC Performance Profiler for M5 Phase
 - Prometheus指标集成
 """
 
+import argparse
 import gc
-import time
+import json
+import logging
 import os
 import sys
-import json
-import argparse
-from typing import Dict, List, Any, Optional
-from datetime import datetime
-import logging
 import threading
+import time
+from datetime import datetime
+from typing import Any, Dict
 
 # 添加项目根目录到Python路径
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 try:
-    from prometheus_client import Summary, Counter, Histogram, Gauge
+    from prometheus_client import Counter, Gauge, Histogram, Summary
 
     PROMETHEUS_AVAILABLE = True
 except ImportError:

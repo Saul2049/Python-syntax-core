@@ -6,17 +6,18 @@ Health Check Script for Trading System
 轻量级健康检查工具，支持快速检查和完整检查模式
 """
 
-import time
+import argparse
+import gc
 import json
-import psutil
 import os
 import sys
-import gc
-import argparse
-from typing import Dict, List, Any, Optional, Tuple
+import time
+from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
-from dataclasses import dataclass, asdict
 from pathlib import Path
+from typing import Any, Dict, List
+
+import psutil
 
 # 导入我们的指标收集器
 try:
@@ -24,7 +25,6 @@ try:
 except ImportError:
     # 如果作为脚本直接运行
     sys.path.append(os.path.dirname(__file__))
-    from metrics_collector import MetricsCollector
 
 
 @dataclass

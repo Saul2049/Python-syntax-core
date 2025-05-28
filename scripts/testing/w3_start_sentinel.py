@@ -6,15 +6,15 @@ W3 Leak Sentinel Launcher
 支持标签化运行和状态追踪
 """
 
-import os
-import sys
-import json
-import time
 import argparse
 import asyncio
+import json
 import logging
+import os
+import sys
+import time
 from datetime import datetime
-from typing import Dict, Optional
+from typing import Dict
 
 # 添加项目根目录到路径
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../.."))
@@ -39,10 +39,10 @@ class W3SentinelLauncher:
     ) -> bool:
         """启动 W3 泄漏哨兵"""
 
-        print(f"🔍 启动 W3 泄漏哨兵")
+        print("🔍 启动 W3 泄漏哨兵")
         print(f"📋 运行名称: {self.run_name}")
         print(f"🎯 目标: 连续{target_hours}小时无泄漏")
-        print(f"📊 监控参数:")
+        print("📊 监控参数:")
         print(f"   检查间隔: {check_interval}秒")
         print(f"   内存阈值: {memory_threshold} MB/min")
         print(f"   FD阈值: {fd_threshold} FD/min")

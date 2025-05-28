@@ -7,22 +7,22 @@ GC Tuning Automation for M5 Week 2
 策略: 一次只动一阶，观察Gen0↘ / Gen2↗
 """
 
+import asyncio
 import gc
+import json
+import logging
 import os
 import sys
 import time
-import asyncio
-import json
-import logging
-from typing import Dict, List, Tuple, Optional
 from dataclasses import dataclass
 from datetime import datetime
+from typing import Dict, Optional, Tuple
 
 # 添加项目根目录到路径
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../.."))
 
-from src.core.gc_optimizer import GCOptimizer
 from scripts.memory.gc_profiler import GCProfiler
+from src.core.gc_optimizer import GCOptimizer
 
 
 @dataclass
@@ -236,7 +236,7 @@ class W2GCTuner:
             result = await self._test_gc_configuration(
                 (best_gen0, best_gen1, gen2_threshold),
                 f"final_{best_gen0}_{best_gen1}_{gen2_threshold}",
-                f"最终配置候选",
+                "最终配置候选",
             )
 
             if result and result.improvement_vs_baseline > best_result.improvement_vs_baseline:
@@ -351,15 +351,15 @@ class W2GCTuner:
         print(f"   Gen0频率: {best['gen0_frequency']:.1f}/s")
         print(f"   Gen2频率: {best['gen2_frequency']:.1f}/s")
 
-        print(f"\n🎯 W2验收结果:")
+        print("\n🎯 W2验收结果:")
         print(f"   目标改进: ≥{report['w2_target_improvement']:.0f}%")
         print(f"   实际改进: {acceptance['achieved_improvement']:+.1f}%")
         print(f"   验收状态: {'✅ PASS' if acceptance['passed'] else '❌ FAIL'}")
 
         if acceptance["passed"]:
-            print(f"\n🎉 W2 GC调参成功完成！可以进入W3阶段")
+            print("\n🎉 W2 GC调参成功完成！可以进入W3阶段")
         else:
-            print(f"\n⚠️ W2 GC调参未达标，需要进一步优化")
+            print("\n⚠️ W2 GC调参未达标，需要进一步优化")
 
         print("=" * 60)
 

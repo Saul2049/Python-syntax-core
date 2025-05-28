@@ -6,14 +6,15 @@ W3 Leak Sentinel + W4 Stress Test Parallel Monitor
 监控两个并行任务的状态和资源使用
 """
 
+import argparse
+import json
 import os
 import sys
-import json
 import time
+from datetime import datetime
+from typing import Dict, List
+
 import psutil
-import argparse
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional
 
 # 添加项目根目录到路径
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../.."))
@@ -190,18 +191,18 @@ class ParallelTaskMonitor:
         w3 = report["tasks"]["w3_leak_sentinel"]
         w4 = report["tasks"]["w4_stress_test"]
 
-        print(f"\n🔍 W3 泄漏哨兵:")
+        print("\n🔍 W3 泄漏哨兵:")
         print(f"   状态: {w3['status']}")
         print(f"   清洁小时: {w3['clean_hours']:.1f}/{w3.get('target_hours', 6)}")
 
-        print(f"\n🔥 W4 压力测试:")
+        print("\n🔥 W4 压力测试:")
         print(f"   状态: {w4['status']}")
         print(f"   信号处理: {w4['signals_processed']:,}")
         print(f"   P95延迟: {w4['p95_latency_ms']:.2f}ms")
 
         # 资源使用
         resources = report["resources"]
-        print(f"\n📊 资源使用:")
+        print("\n📊 资源使用:")
         print(f"   总 RSS: {resources['total_rss_mb']:.1f} MB")
         print(f"   系统内存: {resources['system_memory']['percent_used']:.1f}%")
         print(f"   系统 CPU: {resources['system_cpu_percent']:.1f}%")
@@ -214,11 +215,11 @@ class ParallelTaskMonitor:
                 icon = "🔴" if alert["severity"] == "critical" else "🟡"
                 print(f"   {icon} {alert['message']}")
         else:
-            print(f"\n✅ 无告警")
+            print("\n✅ 无告警")
 
         # 验收状态
         validation = report["validation"]
-        print(f"\n🎯 验收状态:")
+        print("\n🎯 验收状态:")
         print(f"   RSS ≤ 40MB: {'✅' if validation['rss_under_40mb'] else '❌'}")
         print(f"   W3 运行: {'✅' if validation['w3_running'] else '❌'}")
         print(f"   W4 运行: {'✅' if validation['w4_running'] else '❌'}")
@@ -253,12 +254,12 @@ def main():
 
     monitor = ParallelTaskMonitor()
 
-    print(f"🚀 开始 W3+W4 并行监控")
+    print("🚀 开始 W3+W4 并行监控")
     print(f"📊 监控间隔: {args.interval}秒")
     if args.duration > 0:
         print(f"⏰ 监控时长: {args.duration}秒")
     else:
-        print(f"⏰ 持续监控 (Ctrl-C 停止)")
+        print("⏰ 持续监控 (Ctrl-C 停止)")
     print(f"💾 报告保存间隔: {args.save_interval}秒")
 
     start_time = time.time()
@@ -288,7 +289,7 @@ def main():
             time.sleep(args.interval)
 
     except KeyboardInterrupt:
-        print(f"\n⏸️ 用户中断监控")
+        print("\n⏸️ 用户中断监控")
 
         # 保存最终报告
         final_report = monitor.generate_report()

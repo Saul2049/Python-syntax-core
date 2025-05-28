@@ -4,12 +4,13 @@
 实时监控回撤，触发紧急止损和告警
 """
 import logging
-import time
-from typing import Optional, Callable
-from dataclasses import dataclass
-from enum import Enum
 import smtplib
+import time
+from dataclasses import dataclass
 from email.mime.text import MIMEText
+from enum import Enum
+from typing import Callable, Optional
+
 import requests
 
 
@@ -118,16 +119,16 @@ class CircuitBreaker:
             body = f"""
             Trading System Alert
             ====================
-            
+
             Level: {level.value.upper()}
             Time: {time.strftime('%Y-%m-%d %H:%M:%S')}
-            
+
             Message:
             {message}
-            
+
             Peak Balance: ${self.peak_balance:.2f}
             Current Drawdown: {self._calculate_current_drawdown():.2f}%
-            
+
             Please check your trading system immediately!
             """
 

@@ -6,14 +6,15 @@ Unified Metrics Collector SDK (Prometheus Format)
 轻量级、高性能的指标收集器，专为交易系统优化
 """
 
-import time
-import psutil
 import gc
-from typing import Dict, List, Optional, Union, Any
-from dataclasses import dataclass, field
-from datetime import datetime, timezone
 import json
 import os
+import time
+from dataclasses import dataclass, field
+from datetime import datetime, timezone
+from typing import Any, Dict, List, Optional, Union
+
+import psutil
 
 
 @dataclass

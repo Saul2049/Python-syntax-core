@@ -9,12 +9,10 @@ Performance Profiler for M3 Phase
 - 监控关键指标
 """
 
-import time
-import threading
-from datetime import datetime
-from typing import Dict, Any
-import subprocess
 import os
+import time
+from datetime import datetime
+from typing import Any, Dict
 
 from src.core.trading_engine import TradingEngine
 from src.monitoring.metrics_collector import get_metrics_collector
@@ -135,7 +133,6 @@ class PerformanceProfiler:
 
         # 启动干跑进程
         import subprocess
-        import signal
 
         try:
             # 启动性能剖析脚本
