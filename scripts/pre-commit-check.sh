@@ -12,10 +12,8 @@ echo "📋 2. Import sorting with isort..."
 isort src/ tests/ scripts/ config/ examples/ *.py
 
 echo "🔍 3. Code quality check with flake8..."
-# Strict rules for src/ and tests/
-flake8 src/ tests/ --count --max-complexity=10 --max-line-length=100 --statistics --extend-ignore=E501,E402,W503,F403,F405,E203
-# Relaxed rules for scripts/, config/, examples/, and root *.py files
-flake8 scripts/ config/ examples/ *.py --count --max-complexity=20 --max-line-length=120 --statistics --extend-ignore=E501,E402,W503,F403,F405,E722,E203,F841,F401,F821,E731,F402,C901,F541
+# Use strict rules for all directories
+flake8 src/ tests/ scripts/ config/ examples/ *.py --count --max-complexity=10 --max-line-length=100 --statistics --extend-ignore=E501,E402,W503,F403,F405,E203,E722
 
 echo "✅ 4. Verifying Black formatting..."
 black --check src/ tests/ scripts/ config/ examples/ *.py --line-length=100
