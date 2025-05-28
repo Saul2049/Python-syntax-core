@@ -6,9 +6,10 @@ Data Module (数据模块)
 Provides data loading utilities for trading system.
 """
 
-import pandas as pd
-import numpy as np
 from datetime import datetime, timedelta
+
+import numpy as np
+import pandas as pd
 
 
 def load_csv(filepath: str = "btc_eth.csv") -> pd.DataFrame:

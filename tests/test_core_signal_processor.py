@@ -3,13 +3,13 @@
 测试核心信号处理器模块 (Test Core Signal Processor Module)
 """
 
+import concurrent.futures
 from datetime import datetime
 from unittest.mock import patch
 
 import numpy as np
 import pandas as pd
 import pytest
-import concurrent.futures
 
 from src.core.signal_processor import (
     filter_signals,
