@@ -183,6 +183,15 @@ class OptimizedSignalProcessor:
 
         return float(atr.iloc[-1])
 
+    def get_cache_stats(self) -> Dict[str, Any]:
+        """获取缓存统计信息（兼容性方法）"""
+        return {
+            "enabled": True,
+            "size": len(self._cache),
+            "max_size": 100,  # 硬编码的最大缓存大小
+            "hit_rate": "简化版缓存，无命中率统计",
+        }
+
 
 # 全局处理器实例（复用以避免重复初始化）
 _global_processor = OptimizedSignalProcessor()

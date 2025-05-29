@@ -39,8 +39,8 @@ def test_basic_functionality():
     print("🔍 测试基本功能...")
 
     try:
-        # 测试信号处理器
-        from src.core.signal_processor_vectorized import OptimizedSignalProcessor
+        # 测试信号处理器 - 使用正确的导入
+        from src.core.signal_processor_optimized import OptimizedSignalProcessor
 
         processor = OptimizedSignalProcessor()
         # 验证处理器功能
