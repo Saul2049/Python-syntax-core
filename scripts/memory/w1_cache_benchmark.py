@@ -333,8 +333,8 @@ class W1CacheBenchmark:
         report.append("\n🧠 内存使用对比:")
         report.append(f"   基线RSS: {mem_comp['baseline_rss_mb']:.1f} MB")
         report.append(f"   优化RSS: {mem_comp['optimized_rss_mb']:.1f} MB")
-        rss_delta = mem_comp['rss_delta_mb']
-        rss_change = mem_comp['rss_change_percent']
+        rss_delta = mem_comp["rss_delta_mb"]
+        rss_change = mem_comp["rss_change_percent"]
         report.append(f"   变化量:  {rss_delta:+.1f} MB ({rss_change:+.1f}%)")
 
         # 分配率对比
