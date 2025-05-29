@@ -636,7 +636,7 @@ def initialize_config_system(args):
     try:
         # 优先使用增强配置管理器
         try:
-            from config.enhanced_config import get_enhanced_config, setup_logging
+            from scripts.enhanced_config import get_enhanced_config, setup_logging
 
             enhanced_config_available = True
         except ImportError:

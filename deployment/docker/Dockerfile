@@ -32,4 +32,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
     CMD curl -f http://localhost:${MONITORING_PORT}/metrics || exit 1
 
 # 启动命令
-CMD ["python", "scripts/stability_test.py", "--monitoring-port", "9090", "--days", "30", "--config-yaml", "config.yaml"] 
+CMD ["python", "scripts/testing/stability_test.py", "--monitoring-port", "9090", "--days", "30", "--config-yaml", "config.yaml"] 
