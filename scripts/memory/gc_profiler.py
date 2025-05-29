@@ -23,41 +23,42 @@ from typing import Any, Dict
 # 添加项目根目录到Python路径
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
+
+def _create_mock_prometheus_class():
+    """创建模拟的Prometheus类"""
+
+    class MockPrometheusClass:
+        def __init__(self, *args, **kwargs):
+            pass
+
+        def observe(self, *args, **kwargs):
+            pass
+
+        def inc(self, *args, **kwargs):
+            pass
+
+        def set(self, *args, **kwargs):
+            pass
+
+        def labels(self, *args, **kwargs):
+            return self
+
+    return MockPrometheusClass
+
+
+# 导入Prometheus客户端
 try:
     from prometheus_client import Counter, Gauge, Histogram, Summary
 
     PROMETHEUS_AVAILABLE = True
 except ImportError:
     PROMETHEUS_AVAILABLE = False
-
     # 创建空的类避免错误
-    class Summary:
-        def __init__(self, *args, **kwargs):
-            pass
-
-        def observe(self, *args, **kwargs):
-            pass
-
-    class Counter:
-        def __init__(self, *args, **kwargs):
-            pass
-
-        def inc(self, *args, **kwargs):
-            pass
-
-    class Histogram:
-        def __init__(self, *args, **kwargs):
-            pass
-
-        def observe(self, *args, **kwargs):
-            pass
-
-    class Gauge:
-        def __init__(self, *args, **kwargs):
-            pass
-
-        def set(self, *args, **kwargs):
-            pass
+    MockClass = _create_mock_prometheus_class()
+    Summary = MockClass
+    Counter = MockClass
+    Histogram = MockClass
+    Gauge = MockClass
 
 
 class GCProfiler:
@@ -139,61 +140,87 @@ class GCProfiler:
             generation = info.get("generation", -1)
 
             if phase == "start":
-                # 记录开始时间
-                if not hasattr(self, "_gc_start_times"):
-                    self._gc_start_times = {}
-                self._gc_start_times[generation] = timestamp
-
+                self._handle_gc_start(generation, timestamp)
             elif phase == "stop":
-                # 计算暂停时间
-                if hasattr(self, "_gc_start_times") and generation in self._gc_start_times:
-                    pause_duration = timestamp - self._gc_start_times[generation]
-                    collected = info.get("collected", 0)
-
-                    # 🔥优化事件记录 - 限制数量
-                    if len(self.gc_events) < self.max_events:
-                        gc_event = {
-                            "timestamp": datetime.fromtimestamp(timestamp).isoformat(),
-                            "generation": generation,
-                            "pause_duration": pause_duration,
-                            "collected_objects": collected,
-                            "phase": phase,
-                        }
-                        self.gc_events.append(gc_event)
-
-                    # 更新Prometheus指标
-                    if self.enable_prometheus:
-                        gen_label = str(generation)
-                        self.gc_pause_duration.labels(generation=gen_label).observe(pause_duration)
-                        self.gc_collections_total.labels(generation=gen_label).inc()
-                        self.gc_collected_objects.labels(generation=gen_label).inc(collected)
-                        self.gc_pause_histogram.labels(generation=gen_label).observe(pause_duration)
-
-                    # 🔥智能日志记录 - 减少噪音
-                    pause_ms = pause_duration * 1000
-
-                    if not self.quiet_mode and pause_ms > self.log_threshold_ms:
-                        # 有意义的暂停时间
-                        self.logger.info(
-                            f"🗑️ GC Gen{generation}: {pause_ms:.2f}ms, " f"回收{collected}个对象"
-                        )
-                    elif collected == 0 and pause_ms > 5.0:  # 空GC但暂停时间长
-                        # 🔥减少空GC日志频率
-                        now = time.time()
-                        if now - self.last_empty_gc_log > self.empty_gc_log_interval:
-                            if not self.quiet_mode:
-                                self.logger.warning(
-                                    f"⚠️ GC Gen{generation}: {pause_ms:.2f}ms, "
-                                    f"回收0个对象 (空GC暂停较长)"
-                                )
-                            self.last_empty_gc_log = now
-
-                    # 清理开始时间记录
-                    del self._gc_start_times[generation]
+                self._handle_gc_stop(generation, timestamp, info)
 
         except Exception as e:
             if not self.quiet_mode:
                 self.logger.error(f"❌ GC回调错误: {e}")
+
+    def _handle_gc_start(self, generation: int, timestamp: float):
+        """处理GC开始事件"""
+        if not hasattr(self, "_gc_start_times"):
+            self._gc_start_times = {}
+        self._gc_start_times[generation] = timestamp
+
+    def _handle_gc_stop(self, generation: int, timestamp: float, info: Dict[str, Any]):
+        """处理GC停止事件"""
+        if not hasattr(self, "_gc_start_times") or generation not in self._gc_start_times:
+            return
+
+        pause_duration = timestamp - self._gc_start_times[generation]
+        collected = info.get("collected", 0)
+
+        # 记录事件
+        self._record_gc_event(timestamp, generation, pause_duration, collected)
+
+        # 更新指标
+        self._update_prometheus_metrics(generation, pause_duration, collected)
+
+        # 记录日志
+        self._log_gc_event(generation, pause_duration, collected)
+
+        # 清理
+        del self._gc_start_times[generation]
+
+    def _record_gc_event(
+        self, timestamp: float, generation: int, pause_duration: float, collected: int
+    ):
+        """记录GC事件"""
+        if len(self.gc_events) < self.max_events:
+            gc_event = {
+                "timestamp": datetime.fromtimestamp(timestamp).isoformat(),
+                "generation": generation,
+                "pause_duration": pause_duration,
+                "collected_objects": collected,
+                "phase": "stop",
+            }
+            self.gc_events.append(gc_event)
+
+    def _update_prometheus_metrics(self, generation: int, pause_duration: float, collected: int):
+        """更新Prometheus指标"""
+        if not self.enable_prometheus:
+            return
+
+        gen_label = str(generation)
+        self.gc_pause_duration.labels(generation=gen_label).observe(pause_duration)
+        self.gc_collections_total.labels(generation=gen_label).inc()
+        self.gc_collected_objects.labels(generation=gen_label).inc(collected)
+        self.gc_pause_histogram.labels(generation=gen_label).observe(pause_duration)
+
+    def _log_gc_event(self, generation: int, pause_duration: float, collected: int):
+        """记录GC事件日志"""
+        if self.quiet_mode:
+            return
+
+        pause_ms = pause_duration * 1000
+
+        if pause_ms > self.log_threshold_ms:
+            # 有意义的暂停时间
+            self.logger.info(f"🗑️ GC Gen{generation}: {pause_ms:.2f}ms, 回收{collected}个对象")
+        elif collected == 0 and pause_ms > 5.0:
+            # 空GC但暂停时间长
+            self._log_empty_gc_if_needed(generation, pause_ms)
+
+    def _log_empty_gc_if_needed(self, generation: int, pause_ms: float):
+        """在需要时记录空GC日志"""
+        now = time.time()
+        if now - self.last_empty_gc_log > self.empty_gc_log_interval:
+            self.logger.warning(
+                f"⚠️ GC Gen{generation}: {pause_ms:.2f}ms, 回收0个对象 (空GC暂停较长)"
+            )
+            self.last_empty_gc_log = now
 
     def start_monitoring(self):
         """开始GC监控"""

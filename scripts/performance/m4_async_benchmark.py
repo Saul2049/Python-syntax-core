@@ -160,93 +160,102 @@ class M4AsyncBenchmark:
         cpu_measurements = []
         memory_measurements = []
 
-        # 创建多个并发任务
-        async def cpu_monitor():
-            """CPU监控任务"""
-            for _ in range(self.test_duration):
-                cpu_percent = psutil.cpu_percent(interval=1)
-                memory_percent = psutil.virtual_memory().percent
-
-                cpu_measurements.append(cpu_percent)
-                memory_measurements.append(memory_percent)
-
-                await asyncio.sleep(1)
-
-        async def concurrent_signal_processing():
-            """并发信号处理任务"""
-            from src.core.signal_processor_vectorized import OptimizedSignalProcessor
-
-            processor = OptimizedSignalProcessor()
-
-            # 生成测试数据
-            import numpy as np
-            import pandas as pd
-
-            np.random.seed(42)
-            data = []
-            for i in range(100):
-                price = 30000 + np.random.normal(0, 100)
-                data.append(
-                    {
-                        "timestamp": pd.Timestamp.now() + pd.Timedelta(seconds=i),
-                        "open": price,
-                        "high": price + abs(np.random.normal(0, 50)),
-                        "low": price - abs(np.random.normal(0, 50)),
-                        "close": price + np.random.normal(0, 20),
-                        "volume": np.random.randint(100, 1000),
-                    }
-                )
-
-            df = pd.DataFrame(data)
-            df.set_index("timestamp", inplace=True)
-
-            # 并发处理信号
-            for _ in range(self.test_duration):
-                await asyncio.sleep(1)  # 1Hz频率
-
-                # 异步信号处理
-                signals = processor.get_trading_signals_optimized(df)
-                atr = processor.compute_atr_optimized(df)
-
-                # 验证计算结果
-                if signals and atr > 0:
-                    pass  # 计算成功
-
-        async def market_data_simulation():
-            """市场数据模拟任务"""
-            for _ in range(self.test_duration):
-                # 模拟市场数据处理
-                await asyncio.sleep(0.1)  # 10Hz频率
-
-                # 模拟一些计算负载
-                data = [i**2 for i in range(1000)]
-                sum(data)
-
         try:
             # 并发执行所有任务
             await asyncio.gather(
-                cpu_monitor(), concurrent_signal_processing(), market_data_simulation()
+                self._cpu_monitor_task(cpu_measurements, memory_measurements),
+                self._concurrent_signal_processing_task(),
+                self._market_data_simulation_task(),
             )
 
             # 计算性能统计
-            avg_cpu = statistics.mean(cpu_measurements) if cpu_measurements else 0
-            max_cpu = max(cpu_measurements) if cpu_measurements else 0
-            avg_memory = statistics.mean(memory_measurements) if memory_measurements else 0
-
-            results = {
-                "avg_cpu_percent": avg_cpu,
-                "max_cpu_percent": max_cpu,
-                "avg_memory_percent": avg_memory,
-                "cpu_measurements": len(cpu_measurements),
-                "target_met": max_cpu <= 30,  # 目标：CPU≤30%
-            }
-
+            results = self._calculate_performance_stats(cpu_measurements, memory_measurements)
             self._print_concurrent_results(results)
             return results
 
         except Exception as e:
             print(f"❌ 并发性能测试失败: {e}")
             return {"error": str(e)}
+
+    async def _cpu_monitor_task(self, cpu_measurements: list, memory_measurements: list):
+        """CPU监控任务"""
+        for _ in range(self.test_duration):
+            cpu_percent = psutil.cpu_percent(interval=1)
+            memory_percent = psutil.virtual_memory().percent
+
+            cpu_measurements.append(cpu_percent)
+            memory_measurements.append(memory_percent)
+
+            await asyncio.sleep(1)
+
+    async def _concurrent_signal_processing_task(self):
+        """并发信号处理任务"""
+        from src.core.signal_processor_vectorized import OptimizedSignalProcessor
+
+        processor = OptimizedSignalProcessor()
+        df = self._generate_test_dataframe()
+
+        # 并发处理信号
+        for _ in range(self.test_duration):
+            await asyncio.sleep(1)  # 1Hz频率
+
+            # 异步信号处理
+            signals = processor.get_trading_signals_optimized(df)
+            atr = processor.compute_atr_optimized(df)
+
+            # 验证计算结果
+            if signals and atr > 0:
+                pass  # 计算成功
+
+    def _generate_test_dataframe(self):
+        """生成测试数据框"""
+        import numpy as np
+        import pandas as pd
+
+        np.random.seed(42)
+        data = []
+        for i in range(100):
+            price = 30000 + np.random.normal(0, 100)
+            data.append(
+                {
+                    "timestamp": pd.Timestamp.now() + pd.Timedelta(seconds=i),
+                    "open": price,
+                    "high": price + abs(np.random.normal(0, 50)),
+                    "low": price - abs(np.random.normal(0, 50)),
+                    "close": price + np.random.normal(0, 20),
+                    "volume": np.random.randint(100, 1000),
+                }
+            )
+
+        df = pd.DataFrame(data)
+        df.set_index("timestamp", inplace=True)
+        return df
+
+    async def _market_data_simulation_task(self):
+        """市场数据模拟任务"""
+        for _ in range(self.test_duration):
+            # 模拟市场数据处理
+            await asyncio.sleep(0.1)  # 10Hz频率
+
+            # 模拟一些计算负载
+            data = [i**2 for i in range(1000)]
+            sum(data)
+
+    def _calculate_performance_stats(
+        self, cpu_measurements: list, memory_measurements: list
+    ) -> Dict[str, Any]:
+        """计算性能统计"""
+        avg_cpu = statistics.mean(cpu_measurements) if cpu_measurements else 0
+        max_cpu = max(cpu_measurements) if cpu_measurements else 0
+        avg_memory = statistics.mean(memory_measurements) if memory_measurements else 0
+
+        return {
+            "avg_cpu_percent": avg_cpu,
+            "max_cpu_percent": max_cpu,
+            "avg_memory_percent": avg_memory,
+            "cpu_measurements": len(cpu_measurements),
+            "target_met": max_cpu <= 30,  # 目标：CPU≤30%
+        }
 
     def _print_websocket_results(self, results: Dict[str, Any]):
         """打印WebSocket测试结果"""

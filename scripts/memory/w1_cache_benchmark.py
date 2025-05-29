@@ -27,10 +27,12 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.join(current_dir, "..", "..")
 sys.path.insert(0, project_root)
 
-import numpy as np
+# 第三方导入
+import numpy as np  # noqa: E402
 
-from scripts.memory.mem_baseline import MemoryBaseline
-from src.monitoring.metrics_collector import get_metrics_collector
+# 项目导入
+from scripts.memory.mem_baseline import MemoryBaseline  # noqa: E402
+from src.monitoring.metrics_collector import get_metrics_collector  # noqa: E402
 
 
 class W1CacheBenchmark:
@@ -130,82 +132,91 @@ class W1CacheBenchmark:
 
     async def _simulate_strategy_load(self, use_cache: bool = False) -> Dict[str, Any]:
         """模拟策略负载测试 - 增强版"""
-
-        # 生成测试数据
         test_data = self._generate_test_data()
-        allocation_count = 0
-        signals_generated = 0
-
-        # 创建策略实例
-        if use_cache:
-            from src.strategies.cache_optimized_strategy import CacheOptimizedStrategy
-
-            strategy = CacheOptimizedStrategy({})
-            strategy_type = "optimized"
-        else:
-            strategy = self._create_baseline_strategy()
-            strategy_type = "baseline"
+        strategy = self._create_strategy(use_cache)
+        strategy_type = "optimized" if use_cache else "baseline"
 
         if not self.fast_mode:
             print(f"🔄 运行{strategy_type}策略负载测试...")
 
         try:
-            # 运行策略负载
-            for i, symbol in enumerate(self.test_symbols):
-                prices = test_data[symbol]
+            strategy_stats = await self._run_strategy_simulation(strategy, test_data, use_cache)
+            strategy_stats["strategy_type"] = strategy_type
 
-                # 🔥根据模式调整信号数量
-                signal_limit = min(self.signal_count, len(prices))
-
-                for j, price in enumerate(prices[:signal_limit]):
-                    # 生成信号
-                    if use_cache:
-                        result = strategy.generate_signals(symbol, price)
-                    else:
-                        result = strategy.generate_signals(symbol, price)
-
-                    # 验证信号生成
-                    if result is not None:
-                        signals_generated += 1
-
-                    # 简单的分配计数（模拟）
-                    if not use_cache:
-                        allocation_count += 10  # 基线策略更多分配
-                    else:
-                        allocation_count += 1  # 缓存策略减少分配
-
-                    # 进度报告 (只在非FAST模式)
-                    if not self.fast_mode and signals_generated % 1000 == 0:
-                        print(f"   已生成 {signals_generated} 个信号...")
-
-            # 获取策略统计
-            strategy_stats = {
-                "signals_generated": signals_generated,
-                "allocation_count": allocation_count,
-                "strategy_type": strategy_type,
-            }
-
-            # 🔥获取缓存统计 (简化日志)
-            if use_cache and hasattr(strategy, "memory_optimization_report"):
-                cache_stats = strategy.memory_optimization_report()
-                strategy_stats["cache_stats"] = cache_stats
-
-                if not self.fast_mode:
-                    # 只在非FAST模式打印详细统计
-                    print("📊 缓存统计:")
-                    cache_info = cache_stats["cache_info"]
-                    efficiency = cache_stats["memory_efficiency"]
-                    print(f"   MA命中率: {efficiency['ma_cache_hit_rate']:.1%}")
-                    print(f"   ATR命中率: {efficiency['atr_cache_hit_rate']:.1%}")
-                    print(f"   窗口复用: {efficiency['window_reuse_efficiency']:.1%}")
-                    print(f"   内存节省: {efficiency['memory_save_ratio']:.1%}")
-                    print(f"   缓存大小: {cache_info.get('total_cache_size', 0)} 项")
+            # 获取缓存统计
+            if use_cache:
+                self._add_cache_stats(strategy, strategy_stats)
 
             return strategy_stats
 
         except Exception as e:
             print(f"❌ 策略负载测试失败: {e}")
             raise
+
+    def _create_strategy(self, use_cache: bool):
+        """创建策略实例"""
+        if use_cache:
+            from src.strategies.cache_optimized_strategy import CacheOptimizedStrategy
+
+            return CacheOptimizedStrategy({})
+        else:
+            return self._create_baseline_strategy()
+
+    async def _run_strategy_simulation(
+        self, strategy, test_data: Dict[str, list], use_cache: bool
+    ) -> Dict[str, Any]:
+        """运行策略模拟"""
+        allocation_count = 0
+        signals_generated = 0
+
+        for i, symbol in enumerate(self.test_symbols):
+            prices = test_data[symbol]
+            signal_limit = min(self.signal_count, len(prices))
+
+            for j, price in enumerate(prices[:signal_limit]):
+                # 生成信号
+                result = strategy.generate_signals(symbol, price)
+
+                if result is not None:
+                    signals_generated += 1
+
+                # 计算分配
+                allocation_count += self._calculate_allocations(use_cache)
+
+                # 进度报告
+                if not self.fast_mode and signals_generated % 1000 == 0:
+                    print(f"   已生成 {signals_generated} 个信号...")
+
+        return {
+            "signals_generated": signals_generated,
+            "allocation_count": allocation_count,
+        }
+
+    def _calculate_allocations(self, use_cache: bool) -> int:
+        """计算分配数量"""
+        return 1 if use_cache else 10
+
+    def _add_cache_stats(self, strategy, strategy_stats: Dict[str, Any]):
+        """添加缓存统计信息"""
+        if not hasattr(strategy, "memory_optimization_report"):
+            return
+
+        cache_stats = strategy.memory_optimization_report()
+        strategy_stats["cache_stats"] = cache_stats
+
+        if not self.fast_mode:
+            self._print_cache_stats(cache_stats)
+
+    def _print_cache_stats(self, cache_stats: Dict[str, Any]):
+        """打印缓存统计信息"""
+        print("📊 缓存统计:")
+        cache_info = cache_stats["cache_info"]
+        efficiency = cache_stats["memory_efficiency"]
+        print(f"   MA命中率: {efficiency['ma_cache_hit_rate']:.1%}")
+        print(f"   ATR命中率: {efficiency['atr_cache_hit_rate']:.1%}")
+        print(f"   窗口复用: {efficiency['window_reuse_efficiency']:.1%}")
+        print(f"   内存节省: {efficiency['memory_save_ratio']:.1%}")
+        print(f"   缓存大小: {cache_info.get('total_cache_size', 0)} 项")
 
     def _create_baseline_strategy(self):
         """创建基线策略（模拟无缓存）"""
@@ -306,7 +317,10 @@ class W1CacheBenchmark:
             rss_delta = comparison["memory_comparison"]["rss_delta_mb"]
             allocation_reduction = comparison["allocation_comparison"]["reduction_percent"]
 
-            return f"📊 W1基准测试结果: {status} (RSS: {rss_delta:+.1f}MB, 分配改善: {allocation_reduction:.0f}%)"
+            return (
+                f"📊 W1基准测试结果: {status} "
+                f"(RSS: {rss_delta:+.1f}MB, 分配改善: {allocation_reduction:.0f}%)"
+            )
 
         # 完整报告
         report = []
@@ -319,9 +333,9 @@ class W1CacheBenchmark:
         report.append("\n🧠 内存使用对比:")
         report.append(f"   基线RSS: {mem_comp['baseline_rss_mb']:.1f} MB")
         report.append(f"   优化RSS: {mem_comp['optimized_rss_mb']:.1f} MB")
-        report.append(
-            f"   变化量:  {mem_comp['rss_delta_mb']:+.1f} MB ({mem_comp['rss_change_percent']:+.1f}%)"
-        )
+        rss_delta = mem_comp['rss_delta_mb']
+        rss_change = mem_comp['rss_change_percent']
+        report.append(f"   变化量:  {rss_delta:+.1f} MB ({rss_change:+.1f}%)")
 
         # 分配率对比
         alloc_comp = comparison["allocation_comparison"]

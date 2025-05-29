@@ -58,39 +58,42 @@ class ConfigManager:
 
     def _set_defaults(self):
         """设置默认配置值"""
-        # 一般设置
-        if "general" not in self.config:
-            self.config["general"] = {}
-        if "symbols" not in self.config["general"]:
-            self.config["general"]["symbols"] = "BTC/USDT,ETH/USDT"
-        if "risk_percent" not in self.config["general"]:
-            self.config["general"]["risk_percent"] = "0.5"
-        if "check_interval" not in self.config["general"]:
-            self.config["general"]["check_interval"] = "60"
-        if "test_mode" not in self.config["general"]:
-            self.config["general"]["test_mode"] = "true"
+        # 定义默认配置结构
+        default_config = {
+            "general": {
+                "symbols": "BTC/USDT,ETH/USDT",
+                "risk_percent": "0.5",
+                "check_interval": "60",
+                "test_mode": "true",
+            },
+            "data_sources": {
+                "use_binance_testnet": "true",
+                "auto_fallback": "true",
+                "min_switch_interval": "300",
+            },
+            "binance_testnet": {},
+            "logging": {"level": "INFO", "log_dir": "logs/stability_test"},
+        }
 
-        # 数据源设置
-        if "data_sources" not in self.config:
-            self.config["data_sources"] = {}
-        if "use_binance_testnet" not in self.config["data_sources"]:
-            self.config["data_sources"]["use_binance_testnet"] = "true"
-        if "auto_fallback" not in self.config["data_sources"]:
-            self.config["data_sources"]["auto_fallback"] = "true"
-        if "min_switch_interval" not in self.config["data_sources"]:
-            self.config["data_sources"]["min_switch_interval"] = "300"
+        # 应用默认配置
+        self._apply_default_config(default_config)
 
-        # 币安测试网设置
-        if "binance_testnet" not in self.config:
-            self.config["binance_testnet"] = {}
+    def _apply_default_config(self, default_config: dict):
+        """应用默认配置"""
+        for section_name, section_defaults in default_config.items():
+            self._ensure_section_exists(section_name)
+            self._apply_section_defaults(section_name, section_defaults)
 
-        # 日志设置
-        if "logging" not in self.config:
-            self.config["logging"] = {}
-        if "level" not in self.config["logging"]:
-            self.config["logging"]["level"] = "INFO"
-        if "log_dir" not in self.config["logging"]:
-            self.config["logging"]["log_dir"] = "logs/stability_test"
+    def _ensure_section_exists(self, section_name: str):
+        """确保配置段存在"""
+        if section_name not in self.config:
+            self.config[section_name] = {}
+
+    def _apply_section_defaults(self, section_name: str, defaults: dict):
+        """为指定段应用默认值"""
+        for key, default_value in defaults.items():
+            if key not in self.config[section_name]:
+                self.config[section_name][key] = default_value
 
     def get_symbols(self) -> List[str]:
         """获取交易对列表"""

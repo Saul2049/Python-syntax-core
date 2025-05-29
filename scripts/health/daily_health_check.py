@@ -131,29 +131,40 @@ class DailyHealthChecker:
         stats = {}
 
         for line in output.split("\n"):
-            if "RSS:" in line and "MB" in line:
-                try:
-                    # 尝试提取内存数值
-                    import re
-
-                    match = re.search(r"RSS:\s*(\d+)", line)
-                    if match:
-                        stats["rss_mb"] = float(match.group(1))
-                except (ValueError, AttributeError):
-                    pass
-            elif "GC counts:" in line:
-                stats["gc_info"] = line.strip()
-            elif "Open FDs:" in line:
-                try:
-                    import re
-
-                    match = re.search(r"(\d+)\s*open files", line)
-                    if match:
-                        stats["open_fds"] = int(match.group(1))
-                except (ValueError, AttributeError):
-                    pass
+            self._extract_rss_info(line, stats)
+            self._extract_gc_info(line, stats)
+            self._extract_fd_info(line, stats)
 
         return stats
+
+    def _extract_rss_info(self, line: str, stats: Dict):
+        """提取RSS内存信息"""
+        if "RSS:" in line and "MB" in line:
+            try:
+                import re
+
+                match = re.search(r"RSS:\s*(\d+)", line)
+                if match:
+                    stats["rss_mb"] = float(match.group(1))
+            except (ValueError, AttributeError):
+                pass
+
+    def _extract_gc_info(self, line: str, stats: Dict):
+        """提取GC信息"""
+        if "GC counts:" in line:
+            stats["gc_info"] = line.strip()
+
+    def _extract_fd_info(self, line: str, stats: Dict):
+        """提取文件描述符信息"""
+        if "Open FDs:" in line:
+            try:
+                import re
+
+                match = re.search(r"(\d+)\s*open files", line)
+                if match:
+                    stats["open_fds"] = int(match.group(1))
+            except (ValueError, AttributeError):
+                pass
 
     def run_comprehensive_health_check(self) -> Dict:
         """运行综合健康检查"""
