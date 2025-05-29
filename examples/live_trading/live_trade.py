@@ -319,7 +319,10 @@ def run_strategy(client, params, interval, log_path, test_mode=False, state=None
 
                     # 发送通知
                     tg_notify(
-                        f"🟢 买入 {symbol}\n" f"价格: {entry_price}\n" f"数量: {position}\n" f"止损: {stop_price}"
+                        f"🟢 买入 {symbol}\n"
+                        f"价格: {entry_price}\n"
+                        f"数量: {position}\n"
+                        f"止损: {stop_price}"
                     )
 
                 # 记录交易

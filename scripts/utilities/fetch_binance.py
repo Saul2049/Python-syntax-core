@@ -156,7 +156,7 @@ if __name__ == "__main__":
     if missing_btc > 0 or missing_eth > 0:
         print(f"发现缺失值：BTC缺失{missing_btc}条，ETH缺失{missing_eth}条")
         # 使用前向填充处理缺失值
-        df.fillna(method="ffill", inplace=True)
+        df.ffill(inplace=True)
 
     # 保存到CSV文件
     filename = f"btc_eth_2yr_{datetime.now().strftime('%Y%m%d')}.csv"

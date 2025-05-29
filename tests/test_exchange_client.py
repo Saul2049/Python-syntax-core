@@ -6,9 +6,8 @@ Exchange Client Module Tests
 
 import unittest
 from datetime import datetime
-from unittest.mock import MagicMock, PropertyMock, patch
+from unittest.mock import MagicMock, patch
 
-import pandas as pd
 import pytest
 
 # Import modules to test
@@ -37,7 +36,7 @@ class TestExchangeClient(unittest.TestCase):
         """Test get_ticker in demo mode"""
         # Disable random network errors for this test
         mock_random.return_value = 0.9  # Above 0.05 threshold
-        
+
         result = self.client.get_ticker("BTC/USDT")
         self.assertIn("price", result)
         self.assertIn("volume", result)
@@ -57,7 +56,7 @@ class TestExchangeClient(unittest.TestCase):
         """Test place_order in demo mode"""
         # Disable random network errors for this test
         mock_random.return_value = 0.9  # Above 0.05 threshold
-        
+
         result = self.client.place_order("BTC/USDT", "buy", "market", 0.001)
         self.assertIn("id", result)
         self.assertIn("symbol", result)
@@ -71,7 +70,7 @@ class TestExchangeClient(unittest.TestCase):
         """Test rate limiting functionality"""
         # Disable random network errors for this test
         mock_random.return_value = 0.9  # Above 0.05 threshold
-        
+
         # This test checks if rate limiting is implemented
         start_time = datetime.now()
 
@@ -134,7 +133,7 @@ class TestExchangeClientNetworkHandling(unittest.TestCase):
         """Test various demo mode functions"""
         # Disable random network errors for this test
         mock_random.return_value = 0.9  # Above 0.05 threshold
-        
+
         # Test ticker
         ticker = self.client.get_ticker("BTC/USDT")
         self.assertIsInstance(ticker, dict)
@@ -148,8 +147,12 @@ class TestExchangeClientNetworkHandling(unittest.TestCase):
         self.assertIsInstance(order, dict)
         self.assertEqual(order["status"], "filled")
 
-    def test_unsupported_symbol(self):
+    @patch("src.brokers.exchange.client.random.random")
+    def test_unsupported_symbol(self, mock_random):
         """Test handling of unsupported trading symbols"""
+        # Disable random network errors for this test
+        mock_random.return_value = 0.9  # Above 0.05 threshold
+
         # Should not raise error, but return empty/default data
         result = self.client.get_ticker("INVALID/PAIR")
         self.assertIsInstance(result, dict)
@@ -211,11 +214,11 @@ class TestExchangeClientIntegration(unittest.TestCase):
         """Test complete trading workflow"""
         # Disable random network errors for this test
         mock_random.return_value = 0.9  # Above 0.05 threshold
-        
+
         # 1. Check account balance
         balance = self.client.get_account_balance()
         self.assertIn("USDT", balance)
-        initial_usdt = balance["USDT"]
+        balance["USDT"]
 
         # 2. Get current price
         ticker = self.client.get_ticker("BTC/USDT")
@@ -246,7 +249,7 @@ class TestExchangeClientIntegration(unittest.TestCase):
         """Test data format consistency"""
         # Disable random network errors for this test
         mock_random.return_value = 0.9  # Above 0.05 threshold
-        
+
         # Test ticker format
         ticker = self.client.get_ticker("BTC/USDT")
         self.assertIsInstance(ticker["price"], (int, float))

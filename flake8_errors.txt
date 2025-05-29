@@ -1,0 +1,46 @@
+scripts/health/daily_health_check.py:129:5: C901 'DailyHealthChecker.extract_memory_stats' is too complex (11)
+scripts/health/daily_health_check.py:198:5: C901 'DailyHealthChecker._analyze_results' is too complex (15)
+scripts/health/daily_health_check.py:329:9: F841 local variable 'report_file' is assigned to but never used
+scripts/memory/gc_profiler.py:26:1: C901 'TryExcept 26' is too complex (11)
+scripts/memory/gc_profiler.py:135:5: C901 'GCProfiler._gc_callback' is too complex (14)
+scripts/memory/m5_completion_check.py:13:1: C901 'check_m5_completion' is too complex (23)
+scripts/memory/w1_cache_benchmark.py:131:5: C901 'W1CacheBenchmark._simulate_strategy_load' is too complex (12)
+scripts/memory/w1_cache_benchmark.py:165:25: F841 local variable 'result' is assigned to but never used
+scripts/memory/w1_cache_benchmark.py:194:21: F841 local variable 'cache_info' is assigned to but never used
+scripts/memory/w1_quick_test.py:58:17: F841 local variable 'ma_short' is assigned to but never used
+scripts/memory/w1_quick_test.py:59:17: F841 local variable 'ma_long' is assigned to but never used
+scripts/memory/w1_quick_test.py:69:17: F841 local variable 'atr' is assigned to but never used
+scripts/memory/w1_quick_test.py:99:17: F841 local variable 'result' is assigned to but never used
+scripts/monitoring/health_check.py:24:5: F401 '.metrics_collector.MetricsCollector' imported but unused
+scripts/performance/benchmark_latency.py:72:17: F841 local variable 'signals' is assigned to but never used
+scripts/performance/benchmark_latency.py:73:17: F841 local variable 'atr' is assigned to but never used
+scripts/performance/benchmark_latency.py:113:17: F841 local variable 'test_data' is assigned to but never used
+scripts/performance/benchmark_latency.py:153:13: F841 local variable 'signals' is assigned to but never used
+scripts/performance/benchmark_latency.py:154:13: F841 local variable 'atr' is assigned to but never used
+scripts/performance/benchmark_latency.py:209:17: F841 local variable 'signals' is assigned to but never used
+scripts/performance/benchmark_latency.py:259:21: F841 local variable 'signals' is assigned to but never used
+scripts/performance/m4_async_benchmark.py:208:17: F841 local variable 'signals' is assigned to but never used
+scripts/performance/m4_async_benchmark.py:209:17: F841 local variable 'atr' is assigned to but never used
+scripts/performance/m4_simple_benchmark.py:110:21: F841 local variable 'signals' is assigned to but never used
+scripts/performance/m4_simple_benchmark.py:111:21: F841 local variable 'atr' is assigned to but never used
+scripts/performance/m4_simple_benchmark.py:194:17: F841 local variable 'signals' is assigned to but never used
+scripts/performance/m4_simple_benchmark.py:195:17: F841 local variable 'atr' is assigned to but never used
+scripts/performance/vectorization_benchmark.py:95:13: F841 local variable 'result' is assigned to but never used
+scripts/performance/vectorization_benchmark.py:152:13: F841 local variable 'result' is assigned to but never used
+scripts/performance/vectorization_benchmark.py:184:13: F841 local variable 'atr' is assigned to but never used
+scripts/testing/stability_test.py:382:5: C901 'StabilityTest.run' is too complex (22)
+scripts/testing/stability_test.py:437:33: F402 import 'signal' from line 13 shadowed by loop variable
+scripts/testing/stability_test.py:586:24: F821 undefined name 'get_enhanced_config'
+scripts/testing/stability_test.py:599:13: F841 local variable 'get_config' is assigned to but never used
+scripts/testing/stability_test.py:599:13: E731 do not assign a lambda expression, use a def
+scripts/utilities/run_full_test.py:17:7: F541 f-string is missing placeholders
+scripts/utils/config_manager.py:11:1: F401 'pathlib.Path' imported but unused
+scripts/utils/config_manager.py:60:5: C901 'ConfigManager._set_defaults' is too complex (14)
+8     C901 'DailyHealthChecker.extract_memory_stats' is too complex (11)
+1     E731 do not assign a lambda expression, use a def
+2     F401 '.metrics_collector.MetricsCollector' imported but unused
+1     F402 import 'signal' from line 13 shadowed by loop variable
+1     F541 f-string is missing placeholders
+1     F821 undefined name 'get_enhanced_config'
+24    F841 local variable 'report_file' is assigned to but never used
+38

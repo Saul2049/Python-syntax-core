@@ -64,12 +64,26 @@ class TestTradingConfig(unittest.TestCase):
 
         # Remove any environment variables that were set during testing
         test_env_vars = [
-            "SYMBOLS", "RISK_PERCENT", "FAST_MA", "SLOW_MA", "ATR_PERIOD",
-            "CHECK_INTERVAL", "TEST_MODE", "ACCOUNT_EQUITY", "API_KEY", "API_SECRET",
-            "TG_TOKEN", "TG_CHAT_ID", "LOG_LEVEL", "LOG_DIR", "TRADES_DIR",
-            "USE_BINANCE_TESTNET", "MONITORING_PORT", "MONITORING_ENABLED"
+            "SYMBOLS",
+            "RISK_PERCENT",
+            "FAST_MA",
+            "SLOW_MA",
+            "ATR_PERIOD",
+            "CHECK_INTERVAL",
+            "TEST_MODE",
+            "ACCOUNT_EQUITY",
+            "API_KEY",
+            "API_SECRET",
+            "TG_TOKEN",
+            "TG_CHAT_ID",
+            "LOG_LEVEL",
+            "LOG_DIR",
+            "TRADES_DIR",
+            "USE_BINANCE_TESTNET",
+            "MONITORING_PORT",
+            "MONITORING_ENABLED",
         ]
-        
+
         for key in test_env_vars:
             if key in os.environ:
                 del os.environ[key]
@@ -144,7 +158,7 @@ SYMBOLS=BTCUSDT,ADAUSDT
         with open(env_file, "w") as f:
             f.write(env_content)
 
-        config = TradingConfig(env_file=str(env_file))
+        _ = TradingConfig(env_file=str(env_file))
 
         # Check that environment variables were set
         self.assertEqual(os.environ.get("API_KEY"), "env_test_key")
@@ -243,7 +257,7 @@ SYMBOLS=BTCUSDT,ADAUSDT
         external_config = {
             "symbols": ["BTCUSDT", "SOLUSDT"],
             "risk_percent": 0.05,
-            "custom_setting": "test_value"
+            "custom_setting": "test_value",
         }
 
         config.merge_config(external_config)

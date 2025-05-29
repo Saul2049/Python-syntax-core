@@ -176,17 +176,49 @@ python -m pytest tests/test_brokers_* -v      # 经纪商测试
 
 ## 📊 监控与告警
 
-### Prometheus 指标
+### 🔍 **监控文档**
+📖 **完整监控运维手册**: [docs/MONITORING.md](docs/MONITORING.md)
+- 关键指标一览和阈值配置
+- 告警规则和故障排查流程
+- Grafana仪表板配置指南
+- 自动化健康检查体系
+
+### 💻 **快速健康检查**
+```bash
+# 综合系统健康检查
+make health
+
+# 内存专项检查  
+make mem-health
+
+# Prometheus指标检查
+make prometheus-check
+
+# 每日自动健康检查
+python scripts/daily_health_check.py
+```
+
+### 📊 **Prometheus指标**
+- `signal_latency_seconds_p95`: 信号计算延迟P95
+- `process_memory_rss_bytes`: RSS内存使用
+- `gc_pause_duration_seconds`: GC暂停时间
+- `process_open_fds`: 文件描述符计数
 - `trading_trade_count_total`: 交易计数
 - `trading_error_count_total`: 错误计数  
 - `trading_price`: 实时价格
 - `trading_memory_usage_mb`: 内存使用
 
-### Grafana 仪表板
-- 交易活动监控
-- 系统资源监控
-- 错误率告警
-- 策略性能分析
+### 🚨 **告警阈值**
+- 🔴 **P95延迟 > 5.5ms**: 高延迟告警
+- 🔴 **RSS内存 > 60MB**: 内存泄漏告警  
+- 🔴 **GC暂停 > 50ms**: GC性能告警
+- 🔴 **文件描述符 > 800**: FD泄漏告警
+- 🔴 **错误率 > 5/10min**: 高错误率告警
+
+### 🖥️ **Grafana仪表板**
+- **Trading System Overview**: 业务指标监控
+- **M5 Memory Optimization**: 内存优化专项监控  
+- **System Resources**: 系统资源监控
 
 ## 🐳 Docker 部署
 

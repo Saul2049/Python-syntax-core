@@ -93,7 +93,9 @@ if __name__ == "__main__":
     price = df["btc"]
 
     # Run backtest strategy
-    equity, equity_series = run_backtest(price, fast_win=3, slow_win=7, risk_per_trade=0.02, stop_mult=1)
+    equity, equity_series = run_backtest(
+        price, fast_win=3, slow_win=7, risk_per_trade=0.02, stop_mult=1
+    )
 
     print(f"Final equity: {equity:,.2f} USD")
 

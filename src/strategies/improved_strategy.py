@@ -5,8 +5,8 @@
 from math import isfinite
 
 import matplotlib.pyplot as plt
-import pandas as pd
 import numpy as np
+import pandas as pd
 
 from src import broker, metrics, signals
 
@@ -58,17 +58,17 @@ def trend_following(
     # True Range = max(H-L, |H-C_prev|, |L-C_prev|)
     # 对于单价格序列，模拟高低价为价格的小幅变动
     high = price * 1.001  # 模拟日内高点
-    low = price * 0.999   # 模拟日内低点
+    low = price * 0.999  # 模拟日内低点
     prev_close = price.shift(1)
 
     # 计算三个True Range组件
     hl = high - low  # 当日高低价差
     hc = (high - prev_close).abs()  # 高价与前收盘价差的绝对值
-    lc = (low - prev_close).abs()   # 低价与前收盘价差的绝对值
+    lc = (low - prev_close).abs()  # 低价与前收盘价差的绝对值
 
     # 处理第一行的NaN值
     hc = hc.fillna(hl)  # 第一行用hl替代NaN
-    lc = lc.fillna(hl)   # 第一行用hl替代NaN
+    lc = lc.fillna(hl)  # 第一行用hl替代NaN
 
     # 计算True Range - 使用numpy.maximum避免pandas版本兼容性问题
     tr = np.maximum.reduce([hl, hc, lc])
@@ -131,7 +131,7 @@ def improved_ma_cross(
     risk_frac: float = 0.02,
     init_equity: float = 100_000.0,
     use_trailing_stop: bool = True,
-    **kwargs  # 添加kwargs支持向后兼容
+    **kwargs,  # 添加kwargs支持向后兼容
 ) -> pd.Series:
     """
     改进的MA交叉策略
@@ -151,86 +151,141 @@ def improved_ma_cross(
     返回:
         pd.Series: 权益曲线
     """
+    # 处理向后兼容性
+    fast_win, slow_win, price = _handle_backward_compatibility(kwargs, fast_win, slow_win, price)
+
+    # 验证输入数据
+    _validate_input_data(price)
+
+    # 检查是否为向后兼容模式
+    is_backward_compatible = _is_backward_compatible_mode(kwargs)
+
+    # 调整参数以适应数据长度
+    fast_win, slow_win, atr_win = _adjust_parameters_for_data_length(
+        price, fast_win, slow_win, atr_win, is_backward_compatible
+    )
+
+    # 执行回测并返回结果
+    return _execute_backtest_and_format_result(
+        price,
+        fast_win,
+        slow_win,
+        atr_win,
+        risk_frac,
+        init_equity,
+        use_trailing_stop,
+        is_backward_compatible,
+    )
+
+
+def _handle_backward_compatibility(kwargs, fast_win, slow_win, price):
+    """处理向后兼容性参数"""
     import warnings
-    
-    # 向后兼容性处理
-    if 'short_window' in kwargs:
-        fast_win = kwargs['short_window']
-        warnings.warn("simple_ma_cross function is deprecated", DeprecationWarning, stacklevel=2)
-    if 'long_window' in kwargs:
-        slow_win = kwargs['long_window']
-        
-    # 其他策略的向后兼容性
-    if 'window' in kwargs:
-        if 'num_std' in kwargs:
-            warnings.warn("bollinger_breakout function is deprecated", DeprecationWarning, stacklevel=2)
-        elif 'overbought' in kwargs:
-            warnings.warn("rsi_strategy function is deprecated", DeprecationWarning, stacklevel=2)
+
+    # 处理各种已弃用的参数
+    if "short_window" in kwargs:
+        fast_win = kwargs["short_window"]
+        warnings.warn("simple_ma_cross function is deprecated", DeprecationWarning, stacklevel=3)
+    if "long_window" in kwargs:
+        slow_win = kwargs["long_window"]
+
+    # 处理其他策略参数
+    fast_win, slow_win = _handle_other_strategy_params(kwargs, fast_win, slow_win)
+
+    # 处理DataFrame输入
+    price = _extract_price_column_if_needed(kwargs, price)
+
+    return fast_win, slow_win, price
+
+
+def _handle_other_strategy_params(kwargs, fast_win, slow_win):
+    """处理其他策略的参数"""
+    import warnings
+
+    if "window" in kwargs:
+        if "num_std" in kwargs:
+            warnings.warn(
+                "bollinger_breakout function is deprecated", DeprecationWarning, stacklevel=4
+            )
+        elif "overbought" in kwargs:
+            warnings.warn("rsi_strategy function is deprecated", DeprecationWarning, stacklevel=4)
         else:
-            fast_win = kwargs['window']
-            
-    if 'fast_period' in kwargs:
-        fast_win = kwargs['fast_period']
-        warnings.warn("macd_strategy function is deprecated", DeprecationWarning, stacklevel=2)
-    if 'slow_period' in kwargs:
-        slow_win = kwargs['slow_period']
-        
-    if 'lookback_window' in kwargs:
-        fast_win = kwargs['lookback_window']
-        warnings.warn("trend_following_strategy function is deprecated", DeprecationWarning, stacklevel=2)
-        
-    # 如果传入的是DataFrame，需要提取价格列
-    if hasattr(price, 'columns') and 'column' in kwargs:
-        column = kwargs['column']
+            fast_win = kwargs["window"]
+
+    if "fast_period" in kwargs:
+        fast_win = kwargs["fast_period"]
+        warnings.warn("macd_strategy function is deprecated", DeprecationWarning, stacklevel=4)
+    if "slow_period" in kwargs:
+        slow_win = kwargs["slow_period"]
+
+    if "lookback_window" in kwargs:
+        fast_win = kwargs["lookback_window"]
+        warnings.warn(
+            "trend_following_strategy function is deprecated", DeprecationWarning, stacklevel=4
+        )
+
+    return fast_win, slow_win
+
+
+def _extract_price_column_if_needed(kwargs, price):
+    """如果需要，从DataFrame中提取价格列"""
+    if hasattr(price, "columns") and "column" in kwargs:
+        column = kwargs["column"]
         if column in price.columns:
             price = price[column]
         else:
-            # 如果指定列不存在，抛出KeyError
             raise KeyError(f"Column '{column}' not found in DataFrame")
-            
-    # 错误处理 - 空数据检查
-    if hasattr(price, 'empty') and price.empty:
+    return price
+
+
+def _validate_input_data(price):
+    """验证输入数据"""
+    if hasattr(price, "empty") and price.empty:
         raise ValueError("Input data is empty")
-    elif hasattr(price, '__len__') and len(price) == 0:
+    elif hasattr(price, "__len__") and len(price) == 0:
         raise ValueError("Input data is empty")
-        
-    # 向后兼容模式检查
-    is_backward_compatible = any(param in kwargs for param in ['short_window', 'window', 'fast_period', 'lookback_window'])
-    
-    # 在向后兼容模式或测试模式下，动态调整参数以适应小数据集
-    if is_backward_compatible or (hasattr(price, '__len__') and len(price) < max(fast_win, slow_win, atr_win)):
-        data_length = len(price) if hasattr(price, '__len__') else 100
+
+
+def _is_backward_compatible_mode(kwargs):
+    """检查是否为向后兼容模式"""
+    return any(
+        param in kwargs for param in ["short_window", "window", "fast_period", "lookback_window"]
+    )
+
+
+def _adjust_parameters_for_data_length(price, fast_win, slow_win, atr_win, is_backward_compatible):
+    """根据数据长度调整参数"""
+    data_length = len(price) if hasattr(price, "__len__") else 100
+
+    # 在向后兼容模式或数据不足时调整参数
+    if is_backward_compatible or data_length < max(fast_win, slow_win, atr_win):
         if data_length < max(fast_win, slow_win, atr_win):
-            # 动态调整参数
             max_win = max(1, data_length // 4)
             fast_win = min(fast_win, max_win)
             slow_win = min(slow_win, max_win * 2)
             atr_win = min(atr_win, max_win)
-        
-    # 错误处理 - 数据不足检查 (只在非向后兼容模式下严格检查)
-    if not is_backward_compatible and hasattr(price, '__len__') and len(price) < max(fast_win, slow_win, atr_win):
-        raise ValueError(f"Insufficient data: need at least {max(fast_win, slow_win, atr_win)} points, got {len(price)}")
-    
-    # 确保返回DataFrame格式以保持兼容性
-    if is_backward_compatible:
-        # 向后兼容模式，返回DataFrame
-        equity_series = broker.backtest_single(
-            price,
-            fast_win=fast_win,
-            slow_win=slow_win,
-            atr_win=atr_win,
-            risk_frac=risk_frac,
-            init_equity=init_equity,
-            use_trailing_stop=use_trailing_stop,
+
+    # 在非向后兼容模式下进行严格检查
+    elif data_length < max(fast_win, slow_win, atr_win):
+        raise ValueError(
+            f"Insufficient data: need at least {max(fast_win, slow_win, atr_win)} points, got {data_length}"
         )
-        # 转换为DataFrame以匹配旧API期望
-        result_df = pd.DataFrame(index=equity_series.index)
-        result_df['equity'] = equity_series
-        result_df['signal'] = 0  # 添加信号列以兼容旧测试
-        return result_df
-    
-    # 正常模式，返回Series
-    return broker.backtest_single(
+
+    return fast_win, slow_win, atr_win
+
+
+def _execute_backtest_and_format_result(
+    price,
+    fast_win,
+    slow_win,
+    atr_win,
+    risk_frac,
+    init_equity,
+    use_trailing_stop,
+    is_backward_compatible,
+):
+    """执行回测并格式化结果"""
+    equity_series = broker.backtest_single(
         price,
         fast_win=fast_win,
         slow_win=slow_win,
@@ -239,6 +294,16 @@ def improved_ma_cross(
         init_equity=init_equity,
         use_trailing_stop=use_trailing_stop,
     )
+
+    if is_backward_compatible:
+        # 向后兼容模式，返回DataFrame
+        result_df = pd.DataFrame(index=equity_series.index)
+        result_df["equity"] = equity_series
+        result_df["signal"] = 0  # 添加信号列以兼容旧测试
+        return result_df
+
+    # 正常模式，返回Series
+    return equity_series
 
 
 def main(csv_file_path: str = "btc_eth.csv") -> dict:
@@ -257,7 +322,7 @@ def main(csv_file_path: str = "btc_eth.csv") -> dict:
 
     # 设置初始资金
     init_equity = 100_000.0
-    
+
     # 根据数据长度动态调整参数
     data_length = len(btc)
     if data_length < 200:
@@ -383,88 +448,121 @@ def main(csv_file_path: str = "btc_eth.csv") -> dict:
 
     # 返回所有结果供测试使用
     return {
-        'strategies': {
-            'buy_and_hold': bnh_equity,
-            'trend_following': tf_equity,
-            'improved_ma_cross': improved_ma_equity,
-            'original_ma_cross': original_ma_equity
+        "strategies": {
+            "buy_and_hold": bnh_equity,
+            "trend_following": tf_equity,
+            "improved_ma_cross": improved_ma_equity,
+            "original_ma_cross": original_ma_equity,
         },
-        'best_strategy': best_name,
-        'best_equity': best_equity,
-        'statistics': {
-            'buy_orig_signals': len(buy_orig),
-            'sell_orig_signals': len(sell_orig),
-            'buy_improved_signals': len(buy_improved),
-            'sell_improved_signals': len(sell_improved)
-        }
+        "best_strategy": best_name,
+        "best_equity": best_equity,
+        "statistics": {
+            "buy_orig_signals": len(buy_orig),
+            "sell_orig_signals": len(sell_orig),
+            "buy_improved_signals": len(buy_improved),
+            "sell_improved_signals": len(sell_improved),
+        },
     }
 
 
 if __name__ == "__main__":
     import sys
+
     # 支持命令行参数，向后兼容
     if len(sys.argv) > 1:
         main(sys.argv[1])
     else:
         main()
 
+
 # 向后兼容性支持 - 策略类和函数
 class SimpleMAStrategy:
     """简单移动平均策略类 - 向后兼容"""
+
     def __init__(self, short_window=5, long_window=20):
         self.short_window = short_window
         self.long_window = long_window
 
+
 class BollingerBreakoutStrategy:
     """布林带突破策略类 - 向后兼容"""
+
     def __init__(self, window=20, num_std=2.0):
         self.window = window
         self.num_std = num_std
 
+
 class RSIStrategy:
     """RSI策略类 - 向后兼容"""
+
     def __init__(self, window=14, overbought=70, oversold=30):
         self.window = window
         self.overbought = overbought
         self.oversold = oversold
 
+
 class MACDStrategy:
     """MACD策略类 - 向后兼容"""
+
     def __init__(self, fast_period=12, slow_period=26, signal_period=9):
         self.fast_period = fast_period
         self.slow_period = slow_period
         self.signal_period = signal_period
 
+
 # 向后兼容性函数
 def simple_ma_cross(data, short_window=5, long_window=20, column="close", **kwargs):
     """简单移动平均交叉函数 - 向后兼容"""
     import warnings
+
     warnings.warn("simple_ma_cross function is deprecated", DeprecationWarning, stacklevel=2)
-    return improved_ma_cross(data, short_window=short_window, long_window=long_window, column=column, **kwargs)
+    return improved_ma_cross(
+        data, short_window=short_window, long_window=long_window, column=column, **kwargs
+    )
+
 
 def bollinger_breakout(data, window=20, num_std=2.0, column="close", **kwargs):
     """布林带突破函数 - 向后兼容"""
     import warnings
+
     warnings.warn("bollinger_breakout function is deprecated", DeprecationWarning, stacklevel=2)
     return improved_ma_cross(data, window=window, num_std=num_std, column=column, **kwargs)
+
 
 def rsi_strategy(data, window=14, overbought=70, oversold=30, column="close", **kwargs):
     """RSI策略函数 - 向后兼容"""
     import warnings
+
     warnings.warn("rsi_strategy function is deprecated", DeprecationWarning, stacklevel=2)
-    return improved_ma_cross(data, window=window, overbought=overbought, oversold=oversold, column=column, **kwargs)
+    return improved_ma_cross(
+        data, window=window, overbought=overbought, oversold=oversold, column=column, **kwargs
+    )
+
 
 def macd_strategy(data, fast_period=12, slow_period=26, signal_period=9, column="close", **kwargs):
     """MACD策略函数 - 向后兼容"""
     import warnings
+
     warnings.warn("macd_strategy function is deprecated", DeprecationWarning, stacklevel=2)
-    return improved_ma_cross(data, fast_period=fast_period, slow_period=slow_period, signal_period=signal_period, column=column, **kwargs)
+    return improved_ma_cross(
+        data,
+        fast_period=fast_period,
+        slow_period=slow_period,
+        signal_period=signal_period,
+        column=column,
+        **kwargs,
+    )
+
 
 def trend_following_strategy(data, lookback_window=50, column="close", **kwargs):
     """趋势跟踪策略函数 - 向后兼容"""
     import warnings
-    warnings.warn("trend_following_strategy function is deprecated", DeprecationWarning, stacklevel=2)
+
+    warnings.warn(
+        "trend_following_strategy function is deprecated", DeprecationWarning, stacklevel=2
+    )
     return improved_ma_cross(data, lookback_window=lookback_window, column=column, **kwargs)
+
 
 # 将策略类添加到improved_ma_cross作为属性（测试期望的方式）
 improved_ma_cross.SimpleMAStrategy = SimpleMAStrategy

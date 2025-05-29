@@ -120,7 +120,7 @@ class BinanceClient:
 
     def get_server_time(self):
         """获取服务器时间"""
-        response = requests.get(f"{self.base_url}/v3/time")
+        response = requests.get(f"{self.base_url}/v3/time", timeout=10)
         return response.json()
 
     def get_account_info(self):
@@ -131,7 +131,9 @@ class BinanceClient:
         params["signature"] = self._generate_signature(params)
 
         headers = {"X-MBX-APIKEY": self.api_key}
-        response = requests.get(f"{self.base_url}{endpoint}", headers=headers, params=params)
+        response = requests.get(
+            f"{self.base_url}{endpoint}", headers=headers, params=params, timeout=10
+        )
         return response.json()
 
     @rate_limit_retry(max_retries=3, base_delay=1)
@@ -150,7 +152,7 @@ class BinanceClient:
         endpoint = "/v3/klines"
         params = {"symbol": symbol, "interval": interval, "limit": limit}
 
-        response = requests.get(f"{self.base_url}{endpoint}", params=params)
+        response = requests.get(f"{self.base_url}{endpoint}", params=params, timeout=10)
         response.raise_for_status()  # 检查HTTP错误
         data = response.json()
 
@@ -214,7 +216,9 @@ class BinanceClient:
         params["signature"] = self._generate_signature(params)
 
         headers = {"X-MBX-APIKEY": self.api_key}
-        response = requests.post(f"{self.base_url}{endpoint}", headers=headers, params=params)
+        response = requests.post(
+            f"{self.base_url}{endpoint}", headers=headers, params=params, timeout=10
+        )
         response.raise_for_status()
 
         result = response.json()
@@ -245,7 +249,9 @@ class BinanceClient:
         params["signature"] = self._generate_signature(params)
 
         headers = {"X-MBX-APIKEY": self.api_key}
-        response = requests.delete(f"{self.base_url}{endpoint}", headers=headers, params=params)
+        response = requests.delete(
+            f"{self.base_url}{endpoint}", headers=headers, params=params, timeout=10
+        )
 
         return response.json()
 
@@ -261,7 +267,9 @@ class BinanceClient:
         params["signature"] = self._generate_signature(params)
 
         headers = {"X-MBX-APIKEY": self.api_key}
-        response = requests.get(f"{self.base_url}{endpoint}", headers=headers, params=params)
+        response = requests.get(
+            f"{self.base_url}{endpoint}", headers=headers, params=params, timeout=10
+        )
 
         return response.json()
 

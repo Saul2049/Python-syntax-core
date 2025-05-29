@@ -67,11 +67,11 @@ def main():
 
     if tg_token:
         os.environ["TG_TOKEN"] = tg_token
-        print(f"已设置 TG_TOKEN 环境变量")
+        print("已设置 TG_TOKEN 环境变量")
 
     if tg_chat:
         os.environ["TG_CHAT"] = tg_chat
-        print(f"已设置 TG_CHAT 环境变量")
+        print("已设置 TG_CHAT 环境变量")
 
     # 保存环境变量
     if args.save and (tg_token or tg_chat):

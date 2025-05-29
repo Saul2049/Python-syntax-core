@@ -1,0 +1,207 @@
+groups:
+  - name: trading_system_alerts
+    rules:
+      # 🚨 高延迟告警
+      - alert: HighLatency
+        expr: histogram_quantile(0.95, rate(signal_latency_seconds_bucket[5m])) > 0.0055
+        for: 3m
+        labels:
+          severity: warning
+          component: latency
+          team: trading
+        annotations:
+          summary: "Trading signal latency too high"
+          description: "P95 latency {{ $value }}s exceeds 5.5ms threshold for {{ $labels.instance }}"
+          runbook_url: "docs/MONITORING.md#故障场景1-高延迟告警-highlatency"
+
+      # 🧠 内存泄漏告警
+      - alert: MemoryLeak
+        expr: increase(process_memory_rss_bytes[30m]) > 62914560  # 60MB
+        for: 5m
+        labels:
+          severity: critical
+          component: memory
+          team: trading
+        annotations:
+          summary: "Memory leak detected"
+          description: "RSS memory increased by {{ $value | humanize1024 }} in 30 minutes on {{ $labels.instance }}"
+          runbook_url: "docs/MONITORING.md#故障场景2-内存泄漏-memoryleak"
+
+      # 🧠 内存使用过高告警
+      - alert: HighMemoryUsage
+        expr: process_memory_rss_bytes / 1024 / 1024 > 60  # 60MB
+        for: 3m
+        labels:
+          severity: warning
+          component: memory
+          team: trading
+        annotations:
+          summary: "Memory usage too high"
+          description: "RSS memory {{ $value | printf \"%.1f\" }}MB exceeds 60MB threshold on {{ $labels.instance }}"
+
+      # 🗑️ GC性能告警
+      - alert: GCPerformanceDegraded
+        expr: histogram_quantile(0.95, rate(gc_pause_duration_seconds_bucket[10m])) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+          component: gc
+          team: trading
+        annotations:
+          summary: "GC pause time too high"
+          description: "GC P95 pause time {{ $value | printf \"%.3f\" }}s exceeds 50ms threshold on {{ $labels.instance }}"
+          runbook_url: "docs/MONITORING.md#故障场景3-gc性能恶化-gcperformancedegraded"
+
+      # 🔗 文件描述符泄漏告警
+      - alert: FileDescriptorLeak
+        expr: process_open_fds > 800
+        for: 3m
+        labels:
+          severity: warning
+          component: system
+          team: trading
+        annotations:
+          summary: "File descriptor count too high"
+          description: "Open FDs: {{ $value }} > 800 threshold on {{ $labels.instance }}"
+          runbook_url: "docs/MONITORING.md#故障场景4-文件描述符泄漏-filedescriptorleak"
+
+      # 🔗 文件描述符增长率告警
+      - alert: FileDescriptorGrowthRate
+        expr: rate(process_open_fds[10m]) * 60 > 5  # 每分钟增长>5个
+        for: 5m
+        labels:
+          severity: warning
+          component: system
+          team: trading
+        annotations:
+          summary: "File descriptor growth rate too high"
+          description: "FD growth rate {{ $value | printf \"%.1f\" }}/min exceeds 5/min threshold on {{ $labels.instance }}"
+
+      # 📊 数据源断线告警
+      - alert: DataSourceDown
+        expr: data_source_status == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: data_source
+          team: trading
+        annotations:
+          summary: "Data source unavailable"
+          description: "Data source {{ $labels.source_name }} is down on {{ $labels.instance }}"
+
+      # ❌ 错误率激增告警
+      - alert: HighErrorRate
+        expr: increase(trading_error_count_total[10m]) > 5
+        for: 2m
+        labels:
+          severity: warning
+          component: errors
+          team: trading
+        annotations:
+          summary: "High error rate detected"
+          description: "{{ $value }} errors in last 10 minutes on {{ $labels.instance }}"
+
+      # 💔 心跳超时告警
+      - alert: HeartbeatTimeout
+        expr: trading_heartbeat_age_seconds > 180
+        for: 3m
+        labels:
+          severity: critical
+          component: heartbeat
+          team: trading
+        annotations:
+          summary: "Trading system heartbeat timeout"
+          description: "No heartbeat for {{ $value }}s (>180s threshold) on {{ $labels.instance }}"
+
+      # 🧠 内存增长率告警
+      - alert: MemoryGrowthRate
+        expr: rate(process_memory_rss_bytes[10m]) * 60 / 1024 / 1024 > 2  # >2MB/min
+        for: 10m
+        labels:
+          severity: warning
+          component: memory
+          team: trading
+        annotations:
+          summary: "Memory growth rate too high"
+          description: "Memory growing at {{ $value | printf \"%.1f\" }}MB/min (>2MB/min threshold) on {{ $labels.instance }}"
+
+  - name: trading_system_critical_alerts
+    rules:
+      # 🚨 系统完全不可用
+      - alert: TradingSystemDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: system
+          team: trading
+        annotations:
+          summary: "Trading system is down"
+          description: "Trading system {{ $labels.instance }} is completely unavailable"
+
+      # 🚨 Prometheus监控不可用
+      - alert: PrometheusMetricsUnavailable
+        expr: absent(process_memory_rss_bytes)
+        for: 5m
+        labels:
+          severity: critical
+          component: monitoring
+          team: devops
+        annotations:
+          summary: "Prometheus metrics unavailable"
+          description: "Core system metrics are not being collected"
+
+  - name: trading_system_m5_validation
+    rules:
+      # 🎯 W1缓存优化验证
+      - alert: W1CacheOptimizationFailed
+        expr: memory_allocation_rate_mb_per_minute > 10  # 分配率>10MB/min
+        for: 15m
+        labels:
+          severity: warning
+          component: w1_cache
+          team: trading
+        annotations:
+          summary: "W1 cache optimization not effective"
+          description: "Memory allocation rate {{ $value | printf \"%.1f\" }}MB/min exceeds 10MB/min after W1 optimization"
+
+      # 🎯 W2 GC优化验证
+      - alert: W2GCOptimizationFailed
+        expr: histogram_quantile(0.95, rate(gc_pause_duration_seconds_bucket[1h])) > 0.05
+        for: 1h
+        labels:
+          severity: warning
+          component: w2_gc
+          team: trading
+        annotations:
+          summary: "W2 GC optimization not effective"
+          description: "GC P95 pause time {{ $value | printf \"%.3f\" }}s still exceeds 50ms after W2 optimization"
+
+      # 🎯 W3泄漏检测验证
+      - alert: W3LeakDetectionFailed
+        expr: increase(leaked_objects_total[6h]) > 0
+        for: 1m
+        labels:
+          severity: critical
+          component: w3_leak
+          team: trading
+        annotations:
+          summary: "W3 leak detection failed - objects leaked"
+          description: "{{ $value }} objects leaked in the last 6 hours, violating W3 leak-free requirement"
+
+      # 🎯 W4压力测试验证
+      - alert: W4StressTestFailed
+        expr: |
+          (
+            process_memory_rss_bytes / 1024 / 1024 > 40 or
+            histogram_quantile(0.95, rate(signal_latency_seconds_bucket[1h])) > 0.0055 or
+            histogram_quantile(0.95, rate(gc_pause_duration_seconds_bucket[1h])) > 0.05
+          )
+        for: 5m
+        labels:
+          severity: critical
+          component: w4_stress
+          team: trading
+        annotations:
+          summary: "W4 stress test requirements not met"
+          description: "One or more W4 requirements violated: RSS>40MB, P95 latency>5.5ms, or GC pause>50ms" 

@@ -7,11 +7,14 @@ Provides Prometheus metrics export functionality for monitoring
 """
 
 import logging
-import threading
 import time
 from typing import Optional
 
-from prometheus_client import REGISTRY, CollectorRegistry, Counter, Gauge, start_http_server
+try:
+    from prometheus_client import CollectorRegistry, Counter, Gauge, start_http_server
+except ImportError:
+    CollectorRegistry = None
+    start_http_server = None
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +22,7 @@ logger = logging.getLogger(__name__)
 class PrometheusExporter:
     """Prometheus metrics exporter class (Prometheus指标导出器)"""
 
-    def __init__(self, port: int = 9090, registry: Optional[CollectorRegistry] = None):
+    def __init__(self, port: int = 8000, registry: Optional[object] = None):
         """
         Initialize Prometheus exporter
 
@@ -28,14 +31,9 @@ class PrometheusExporter:
             registry: Custom registry for test isolation
         """
         self.port = port
-        self.server_started = False
-
-        # Use custom registry or create new registry for testing
-        if registry is not None:
-            self.registry = registry
-        else:
-            # Use default registry in production environment
-            self.registry = REGISTRY
+        self.registry = registry or (CollectorRegistry() if CollectorRegistry else None)
+        self.logger = logging.getLogger(__name__)
+        self._server_started = False
 
         # Initialize metrics with duplicate check
         self._initialize_metrics()
@@ -106,6 +104,49 @@ class PrometheusExporter:
                 "trading_strategy_returns",
                 "Strategy returns percentage",
                 ["strategy_name"],
+                registry=self.registry,
+            )
+
+            # 🔥 M5-W2: GC Performance Metrics
+            self.gc_collections_total = Counter(
+                "gc_collections_total",
+                "Total number of GC collections",
+                ["generation"],  # Labels: GC generation (0, 1, 2)
+                registry=self.registry,
+            )
+
+            self.gc_collected_objects = Counter(
+                "gc_collected_objects_total",
+                "Total number of objects collected by GC",
+                ["generation"],
+                registry=self.registry,
+            )
+
+            self.gc_pause_duration_seconds = Gauge(
+                "gc_pause_duration_seconds",
+                "Current GC pause duration in seconds",
+                ["generation"],
+                registry=self.registry,
+            )
+
+            self.gc_objects_tracked = Gauge(
+                "gc_objects_tracked",
+                "Number of objects currently tracked by GC",
+                ["generation"],
+                registry=self.registry,
+            )
+
+            # Memory optimization metrics
+            self.cache_hit_rate = Gauge(
+                "cache_hit_rate",
+                "Cache hit rate percentage",
+                ["cache_type"],  # Labels: ma, atr, window
+                registry=self.registry,
+            )
+
+            self.memory_allocation_rate = Gauge(
+                "memory_allocation_rate_per_second",
+                "Memory allocation rate per second",
                 registry=self.registry,
             )
 
@@ -203,26 +244,66 @@ class PrometheusExporter:
             registry=self.registry,
         )
 
-    def start(self):
+        # 🔥 M5-W2: GC Performance Metrics
+        self.gc_collections_total = Counter(
+            f"gc_collections_total_{unique_id}",
+            "Total number of GC collections",
+            ["generation"],  # Labels: GC generation (0, 1, 2)
+            registry=self.registry,
+        )
+
+        self.gc_collected_objects = Counter(
+            f"gc_collected_objects_total_{unique_id}",
+            "Total number of objects collected by GC",
+            ["generation"],
+            registry=self.registry,
+        )
+
+        self.gc_pause_duration_seconds = Gauge(
+            f"gc_pause_duration_seconds_{unique_id}",
+            "Current GC pause duration in seconds",
+            ["generation"],
+            registry=self.registry,
+        )
+
+        self.gc_objects_tracked = Gauge(
+            f"gc_objects_tracked_{unique_id}",
+            "Number of objects currently tracked by GC",
+            ["generation"],
+            registry=self.registry,
+        )
+
+        # Memory optimization metrics
+        self.cache_hit_rate = Gauge(
+            f"cache_hit_rate_{unique_id}",
+            "Cache hit rate percentage",
+            ["cache_type"],  # Labels: ma, atr, window
+            registry=self.registry,
+        )
+
+        self.memory_allocation_rate = Gauge(
+            f"memory_allocation_rate_per_second_{unique_id}",
+            "Memory allocation rate per second",
+            registry=self.registry,
+        )
+
+    def start_server(self) -> bool:
         """Start Prometheus metrics export server"""
-        if not self.server_started:
-            try:
-                # Start server with custom registry
+        if self._server_started:
+            return True
+
+        try:
+            if start_http_server:
                 start_http_server(self.port, registry=self.registry)
-                self.server_started = True
-
-                # Start heartbeat thread
-                if self.heartbeat_thread is None:
-                    self.heartbeat_thread = threading.Thread(
-                        target=self._update_heartbeat, daemon=True
-                    )
-                    self.heartbeat_thread.start()
-
-                logger.info(f"Prometheus exporter started on port {self.port}")
-            except Exception as e:
-                logger.error(f"Failed to start Prometheus server: {e}")
-        else:
-            logger.warning("Prometheus server is already running")
+                self._server_started = True
+                self.logger.info(f"Prometheus exporter started on port {self.port}")
+                return True
+            else:
+                self.logger.warning("prometheus_client未安装，无法启动服务器")
+                return False
+        except Exception as e:
+            self.logger.error(f"Failed to start Prometheus server: {e}")
+            return False
 
     def _update_heartbeat(self):
         """Background thread to update heartbeat metrics"""
@@ -231,16 +312,18 @@ class PrometheusExporter:
             self.heartbeat_age.set(now - self.last_heartbeat)
             time.sleep(1)
 
-    def stop(self):
+    def stop_server(self) -> bool:
         """Stop the exporter"""
         self.stop_heartbeat = True
         if self.heartbeat_thread:
             self.heartbeat_thread.join(timeout=2)
-        logger.info("Prometheus exporter stopped")
+        self.logger.info("Prometheus exporter stopped")
+        self._server_started = False
+        return True
 
 
 # Convenience function for backward compatibility
-def get_exporter(port: int = 9090) -> PrometheusExporter:
+def get_exporter(port: int = 8000) -> PrometheusExporter:
     """
     Get singleton Prometheus exporter instance
 

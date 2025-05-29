@@ -59,7 +59,7 @@ class TelegramBot:
             if parse_mode:
                 payload["parse_mode"] = parse_mode
 
-            response = requests.post(url, json=payload)
+            response = requests.post(url, json=payload, timeout=10)
 
             if response.status_code == 200:
                 return True
@@ -95,7 +95,7 @@ class TelegramBot:
                 if caption:
                     data["caption"] = caption
 
-                response = requests.post(url, files=files, data=data)
+                response = requests.post(url, files=files, data=data, timeout=10)
 
             if response.status_code == 200:
                 return True

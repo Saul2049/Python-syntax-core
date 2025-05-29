@@ -322,7 +322,7 @@ class AdaptiveMovingAverageStrategy(TechnicalIndicatorStrategy):
             if i >= self.window:
                 window_size = int(adaptive_window.iloc[i])
                 start_idx = max(0, i - window_size + 1)
-                adaptive_ma.iloc[i] = close.iloc[start_idx:(i + 1)].mean()
+                adaptive_ma.iloc[i] = close.iloc[start_idx : (i + 1)].mean()
             else:
                 adaptive_ma.iloc[i] = close.iloc[: i + 1].mean()
 
