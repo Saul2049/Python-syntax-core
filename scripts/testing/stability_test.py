@@ -3,6 +3,13 @@
 """
 稳定性测试脚本 - 运行交易系统并监控性能和错误
 Stability Test Script - Run trading system and monitor performance and errors
+
+该脚本用于测试交易系统的长期稳定性，包括：
+- 内存泄漏检测
+- 网络中断恢复
+- 数据源切换
+- 系统资源监控
+- 错误处理和恢复
 """
 
 import argparse
@@ -15,8 +22,41 @@ import sys
 import time
 from pathlib import Path
 
-# 确保将项目根目录添加到Python路径
+# 标准库和第三方库导入
+import psutil
+
+# 添加项目根目录到Python路径
 sys.path.insert(0, os.path.abspath(os.path.dirname(os.path.dirname(__file__))))
+
+# 项目模块导入 - 使用条件导入处理可选依赖
+try:
+    from scripts.market_data import create_market_data_manager
+except ImportError:
+    create_market_data_manager = None
+
+try:
+    from scripts.enhanced_config import get_config, setup_logging
+
+    ENHANCED_CONFIG_AVAILABLE = True
+except ImportError:
+    ENHANCED_CONFIG_AVAILABLE = False
+    try:
+        from scripts.config_manager import get_config
+
+        setup_logging = None
+        OLD_CONFIG_AVAILABLE = True
+    except ImportError:
+        get_config = None
+        setup_logging = None
+        OLD_CONFIG_AVAILABLE = False
+
+try:
+    from scripts.monitoring import get_exporter
+
+    MONITORING_ENABLED = True
+except ImportError:
+    get_exporter = None
+    MONITORING_ENABLED = False
 
 # 先设置基础日志
 logging.basicConfig(
@@ -26,39 +66,18 @@ logging.basicConfig(
 )
 logger = logging.getLogger("stability_test")
 
-# 导入配置管理器
-try:
-    # 尝试导入增强配置管理器
-    from scripts.enhanced_config import get_config, setup_logging
-
+# 记录配置状态
+if ENHANCED_CONFIG_AVAILABLE:
     logger.info("使用增强配置管理器")
-except ImportError:
-    logger.info("无法导入增强配置管理器，尝试导入旧版配置管理器")
-    try:
-        # 如果无法导入增强版，则尝试导入旧版
-        from scripts.config_manager import get_config
+elif OLD_CONFIG_AVAILABLE:
+    logger.info("使用旧版配置管理器")
+else:
+    logger.warning("无法导入配置管理器，将使用默认值")
 
-        logger.info("使用旧版配置管理器")
-        setup_logging = None
-    except ImportError:
-        # 如果都无法导入，使用默认值
-        logger.warning("无法导入配置管理器，将使用默认值")
-        get_config = None
-        setup_logging = None
-
-# 导入市场数据管理器
-from scripts.market_data import create_market_data_manager
-
-# 导入监控模块
-try:
-    from scripts.monitoring import get_exporter
-
+if MONITORING_ENABLED:
     logger.info("已导入监控模块")
-    MONITORING_ENABLED = True
-except ImportError:
+else:
     logger.warning("无法导入监控模块，监控功能将被禁用")
-    get_exporter = None
-    MONITORING_ENABLED = False
 
 
 # 定义模拟类
@@ -239,7 +258,8 @@ class StabilityTest:
         signal.signal(signal.SIGTERM, self.signal_handler)
 
         logger.info(
-            f"初始化稳定性测试: {self.symbols}, 持续{duration_days or 3}天, 保留日志: {self.preserve_logs}"
+            f"初始化稳定性测试: {self.symbols}, "
+            f"持续{duration_days or 3}天, 保留日志: {self.preserve_logs}"
         )
 
         # 创建市场数据管理器
@@ -350,8 +370,6 @@ class StabilityTest:
     def monitor_system_resources(self):
         """监控系统资源使用情况"""
         try:
-            import psutil
-
             process = psutil.Process(os.getpid())
             memory_mb = process.memory_info().rss / (1024 * 1024)
             cpu_percent = process.cpu_percent(interval=1)
@@ -379,6 +397,119 @@ class StabilityTest:
             logger.warning("无法导入psutil，跳过资源监控")
             return 0, 0
 
+    def _initialize_test_run(self):
+        """初始化测试运行"""
+        self.stats["start_time"] = datetime.datetime.now()
+        start_time = time.time()
+        end_time = start_time + self.duration_seconds
+
+        logger.info(f"开始稳定性测试，计划结束时间: {datetime.datetime.fromtimestamp(end_time)}")
+
+        return start_time, end_time
+
+    def _setup_monitoring(self):
+        """设置监控"""
+        last_data_source = self.market_data_manager.get_current_provider_name()
+        if self.exporter:
+            self.exporter.update_data_source_status(last_data_source, True)
+        return last_data_source
+
+    def _process_iteration(self, iteration, last_data_source, start_time):
+        """处理单次迭代"""
+        # 更新心跳
+        if self.exporter:
+            self.exporter.update_heartbeat()
+
+        # 每小时记录一次系统资源
+        if iteration % (3600 // self.check_interval) == 0:
+            self.monitor_system_resources()
+
+        # 检查数据源切换
+        last_data_source = self._check_data_source_switch(last_data_source)
+
+        # 运行交易循环
+        self._process_trading_signals()
+
+        # 每天生成报告
+        if iteration % (86400 // self.check_interval) == 0:
+            days_running = (time.time() - start_time) / 86400
+            self.generate_report(days_running)
+
+        # 模拟网络中断
+        if iteration % 1000 == 0:
+            self._simulate_network_interruption()
+
+        return last_data_source
+
+    def _check_data_source_switch(self, last_data_source):
+        """检查数据源是否切换"""
+        current_data_source = self.market_data_manager.get_current_provider_name()
+        if current_data_source != last_data_source:
+            logger.info(f"数据源已切换: {last_data_source} -> {current_data_source}")
+            self.stats["data_source_switches"] += 1
+
+            # 更新数据源状态指标
+            if self.exporter:
+                self.exporter.update_data_source_status(last_data_source, False)
+                self.exporter.update_data_source_status(current_data_source, True)
+
+            return current_data_source
+        return last_data_source
+
+    def _process_trading_signals(self):
+        """处理交易信号"""
+        signals = self.trading_loop.check_and_execute()
+        if not signals:
+            return
+
+        self.stats["total_signals"] += len(signals)
+
+        # 更新交易指标
+        if self.exporter:
+            for trading_signal in signals:
+                # 记录交易信号
+                self.exporter.record_trade(trading_signal["symbol"], trading_signal["action"])
+                # 更新价格
+                self.exporter.update_price(trading_signal["symbol"], float(trading_signal["price"]))
+
+                # 记录信号到专用交易对日志
+                symbol_safe = trading_signal["symbol"].replace("/", "_")
+                symbol_logger = logging.getLogger(f"trading.{symbol_safe}")
+                symbol_logger.info(f"信号: {trading_signal['action']} @ {trading_signal['price']}")
+
+    def _simulate_network_interruption(self):
+        """模拟网络中断"""
+        logger.info("模拟网络中断...")
+        self.stats["data_interruptions"] += 1
+        time.sleep(5)  # 暂停5秒
+        logger.info("恢复连接...")
+        self.stats["reconnections"] += 1
+
+    def _handle_iteration_error(self, iteration, e):
+        """处理迭代错误"""
+        self.stats["errors"] += 1
+        logger.error(f"迭代 {iteration} 出错: {e}")
+
+        # 更新错误指标
+        if self.exporter:
+            self.exporter.record_error("iteration_error")
+
+        # 如果连续错误太多，暂停一段时间
+        if self.stats["errors"] > 5 and self.stats["errors"] % 5 == 0:
+            logger.warning("检测到多个错误，暂停5分钟后继续...")
+            time.sleep(300)
+
+    def _finalize_test_run(self, start_time):
+        """完成测试运行"""
+        total_duration = time.time() - start_time
+        days_running = total_duration / 86400
+        self.generate_report(days_running, is_final=True)
+
+        if self.stop_requested:
+            logger.info("测试被手动终止")
+        else:
+            logger.info("稳定性测试成功完成")
+
     def run(self):
         """运行稳定性测试"""
         if not self.setup_trading_system():
@@ -386,110 +517,27 @@ class StabilityTest:
             return False
 
         try:
-            # 记录开始时间
-            self.stats["start_time"] = datetime.datetime.now()
-            start_time = time.time()
-            end_time = start_time + self.duration_seconds
-
-            logger.info(
-                f"开始稳定性测试，计划结束时间: {datetime.datetime.fromtimestamp(end_time)}"
-            )
+            # 初始化测试
+            start_time, end_time = self._initialize_test_run()
+            last_data_source = self._setup_monitoring()
 
             # 主循环
             iteration = 0
-            last_data_source = self.market_data_manager.get_current_provider_name()
-
-            # 如果启用监控，设置初始数据源状态
-            if self.exporter:
-                self.exporter.update_data_source_status(last_data_source, True)
-
             while time.time() < end_time and not self.stop_requested:
                 iteration += 1
 
                 try:
-                    # 更新心跳
-                    if self.exporter:
-                        self.exporter.update_heartbeat()
-
-                    # 每小时记录一次系统资源
-                    if iteration % (3600 // self.check_interval) == 0:
-                        self.monitor_system_resources()
-
-                    # 检查数据源是否切换
-                    current_data_source = self.market_data_manager.get_current_provider_name()
-                    if current_data_source != last_data_source:
-                        logger.info(f"数据源已切换: {last_data_source} -> {current_data_source}")
-                        self.stats["data_source_switches"] += 1
-                        last_data_source = current_data_source
-
-                        # 更新数据源状态指标
-                        if self.exporter:
-                            self.exporter.update_data_source_status(last_data_source, False)
-                            self.exporter.update_data_source_status(current_data_source, True)
-
-                    # 运行交易循环一次
-                    signals = self.trading_loop.check_and_execute()
-                    if signals:
-                        self.stats["total_signals"] += len(signals)
-
-                        # 更新交易指标
-                        if self.exporter:
-                            for trading_signal in signals:
-                                # 记录交易信号
-                                self.exporter.record_trade(
-                                    trading_signal["symbol"], trading_signal["action"]
-                                )
-                                # 更新价格
-                                self.exporter.update_price(
-                                    trading_signal["symbol"], float(trading_signal["price"])
-                                )
-
-                                # 记录信号到专用交易对日志
-                                symbol_safe = trading_signal["symbol"].replace("/", "_")
-                                symbol_logger = logging.getLogger(f"trading.{symbol_safe}")
-                                symbol_logger.info(
-                                    f"信号: {trading_signal['action']} @ {trading_signal['price']}"
-                                )
-
-                    # 每天生成一次报告
-                    if iteration % (86400 // self.check_interval) == 0:
-                        days_running = (time.time() - start_time) / 86400
-                        self.generate_report(days_running)
-
-                    # 随机模拟网络中断和恢复
-                    if iteration % 1000 == 0:
-                        logger.info("模拟网络中断...")
-                        self.stats["data_interruptions"] += 1
-                        time.sleep(5)  # 暂停5秒
-                        logger.info("恢复连接...")
-                        self.stats["reconnections"] += 1
-
+                    last_data_source = self._process_iteration(
+                        iteration, last_data_source, start_time
+                    )
                 except Exception as e:
-                    self.stats["errors"] += 1
-                    logger.error(f"迭代 {iteration} 出错: {e}")
-
-                    # 更新错误指标
-                    if self.exporter:
-                        self.exporter.record_error("iteration_error")
-
-                    # 如果连续错误太多，暂停一段时间
-                    if self.stats["errors"] > 5 and self.stats["errors"] % 5 == 0:
-                        logger.warning("检测到多个错误，暂停5分钟后继续...")
-                        time.sleep(300)
+                    self._handle_iteration_error(iteration, e)
 
                 # 等待下一个检查间隔
                 time.sleep(self.check_interval)
 
-            # 测试结束，生成最终报告
-            total_duration = time.time() - start_time
-            days_running = total_duration / 86400
-            self.generate_report(days_running, is_final=True)
-
-            if self.stop_requested:
-                logger.info("测试被手动终止")
-            else:
-                logger.info("稳定性测试成功完成")
-
+            # 完成测试
+            self._finalize_test_run(start_time)
             return True
 
         except KeyboardInterrupt:
@@ -561,8 +609,8 @@ class StabilityTest:
         return report
 
 
-def main():
-    """主函数"""
+def setup_argument_parser():
+    """设置命令行参数解析器"""
     parser = argparse.ArgumentParser(description="加密货币交易系统稳定性测试")
     parser.add_argument("--symbols", type=str, help="要测试的交易对，用逗号分隔")
     parser.add_argument("--days", type=int, help="测试持续天数")
@@ -578,11 +626,12 @@ def main():
     parser.add_argument("--env-file", type=str, help="环境变量文件路径")
     parser.add_argument("--monitoring-port", type=int, default=9090, help="监控端口")
     parser.add_argument("--no-preserve-logs", action="store_true", help="不保留完整历史日志")
+    return parser
 
-    args = parser.parse_args()
 
-    # 初始化配置
-    get_config = None  # 声明变量
+def initialize_config_system(args):
+    """初始化配置系统"""
+    get_config = None
 
     try:
         # 优先使用增强配置管理器
@@ -602,8 +651,6 @@ def main():
                 )
 
             get_config = create_enhanced_config
-
-            # 设置日志
             setup_logging()
             logger.info("使用增强配置系统")
         elif args.config:
@@ -619,35 +666,49 @@ def main():
         logger.error(f"初始化配置系统时出错: {e}")
         logger.warning("使用默认配置")
 
-    # 使用配置（如果可用）
-    if get_config:
-        try:
-            config = get_config()
-            logger.info("配置系统初始化成功")
-            # 记录配置信息
-            if hasattr(config, "get_symbols"):
-                logger.info(f"配置的交易对: {config.get_symbols()}")
-        except Exception as e:
-            logger.warning(f"配置加载失败: {e}")
-            config = None
-    else:
-        config = None
+    return get_config
 
-    # 安全检查
-    if args.production:
-        logger.warning("警告: 您正在生产模式下运行测试，这将执行实际交易!")
-        confirm = input("确认继续? (y/n): ")
-        if confirm.lower() != "y":
-            logger.info("测试已取消")
-            return
 
-    # 解析交易对
-    symbols = None
-    if args.symbols:
-        symbols = [s.strip() for s in args.symbols.split(",")]
+def load_config(get_config):
+    """加载配置"""
+    if not get_config:
+        return None
 
-    # 创建并运行测试
-    test = StabilityTest(
+    try:
+        config = get_config()
+        logger.info("配置系统初始化成功")
+        # 记录配置信息
+        if hasattr(config, "get_symbols"):
+            logger.info(f"配置的交易对: {config.get_symbols()}")
+        return config
+    except Exception as e:
+        logger.warning(f"配置加载失败: {e}")
+        return None
+
+
+def check_production_mode(args):
+    """检查生产模式安全性"""
+    if not args.production:
+        return True
+
+    logger.warning("警告: 您正在生产模式下运行测试，这将执行实际交易!")
+    confirm = input("确认继续? (y/n): ")
+    if confirm.lower() != "y":
+        logger.info("测试已取消")
+        return False
+    return True
+
+
+def parse_symbols(args):
+    """解析交易对"""
+    if not args.symbols:
+        return None
+    return [s.strip() for s in args.symbols.split(",")]
+
+
+def create_stability_test(args, symbols):
+    """创建稳定性测试实例"""
+    return StabilityTest(
         symbols=symbols,
         duration_days=args.days,
         check_interval=args.interval,
@@ -659,6 +720,32 @@ def main():
         preserve_logs=not args.no_preserve_logs,
     )
 
+
+def main():
+    """主函数"""
+    # 设置参数解析器
+    parser = setup_argument_parser()
+    args = parser.parse_args()
+
+    # 初始化配置系统
+    get_config = initialize_config_system(args)
+    config = load_config(get_config)
+
+    # 记录配置状态
+    if config:
+        logger.info("配置加载成功，将使用配置文件设置")
+    else:
+        logger.info("未加载配置文件，将使用命令行参数")
+
+    # 安全检查
+    if not check_production_mode(args):
+        return 1
+
+    # 解析交易对
+    symbols = parse_symbols(args)
+
+    # 创建并运行测试
+    test = create_stability_test(args, symbols)
     success = test.run()
 
     if success:

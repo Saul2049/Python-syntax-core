@@ -195,18 +195,19 @@ class DailyHealthChecker:
 
         return self.health_report
 
-    def _analyze_results(self):
-        """分析健康检查结果"""
+    def _check_failed_tests(self):
+        """检查失败的测试"""
         failed_checks = []
-        warnings = []
-
-        # 检查各项结果
         for check_name, result in self.health_report["checks"].items():
             if isinstance(result, dict) and not result.get("success", False):
                 failed_checks.append(check_name)
+        return failed_checks
 
-        # 内存状态分析
+    def _analyze_memory_status(self):
+        """分析内存状态"""
+        warnings = []
         mem_stats = self.health_report["checks"].get("memory_stats", {})
+
         if "rss_mb" in mem_stats:
             rss_mb = mem_stats["rss_mb"]
             if rss_mb > 60:
@@ -221,12 +222,18 @@ class DailyHealthChecker:
             elif fds > 500:
                 warnings.append(f"File descriptors elevated: {fds} > 500 target")
 
-        # Prometheus指标分析
+        return warnings
+
+    def _analyze_prometheus_metrics(self):
+        """分析Prometheus指标"""
+        warnings = []
         prom_health = self.health_report["checks"].get("prometheus_health", {})
         if prom_health.get("missing_m5_metrics"):
             warnings.append(f"Missing M5 metrics: {prom_health['missing_m5_metrics']}")
+        return warnings
 
-        # 设置总体状态
+    def _determine_overall_status(self, failed_checks, warnings):
+        """确定总体状态"""
         if failed_checks:
             self.health_report["overall_status"] = "unhealthy"
             self.health_report["failed_checks"] = failed_checks
@@ -235,7 +242,8 @@ class DailyHealthChecker:
         else:
             self.health_report["overall_status"] = "healthy"
 
-        # 生成建议
+    def _generate_recommendations(self, failed_checks, warnings):
+        """生成建议"""
         recommendations = []
         if failed_checks:
             recommendations.append("Review failed checks and address underlying issues")
@@ -245,6 +253,24 @@ class DailyHealthChecker:
             recommendations.append("System is healthy - continue monitoring")
 
         self.health_report["recommendations"] = recommendations
+
+    def _analyze_results(self):
+        """分析健康检查结果"""
+        # 检查失败的测试
+        failed_checks = self._check_failed_tests()
+
+        # 分析各种状态
+        memory_warnings = self._analyze_memory_status()
+        prometheus_warnings = self._analyze_prometheus_metrics()
+
+        # 合并所有警告
+        all_warnings = memory_warnings + prometheus_warnings
+
+        # 确定总体状态
+        self._determine_overall_status(failed_checks, all_warnings)
+
+        # 生成建议
+        self._generate_recommendations(failed_checks, all_warnings)
 
     def save_report(self) -> str:
         """保存健康检查报告"""
