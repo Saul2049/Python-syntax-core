@@ -14,7 +14,7 @@ permissions:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository_owner }}/python-syntax-core
+  IMAGE_NAME: saul2049/python-syntax-core
 
 jobs:
   code-quality:
