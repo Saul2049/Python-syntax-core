@@ -74,10 +74,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Create config file
-        run: |
-          cp scripts/config.yaml.template config.yaml
-
       - name: Extract Docker metadata
         id: meta
         uses: docker/metadata-action@v5
@@ -85,14 +81,17 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
             type=ref,event=branch
-            type=sha,prefix={{branch}}-
+            type=sha,prefix=sha-
             type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Create config file
+        run: |
+          cp scripts/config.yaml.template config.yaml
 
       - name: Debug - Show metadata
         run: |
           echo "Registry: ${{ env.REGISTRY }}"
           echo "Image name: ${{ env.IMAGE_NAME }}"
-          echo "Full image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}"
           echo "Generated tags:"
           echo "${{ steps.meta.outputs.tags }}"
 
@@ -137,7 +136,7 @@ jobs:
 
       - name: Pull image
         run: |
-          docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:sha-${{ github.sha }}
+          docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:main-${{ github.sha }}
 
       - name: Create docker-compose.test.yml
         run: |
@@ -146,7 +145,7 @@ jobs:
           
           services:
             trading-system:
-              image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:sha-${{ github.sha }}
+              image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:main-${{ github.sha }}
               container_name: trading-system
               volumes:
                 - ./config.yaml:/app/config.yaml
