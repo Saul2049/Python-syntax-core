@@ -80,14 +80,14 @@ class VectorizationBenchmark:
         original_times = []
         for i in range(iterations):
             start_time = time.perf_counter()
-            result = get_trading_signals(self.test_data)
+            _result = get_trading_signals(self.test_data)
             end_time = time.perf_counter()
             original_times.append(end_time - start_time)
 
             # 验证结果有效性
-            if i == 0 and result is not None:
+            if i == 0 and _result is not None:
                 print(
-                    f"   原始版本信号数量: {len(result) if hasattr(result, '__len__') else 'N/A'}"
+                    f"   原始版本信号数量: {len(_result) if hasattr(_result, '__len__') else 'N/A'}"
                 )
 
             if (i + 1) % 20 == 0:
@@ -98,14 +98,14 @@ class VectorizationBenchmark:
         optimized_times = []
         for i in range(iterations):
             start_time = time.perf_counter()
-            result = get_trading_signals_optimized(self.test_data)
+            _result = get_trading_signals_optimized(self.test_data)
             end_time = time.perf_counter()
             optimized_times.append(end_time - start_time)
 
             # 验证结果有效性
-            if i == 0 and result is not None:
+            if i == 0 and _result is not None:
                 print(
-                    f"   优化版本信号数量: {len(result) if hasattr(result, '__len__') else 'N/A'}"
+                    f"   优化版本信号数量: {len(_result) if hasattr(_result, '__len__') else 'N/A'}"
                 )
 
             if (i + 1) % 20 == 0:
@@ -161,14 +161,14 @@ class VectorizationBenchmark:
             updated_data = pd.concat([new_data, new_row])
 
             start_time = time.perf_counter()
-            result = processor.get_trading_signals_optimized(updated_data)
+            _result = processor.get_trading_signals_optimized(updated_data)
             end_time = time.perf_counter()
             cache_times.append(end_time - start_time)
 
             # 验证缓存结果
-            if i == 0 and result is not None:
+            if i == 0 and _result is not None:
                 print(
-                    f"   缓存测试信号数量: {len(result) if hasattr(result, '__len__') else 'N/A'}"
+                    f"   缓存测试信号数量: {len(_result) if hasattr(_result, '__len__') else 'N/A'}"
                 )
 
         cache_avg = np.mean(cache_times) * 1000
@@ -203,11 +203,11 @@ class VectorizationBenchmark:
         optimized_atr_values = []
         for i in range(iterations):
             start_time = time.perf_counter()
-            atr = processor.compute_atr_optimized(self.test_data)
+            _atr = processor.compute_atr_optimized(self.test_data)
             end_time = time.perf_counter()
             optimized_atr_times.append(end_time - start_time)
             if i == 0:
-                optimized_atr_values.append(atr)
+                optimized_atr_values.append(_atr)
 
         original_atr_avg = np.mean(original_atr_times) * 1000
         optimized_atr_avg = np.mean(optimized_atr_times) * 1000

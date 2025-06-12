@@ -168,16 +168,13 @@ class Broker:
     def _send_trade_notification(self, trade_data: Dict[str, Any]) -> None:
         """发送交易通知"""
         try:
-            side_emoji = "🟢" if trade_data["side"] == "BUY" else "🔴"
-            message = (
-                f"{side_emoji} 交易执行 (Trade Executed)\n"
-                f"符号 (Symbol): {trade_data['symbol']}\n"
-                f"方向 (Side): {trade_data['side']}\n"
-                f"数量 (Quantity): {trade_data['quantity']}\n"
-                f"价格 (Price): {trade_data['price']:.8f}\n"
-                f"原因 (Reason): {trade_data['reason']}"
+            self.notifier.notify_trade(
+                action=trade_data["side"],
+                symbol=trade_data["symbol"],
+                price=trade_data["price"],
+                quantity=trade_data["quantity"],
+                reason=trade_data.get("reason"),
             )
-            self.notifier.notify_trade(trade_data, message)
         except Exception as e:
             print(f"发送通知失败: {e}")
 
@@ -213,9 +210,14 @@ class Broker:
             if start_date or end_date:
                 df["timestamp"] = pd.to_datetime(df["timestamp"])
                 if start_date:
-                    df = df[df["timestamp"] >= start_date]
+                    start_datetime = pd.to_datetime(start_date)
+                    df = df[df["timestamp"] >= start_datetime]
                 if end_date:
-                    df = df[df["timestamp"] <= end_date]
+                    # 结束日期应该包含整天，所以加上23:59:59
+                    end_datetime = (
+                        pd.to_datetime(end_date) + pd.Timedelta(days=1) - pd.Timedelta(seconds=1)
+                    )
+                    df = df[df["timestamp"] <= end_datetime]
 
             return df
 

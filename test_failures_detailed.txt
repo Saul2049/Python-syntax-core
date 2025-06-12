@@ -1,0 +1,42 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.10.8, pytest-8.3.5, pluggy-1.5.0
+rootdir: /Users/liam/Python syntax core
+configfile: pytest.ini
+plugins: xdist-3.7.0, timeout-2.4.0, cov-6.1.1, forked-1.6.0, asyncio-1.0.0
+asyncio: mode=strict, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 5785 items / 4 skipped
+
+archive/old_tests/test_100_percent_coverage_blitz.py ....                [  0%]
+archive/old_tests/test_breakout_strategies_coverage.py ................. [  0%]
+.....................                                                    [  0%]
+archive/old_tests/test_brokers_comprehensive.py ........................ [  1%]
+....                                                                     [  1%]
+archive/old_tests/test_config_defaults_comprehensive.py ................ [  1%]
+.                                                                        [  1%]
+archive/old_tests/test_config_utils_coverage.py ........................ [  1%]
+..................                                                       [  2%]
+archive/old_tests/test_core_modules_coverage.py ......................   [  2%]
+archive/old_tests/test_core_price_fetcher_coverage.py .................. [  2%]
+.............                                                            [  3%]
+archive/old_tests/test_core_trading_engine_coverage.py ................. [  3%]
+....F
+
+=================================== FAILURES ===================================
+_________ TestTradingCycleExecution.test_execute_trading_cycle_success _________
+/usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/mock.py:1366: in patched
+    with self.decoration_helper(patched,
+/usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/contextlib.py:135: in __enter__
+    return next(self.gen)
+/usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/mock.py:1348: in decoration_helper
+    arg = exit_stack.enter_context(patching)
+/usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/contextlib.py:492: in enter_context
+    result = _cm_type.__enter__(cm)
+/usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/mock.py:1437: in __enter__
+    original, local = self.get_original()
+/usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/mock.py:1410: in get_original
+    raise AttributeError(
+E   AttributeError: <module 'src.core.trading_engine' from '/Users/liam/Python syntax core/src/core/trading_engine.py'> does not have the attribute 'get_trading_signals'
+=========================== short test summary info ============================
+FAILED archive/old_tests/test_core_trading_engine_coverage.py::TestTradingCycleExecution::test_execute_trading_cycle_success
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+============ 1 failed, 203 passed, 4 skipped, 9 warnings in 19.12s =============

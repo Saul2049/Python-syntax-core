@@ -466,16 +466,16 @@ class StabilityTest:
 
         # 更新交易指标
         if self.exporter:
-            for trading_signal in signals:
+            for trade_signal in signals:
                 # 记录交易信号
-                self.exporter.record_trade(trading_signal["symbol"], trading_signal["action"])
+                self.exporter.record_trade(trade_signal["symbol"], trade_signal["action"])
                 # 更新价格
-                self.exporter.update_price(trading_signal["symbol"], float(trading_signal["price"]))
+                self.exporter.update_price(trade_signal["symbol"], float(trade_signal["price"]))
 
                 # 记录信号到专用交易对日志
-                symbol_safe = trading_signal["symbol"].replace("/", "_")
+                symbol_safe = trade_signal["symbol"].replace("/", "_")
                 symbol_logger = logging.getLogger(f"trading.{symbol_safe}")
-                symbol_logger.info(f"信号: {trading_signal['action']} @ {trading_signal['price']}")
+                symbol_logger.info(f"信号: {trade_signal['action']} @ {trade_signal['price']}")
 
     def _simulate_network_interruption(self):
         """模拟网络中断"""
@@ -636,17 +636,23 @@ def initialize_config_system(args):
     try:
         # 优先使用增强配置管理器
         try:
-            from scripts.enhanced_config import get_enhanced_config, setup_logging
+            from scripts.enhanced_config import get_enhanced_config as _get_enhanced_config
+            from scripts.enhanced_config import setup_logging
 
             enhanced_config_available = True
         except ImportError:
             enhanced_config_available = False
             setup_logging = None
+            _get_enhanced_config = None
 
-        if enhanced_config_available and setup_logging is not None:
+        if (
+            enhanced_config_available
+            and setup_logging is not None
+            and _get_enhanced_config is not None
+        ):
             # 初始化配置
             def create_enhanced_config():
-                return get_enhanced_config(
+                return _get_enhanced_config(
                     config_yaml=args.config_yaml, env_file=args.env_file, config_ini=args.config
                 )
 

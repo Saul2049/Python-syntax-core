@@ -1,0 +1,2119 @@
+........................................................................ [  3%]
+........................................................................ [  6%]
+........................................................................ [ 10%]
+........................................................................ [ 13%]
+....F................................................................... [ 16%]
+.............................................F......F................... [ 20%]
+........................................................................ [ 23%]
+........................................................................ [ 27%]
+........................................................................ [ 30%]
+..............E......................................................... [ 33%]
+........................................................................ [ 37%]
+........................................................................ [ 40%]
+........................................................................ [ 44%]
+......................F.........F.......FF.F..................F......... [ 47%]
+......................F..............................................F.F [ 50%]
+..........FF.......F......FF.....F...................................FFF [ 54%]
+.FF..F............................FFF..................FF............... [ 57%]
+.................................F...................................... [ 61%]
+.F..F................................................................... [ 64%]
+....................................F.F.........F....................... [ 67%]
+.................................F.F...F................................ [ 71%]
+.....F...F...................................FF....F.F..FFFF....FFFFFF.. [ 74%]
+....FFF.F........F....FF..........................................F..F.. [ 77%]
+........................................................................ [ 81%]
+.......FFFFFFFF.FFF..ss.s.ss.s........FF................................ [ 84%]
+...................................................................s.... [ 88%]
+................................................F....EEEEEEEEEEEEEEEEEEE [ 91%]
+EEEEEEEEEEE...FFFFFFFFFFFFFFFFFFFFFFFFFF....FFFFF....FFF..FF..........F. [ 94%]
+..........................F..FF......................................... [ 98%]
+.........F.........................                                      [100%]
+==================================== ERRORS ====================================
+_ ERROR at teardown of TestPositionManagerFileOperations.test_load_positions_file_not_exists _
+tests/test_core_position_management.py:389: in position_manager
+    with tempfile.NamedTemporaryFile(suffix=".json") as f:
+/usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/tempfile.py:502: in __exit__
+    self.close()
+/usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/tempfile.py:509: in close
+    self._closer.close()
+/usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/tempfile.py:446: in close
+    unlink(self.name)
+E   FileNotFoundError: [Errno 2] No such file or directory: '/var/folders/7q/6qzph4cs7h75y6j7ll9dgb340000gn/T/tmp24e4da25.json'
+____ ERROR at setup of TestTradingEngine.test_trading_engine_initialization ____
+tests/test_trading_engines.py:57: in setup_method
+    self.engine = TradingEngine(
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+__ ERROR at setup of TestTradingEngine.test_analyze_market_conditions_success __
+tests/test_trading_engines.py:57: in setup_method
+    self.engine = TradingEngine(
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+__ ERROR at setup of TestTradingEngine.test_analyze_market_conditions_no_data __
+tests/test_trading_engines.py:57: in setup_method
+    self.engine = TradingEngine(
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+_ ERROR at setup of TestTradingEngine.test_analyze_market_conditions_empty_data _
+tests/test_trading_engines.py:57: in setup_method
+    self.engine = TradingEngine(
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+_ ERROR at setup of TestTradingEngine.test_analyze_market_conditions_exception _
+tests/test_trading_engines.py:57: in setup_method
+    self.engine = TradingEngine(
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+_________ ERROR at setup of TestTradingEngine.test_create_error_result _________
+tests/test_trading_engines.py:57: in setup_method
+    self.engine = TradingEngine(
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+____________ ERROR at setup of TestTradingEngine.test_analyze_trend ____________
+tests/test_trading_engines.py:57: in setup_method
+    self.engine = TradingEngine(
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+________ ERROR at setup of TestTradingEngine.test_analyze_trend_bullish ________
+tests/test_trading_engines.py:57: in setup_method
+    self.engine = TradingEngine(
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+________ ERROR at setup of TestTradingEngine.test_analyze_trend_bearish ________
+tests/test_trading_engines.py:57: in setup_method
+    self.engine = TradingEngine(
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+_________ ERROR at setup of TestTradingEngine.test_analyze_volatility __________
+tests/test_trading_engines.py:57: in setup_method
+    self.engine = TradingEngine(
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+_______ ERROR at setup of TestTradingEngine.test_generate_recommendation _______
+tests/test_trading_engines.py:57: in setup_method
+    self.engine = TradingEngine(
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+__ ERROR at setup of TestTradingEngine.test_execute_trade_decision_with_error __
+tests/test_trading_engines.py:57: in setup_method
+    self.engine = TradingEngine(
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+___ ERROR at setup of TestTradingEngine.test_execute_trade_decision_success ____
+tests/test_trading_engines.py:57: in setup_method
+    self.engine = TradingEngine(
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+_ ERROR at setup of TestTradingEngine.test_validate_trading_conditions_weak_signal _
+tests/test_trading_engines.py:57: in setup_method
+    self.engine = TradingEngine(
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+_ ERROR at setup of TestTradingEngine.test_validate_trading_conditions_force_trade _
+tests/test_trading_engines.py:57: in setup_method
+    self.engine = TradingEngine(
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+__ ERROR at setup of TestTradingEngine.test_calculate_position_size_internal ___
+tests/test_trading_engines.py:57: in setup_method
+    self.engine = TradingEngine(
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+________ ERROR at setup of TestTradingEngine.test_create_hold_response _________
+tests/test_trading_engines.py:57: in setup_method
+    self.engine = TradingEngine(
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+________ ERROR at setup of TestTradingEngine.test_create_error_response ________
+tests/test_trading_engines.py:57: in setup_method
+    self.engine = TradingEngine(
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+_______ ERROR at setup of TestTradingEngine.test_update_trade_statistics _______
+tests/test_trading_engines.py:57: in setup_method
+    self.engine = TradingEngine(
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+__________ ERROR at setup of TestTradingEngine.test_get_engine_status __________
+tests/test_trading_engines.py:57: in setup_method
+    self.engine = TradingEngine(
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+____________ ERROR at setup of TestTradingEngine.test_start_engine _____________
+tests/test_trading_engines.py:57: in setup_method
+    self.engine = TradingEngine(
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+_____________ ERROR at setup of TestTradingEngine.test_stop_engine _____________
+tests/test_trading_engines.py:57: in setup_method
+    self.engine = TradingEngine(
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+_______ ERROR at setup of TestTradingEngine.test_calculate_position_size _______
+tests/test_trading_engines.py:57: in setup_method
+    self.engine = TradingEngine(
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+_________ ERROR at setup of TestTradingEngine.test_process_buy_signal __________
+tests/test_trading_engines.py:57: in setup_method
+    self.engine = TradingEngine(
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+_________ ERROR at setup of TestTradingEngine.test_process_sell_signal _________
+tests/test_trading_engines.py:57: in setup_method
+    self.engine = TradingEngine(
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+__________ ERROR at setup of TestTradingEngine.test_update_positions ___________
+tests/test_trading_engines.py:57: in setup_method
+    self.engine = TradingEngine(
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+_________ ERROR at setup of TestTradingEngine.test_send_status_update __________
+tests/test_trading_engines.py:57: in setup_method
+    self.engine = TradingEngine(
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+________ ERROR at setup of TestTradingEngine.test_execute_trading_cycle ________
+tests/test_trading_engines.py:57: in setup_method
+    self.engine = TradingEngine(
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+______ ERROR at setup of TestTradingEngine.test_update_monitoring_metrics ______
+tests/test_trading_engines.py:57: in setup_method
+    self.engine = TradingEngine(
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+_________ ERROR at setup of TestTradingEngine.test_start_trading_loop __________
+tests/test_trading_engines.py:57: in setup_method
+    self.engine = TradingEngine(
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+=================================== FAILURES ===================================
+____________ TestMarketSimulator.test_plot_results_no_show_no_save _____________
+tests/test_brokers_simulator_market_sim.py:414: in test_plot_results_no_show_no_save
+    mock_close.assert_called_once()
+/usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/mock.py:898: in assert_called_once
+    raise AssertionError(msg)
+E   AssertionError: Expected 'close' to have been called once. Called 2 times.
+E   Calls: [call('all'), call()].
+__________________ TestConfigRefactoring.test_config_priority __________________
+tests/test_config_refactoring.py:221: in test_config_priority
+    self.assertEqual(config.get_symbols(), ["BTCUSDT", "ETHUSDT", "ADAUSDT"])
+E   AssertionError: Lists differ: ['BTCUSDT', 'ETHUSDT'] != ['BTCUSDT', 'ETHUSDT', 'ADAUSDT']
+E   
+E   Second list contains 1 additional elements.
+E   First extra element 2:
+E   'ADAUSDT'
+E   
+E   - ['BTCUSDT', 'ETHUSDT']
+E   + ['BTCUSDT', 'ETHUSDT', 'ADAUSDT']
+E   ?                      +++++++++++
+------------------------------ Captured log call -------------------------------
+WARNING  src.config.sources:sources.py:114 PyYAML not installed, skipping YAML config loading
+________________ TestConfigRefactoring.test_yaml_config_loading ________________
+tests/test_config_refactoring.py:170: in test_yaml_config_loading
+    self.assertEqual(config.get_symbols(), ["BTCUSDT", "ETHUSDT", "ADAUSDT"])
+E   AssertionError: Lists differ: ['BTCUSDT', 'ETHUSDT'] != ['BTCUSDT', 'ETHUSDT', 'ADAUSDT']
+E   
+E   Second list contains 1 additional elements.
+E   First extra element 2:
+E   'ADAUSDT'
+E   
+E   - ['BTCUSDT', 'ETHUSDT']
+E   + ['BTCUSDT', 'ETHUSDT', 'ADAUSDT']
+E   ?                      +++++++++++
+------------------------------ Captured log call -------------------------------
+WARNING  src.config.sources:sources.py:114 PyYAML not installed, skipping YAML config loading
+__________ TestConvenienceFunctions.test_save_processed_data_parquet ___________
+tests/test_data_saver_coverage_boost.py:381: in test_save_processed_data_parquet
+    self.assertTrue(success)
+E   AssertionError: False is not true
+----------------------------- Captured stdout call -----------------------------
+❌ 保存数据时出错: Unable to find a usable engine; tried using: 'pyarrow', 'fastparquet'.
+A suitable version of pyarrow or fastparquet is required for parquet support.
+Trying to import the above resulted in these errors:
+ - Missing optional dependency 'pyarrow'. pyarrow is required for parquet support. Use pip or conda to install pyarrow.
+ - Missing optional dependency 'fastparquet'. fastparquet is required for parquet support. Use pip or conda to install fastparquet.
+____________ TestDataSaverBasicSaving.test_save_data_parquet_format ____________
+tests/test_data_saver_final.py:112: in test_save_data_parquet_format
+    self.assertTrue(result)
+E   AssertionError: False is not true
+----------------------------- Captured stdout call -----------------------------
+❌ 保存格式 parquet 时出错: Unable to find a usable engine; tried using: 'pyarrow', 'fastparquet'.
+A suitable version of pyarrow or fastparquet is required for parquet support.
+Trying to import the above resulted in these errors:
+ - Missing optional dependency 'pyarrow'. pyarrow is required for parquet support. Use pip or conda to install pyarrow.
+ - Missing optional dependency 'fastparquet'. fastparquet is required for parquet support. Use pip or conda to install fastparquet.
+_________ TestDataSaverFormatHandling.test_execute_save_operation_hdf5 _________
+/usr/local/lib/python3.10/site-packages/pandas/compat/_optional.py:141: in import_optional_dependency
+    module = importlib.import_module(name)
+/usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/importlib/__init__.py:126: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+E   ModuleNotFoundError: No module named 'tables'
+
+During handling of the above exception, another exception occurred:
+tests/test_data_saver_final.py:219: in test_execute_save_operation_hdf5
+    self.saver._execute_save_operation(self.test_df, file_path, "hdf5", key="data")
+src/data/validators/data_saver.py:148: in _execute_save_operation
+    df.to_hdf(file_path, key=store_key, **kwargs)
+/usr/local/lib/python3.10/site-packages/pandas/core/generic.py:2799: in to_hdf
+    pytables.to_hdf(
+/usr/local/lib/python3.10/site-packages/pandas/io/pytables.py:298: in to_hdf
+    with HDFStore(
+/usr/local/lib/python3.10/site-packages/pandas/io/pytables.py:559: in __init__
+    tables = import_optional_dependency("tables")
+/usr/local/lib/python3.10/site-packages/pandas/compat/_optional.py:144: in import_optional_dependency
+    raise ImportError(msg)
+E   ImportError: Missing optional dependency 'pytables'.  Use pip or conda to install pytables.
+___ TestDataSaverFormatHandling.test_execute_save_operation_hdf5_default_key ___
+/usr/local/lib/python3.10/site-packages/pandas/compat/_optional.py:141: in import_optional_dependency
+    module = importlib.import_module(name)
+/usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/importlib/__init__.py:126: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+E   ModuleNotFoundError: No module named 'tables'
+
+During handling of the above exception, another exception occurred:
+tests/test_data_saver_final.py:225: in test_execute_save_operation_hdf5_default_key
+    self.saver._execute_save_operation(self.test_df, file_path, "hdf5")
+src/data/validators/data_saver.py:148: in _execute_save_operation
+    df.to_hdf(file_path, key=store_key, **kwargs)
+/usr/local/lib/python3.10/site-packages/pandas/core/generic.py:2799: in to_hdf
+    pytables.to_hdf(
+/usr/local/lib/python3.10/site-packages/pandas/io/pytables.py:298: in to_hdf
+    with HDFStore(
+/usr/local/lib/python3.10/site-packages/pandas/io/pytables.py:559: in __init__
+    tables = import_optional_dependency("tables")
+/usr/local/lib/python3.10/site-packages/pandas/compat/_optional.py:144: in import_optional_dependency
+    raise ImportError(msg)
+E   ImportError: Missing optional dependency 'pytables'.  Use pip or conda to install pytables.
+_______ TestDataSaverFormatHandling.test_execute_save_operation_parquet ________
+tests/test_data_saver_final.py:190: in test_execute_save_operation_parquet
+    self.saver._execute_save_operation(self.test_df, file_path, "parquet")
+src/data/validators/data_saver.py:139: in _execute_save_operation
+    df.to_parquet(file_path, **kwargs)
+/usr/local/lib/python3.10/site-packages/pandas/util/_decorators.py:211: in wrapper
+    return func(*args, **kwargs)
+/usr/local/lib/python3.10/site-packages/pandas/core/frame.py:2975: in to_parquet
+    return to_parquet(
+/usr/local/lib/python3.10/site-packages/pandas/io/parquet.py:426: in to_parquet
+    impl = get_engine(engine)
+/usr/local/lib/python3.10/site-packages/pandas/io/parquet.py:52: in get_engine
+    raise ImportError(
+E   ImportError: Unable to find a usable engine; tried using: 'pyarrow', 'fastparquet'.
+E   A suitable version of pyarrow or fastparquet is required for parquet support.
+E   Trying to import the above resulted in these errors:
+E    - Missing optional dependency 'pyarrow'. pyarrow is required for parquet support. Use pip or conda to install pyarrow.
+E    - Missing optional dependency 'fastparquet'. fastparquet is required for parquet support. Use pip or conda to install fastparquet.
+___________ TestDataSaverAdvancedFeatures.test_save_multiple_formats ___________
+tests/test_data_saver_final.py:411: in test_save_multiple_formats
+    self.assertTrue(results[fmt])
+E   AssertionError: False is not true
+----------------------------- Captured stdout call -----------------------------
+✅ 数据已成功保存到: /var/folders/7q/6qzph4cs7h75y6j7ll9dgb340000gn/T/tmpb1gcivy8/test.csv
+✅ 数据已成功保存到: /var/folders/7q/6qzph4cs7h75y6j7ll9dgb340000gn/T/tmpb1gcivy8/test.pickle
+❌ 保存格式 parquet 时出错: Unable to find a usable engine; tried using: 'pyarrow', 'fastparquet'.
+A suitable version of pyarrow or fastparquet is required for parquet support.
+Trying to import the above resulted in these errors:
+ - Missing optional dependency 'pyarrow'. pyarrow is required for parquet support. Use pip or conda to install pyarrow.
+ - Missing optional dependency 'fastparquet'. fastparquet is required for parquet support. Use pip or conda to install fastparquet.
+________ TestSaveProcessedDataFunction.test_save_processed_data_parquet ________
+tests/test_data_saver_final.py:917: in test_save_processed_data_parquet
+    self.assertTrue(result)
+E   AssertionError: False is not true
+----------------------------- Captured stdout call -----------------------------
+❌ 保存数据时出错: Unable to find a usable engine; tried using: 'pyarrow', 'fastparquet'.
+A suitable version of pyarrow or fastparquet is required for parquet support.
+Trying to import the above resulted in these errors:
+ - Missing optional dependency 'pyarrow'. pyarrow is required for parquet support. Use pip or conda to install pyarrow.
+ - Missing optional dependency 'fastparquet'. fastparquet is required for parquet support. Use pip or conda to install fastparquet.
+____ TestDataNormalizerWithoutSklearn.test_transform_untrained_scaler_error ____
+tests/test_data_transformers_coverage_boost.py:88: in test_transform_untrained_scaler_error
+    with pytest.raises(ValueError, match="归一化器未训练"):
+E   Failed: DID NOT RAISE <class 'ValueError'>
+----------------------------- Captured stdout call -----------------------------
+⚠️ 警告: sklearn未安装，使用简化实现
+_ TestDataNormalizerWithoutSklearn.test_inverse_transform_untrained_scaler_error _
+tests/test_data_transformers_coverage_boost.py:111: in test_inverse_transform_untrained_scaler_error
+    with pytest.raises(ValueError, match="归一化器未训练"):
+E   Failed: DID NOT RAISE <class 'ValueError'>
+----------------------------- Captured stdout call -----------------------------
+⚠️ 警告: sklearn未安装，使用简化实现
+⚠️ 警告: 简化实现不支持inverse_transform
+_________ TestDataNormalizerRobustMethod.test_initialize_robust_scaler _________
+tests/test_data_transformers_coverage_boost.py:247: in test_initialize_robust_scaler
+    assert normalizer.scaler is not None
+E   assert None is not None
+E    +  where None = <src.data.transformers.data_transformers.DataNormalizer object at 0x12ff388b0>.scaler
+----------------------------- Captured stdout call -----------------------------
+⚠️ 警告: sklearn未安装，使用简化实现
+_______ TestDataNormalizerRobustMethod.test_invalid_normalization_method _______
+tests/test_data_transformers_coverage_boost.py:253: in test_invalid_normalization_method
+    with pytest.raises(ValueError, match="不支持的归一化方法"):
+E   Failed: DID NOT RAISE <class 'ValueError'>
+----------------------------- Captured stdout call -----------------------------
+⚠️ 警告: sklearn未安装，使用简化实现
+____ TestDataNormalizerComprehensive.test_fit_transform_robust_with_sklearn ____
+tests/test_data_transformers_enhanced.py:89: in test_fit_transform_robust_with_sklearn
+    result = normalizer.fit_transform(self.df_data)
+src/data/transformers/data_transformers.py:70: in fit_transform
+    return self._simple_normalize(data)
+src/data/transformers/data_transformers.py:100: in _simple_normalize
+    raise ValueError(f"简化实现不支持方法: {self.method}")
+E   ValueError: 简化实现不支持方法: robust
+----------------------------- Captured stdout call -----------------------------
+⚠️ 警告: sklearn未安装，使用简化实现
+____ TestDataNormalizerComprehensive.test_init_invalid_method_with_sklearn _____
+tests/test_data_transformers_enhanced.py:52: in test_init_invalid_method_with_sklearn
+    with self.assertRaises(ValueError):
+E   AssertionError: ValueError not raised
+----------------------------- Captured stdout call -----------------------------
+⚠️ 警告: sklearn未安装，使用简化实现
+_____ TestDataNormalizerComprehensive.test_inverse_transform_with_sklearn ______
+tests/test_data_transformers_enhanced.py:126: in test_inverse_transform_with_sklearn
+    pd.testing.assert_frame_equal(recovered, self.df_data, check_dtype=False)
+pandas/_libs/testing.pyx:52: in pandas._libs.testing.assert_almost_equal
+    ???
+pandas/_libs/testing.pyx:167: in pandas._libs.testing.assert_almost_equal
+    ???
+E   AssertionError: DataFrame.iloc[:, 0] (column name="price") are different
+E   
+E   DataFrame.iloc[:, 0] (column name="price") values are different (100.0 %)
+E   [index]: [0, 1, 2, 3, 4]
+E   [left]:  [0.0, 0.25, 0.5, 0.75, 1.0]
+E   [right]: [100, 200, 300, 400, 500]
+----------------------------- Captured stdout call -----------------------------
+⚠️ 警告: sklearn未安装，使用简化实现
+⚠️ 警告: 简化实现不支持inverse_transform
+___ TestDataNormalizerComprehensive.test_transform_without_fit_with_sklearn ____
+tests/test_data_transformers_enhanced.py:104: in test_transform_without_fit_with_sklearn
+    with self.assertRaises(ValueError):
+E   AssertionError: ValueError not raised
+----------------------------- Captured stdout call -----------------------------
+⚠️ 警告: sklearn未安装，使用简化实现
+___ TestAsyncTradingEngineEnhancedCoverage.test_process_market_data_success ____
+tests/test_enhanced_async_trading_engine_coverage.py:89: in test_process_market_data_success
+    assert result['status'] == 'success'
+E   KeyError: 'status'
+__ TestAsyncTradingEngineEnhancedCoverage.test_process_market_data_no_signal ___
+tests/test_enhanced_async_trading_engine_coverage.py:118: in test_process_market_data_no_signal
+    assert result['action'] == 'no_trade'
+E   KeyError: 'action'
+__ TestAsyncTradingEngineEnhancedCoverage.test_process_market_data_exception ___
+tests/test_enhanced_async_trading_engine_coverage.py:136: in test_process_market_data_exception
+    self.metrics_mock.record_exception.assert_called()
+/usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/mock.py:888: in assert_called
+    raise AssertionError(msg)
+E   AssertionError: Expected 'record_exception' to have been called.
+______ TestAsyncTradingEngineEnhancedCoverage.test_concurrent_processing _______
+tests/test_enhanced_async_trading_engine_coverage.py:192: in test_concurrent_processing
+    assert 'action' in result
+E   assert 'action' in {'error': "'OptimizedSignalProcessor' object has no attribute 'process_signals'", 'symbol': 'BTCUSDT'}
+_______ TestAsyncTradingEngineEnhancedCoverage.test_cleanup_and_shutdown _______
+tests/test_enhanced_async_trading_engine_coverage.py:212: in test_cleanup_and_shutdown
+    self.broker_mock.close.assert_called()
+/usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/mock.py:888: in assert_called
+    raise AssertionError(msg)
+E   AssertionError: Expected 'close' to have been called.
+______ TestAsyncTradingEngineEnhancedCoverage.test_performance_monitoring ______
+tests/test_enhanced_async_trading_engine_coverage.py:273: in test_performance_monitoring
+    self.metrics_mock.record_latency.assert_called()
+/usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/mock.py:888: in assert_called
+    raise AssertionError(msg)
+E   AssertionError: Expected 'record_latency' to have been called.
+___ TestTradingEngineEnhancedCoverage.test_analyze_market_conditions_success ___
+tests/test_enhanced_trading_engine_coverage.py:96: in test_analyze_market_conditions_success
+    assert result['atr'] == 1.5
+E   assert 513.602557 == 1.5
+----------------------------- Captured stdout call -----------------------------
+获取真实数据失败: API Key和Secret必须提供，或从环境变量/配置文件加载, 使用模拟数据
+___ TestTradingEngineEnhancedCoverage.test_analyze_market_conditions_no_data ___
+tests/test_enhanced_trading_engine_coverage.py:111: in test_analyze_market_conditions_no_data
+    assert result['error'] == "无法获取市场数据"
+E   AssertionError: assert '市场分析失败: argu... not iterable' == '无法获取市场数据'
+E     
+E     - 无法获取市场数据
+E     + 市场分析失败: argument of type 'Mock' is not iterable
+----------------------------- Captured stdout call -----------------------------
+获取真实数据失败: API Key和Secret必须提供，或从环境变量/配置文件加载, 使用模拟数据
+_ TestTradingEngineEnhancedCoverage.test_analyze_market_conditions_empty_data __
+tests/test_enhanced_trading_engine_coverage.py:123: in test_analyze_market_conditions_empty_data
+    assert result['error'] == "无法获取市场数据"
+E   AssertionError: assert '市场分析失败: argu... not iterable' == '无法获取市场数据'
+E     
+E     - 无法获取市场数据
+E     + 市场分析失败: argument of type 'Mock' is not iterable
+----------------------------- Captured stdout call -----------------------------
+获取真实数据失败: API Key和Secret必须提供，或从环境变量/配置文件加载, 使用模拟数据
+_________ TestTradingEngineEnhancedCoverage.test_init_without_env_vars _________
+tests/test_enhanced_trading_engine_coverage.py:331: in test_init_without_env_vars
+    engine = TradingEngine()
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:22: in __init__
+    raise ValueError("Telegram token not found in environment")
+E   ValueError: Telegram token not found in environment
+_________ TestTradingEngineEnhancedCoverage.test_broker_initialization _________
+tests/test_enhanced_trading_engine_coverage.py:354: in test_broker_initialization
+    mock_broker_class.assert_called_once_with(
+/usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/mock.py:930: in assert_called_once_with
+    raise AssertionError(msg)
+E   AssertionError: Expected 'Broker' to be called once. Called 0 times.
+_______________ TestMarketDataSync.test_sync_market_data_success _______________
+tests/test_exchange_client_coverage_boost.py:510: in test_sync_market_data_success
+    assert "timestamp" in result.columns
+E   AssertionError: assert 'timestamp' in Index(['open', 'high', 'low', 'close', 'volume'], dtype='object')
+E    +  where Index(['open', 'high', 'low', 'close', 'volume'], dtype='object') =              open   high    low  close  volume\ntimestamp                                     \n2022-01-01  50000  51000  49000  50500     100\n2022-01-02  50500  52000  50000  51500     150.columns
+------------------------------ Captured log setup ------------------------------
+WARNING  exchange_client:client.py:71 无法加载演示数据: [Errno 2] No such file or directory: 'btc_eth.csv'
+_________________ TestMainFunction.test_main_function_success __________________
+tests/test_improved_strategy.py:548: in test_main_function_success
+    result = main("test_file.csv")
+src/strategies/improved_strategy.py:355: in main
+    f"简单买入持有:   CAGR: {metrics.cagr(bnh_equity):.2%}, "
+src/metrics.py:10: in cagr
+    years = (equity.index[-1] - equity.index[0]).days / 365.25
+E   AttributeError: 'int' object has no attribute 'days'
+----------------------------- Captured stdout call -----------------------------
+
+策略绩效比较:
+--------------------------------------------------------------------------------
+_______________ TestMainFunction.test_main_function_invalid_data _______________
+tests/test_improved_strategy.py:591: in test_main_function_invalid_data
+    result = main("invalid_file.csv")
+src/strategies/improved_strategy.py:355: in main
+    f"简单买入持有:   CAGR: {metrics.cagr(bnh_equity):.2%}, "
+src/metrics.py:10: in cagr
+    years = (equity.index[-1] - equity.index[0]).days / 365.25
+E   AttributeError: 'int' object has no attribute 'days'
+----------------------------- Captured stdout call -----------------------------
+
+策略绩效比较:
+--------------------------------------------------------------------------------
+______________ TestGlobalFunctions.test_environment_configuration ______________
+tests/test_metrics_collector_coverage_boost.py:278: in test_environment_configuration
+    self.assertFalse(collector.config.enabled)
+E   AssertionError: True is not false
+___________________ TestGlobalFunctions.test_init_monitoring ___________________
+tests/test_metrics_collector_coverage_boost.py:289: in test_init_monitoring
+    mock_collector.start_server.assert_called_once()
+/usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/mock.py:898: in assert_called_once
+    raise AssertionError(msg)
+E   AssertionError: Expected 'start_server' to have been called once. Called 0 times.
+_____________ TestServerManagementFixed.test_start_server_failure ______________
+tests/test_metrics_collector_enhanced_fixed.py:124: in test_start_server_failure
+    with self.assertRaises(Exception):
+E   AssertionError: Exception not raised
+_ TestMissingValueHandlerInterpolation.test_interpolate_missing_values_polynomial _
+/usr/local/lib/python3.10/site-packages/pandas/compat/_optional.py:141: in import_optional_dependency
+    module = importlib.import_module(name)
+/usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/importlib/__init__.py:126: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+E   ModuleNotFoundError: No module named 'scipy'
+
+During handling of the above exception, another exception occurred:
+tests/test_missing_values_enhanced.py:225: in test_interpolate_missing_values_polynomial
+    result = MissingValueHandler.interpolate_missing_values(
+src/data/transformers/missing_values.py:104: in interpolate_missing_values
+    MissingValueHandler._apply_interpolation_method(result_df, col, method)
+src/data/transformers/missing_values.py:123: in _apply_interpolation_method
+    result_df[col] = interpolation_methods[method](result_df, col)
+src/data/transformers/missing_values.py:117: in <lambda>
+    "polynomial": lambda df, col: MissingValueHandler._safe_interpolate(
+src/data/transformers/missing_values.py:139: in _safe_interpolate
+    return result_df[col].interpolate(method=method, **kwargs)
+/usr/local/lib/python3.10/site-packages/pandas/util/_decorators.py:331: in wrapper
+    return func(*args, **kwargs)
+/usr/local/lib/python3.10/site-packages/pandas/core/series.py:6063: in interpolate
+    return super().interpolate(
+/usr/local/lib/python3.10/site-packages/pandas/core/generic.py:7568: in interpolate
+    new_data = obj._mgr.interpolate(
+/usr/local/lib/python3.10/site-packages/pandas/core/internals/managers.py:424: in interpolate
+    return self.apply("interpolate", **kwargs)
+/usr/local/lib/python3.10/site-packages/pandas/core/internals/managers.py:352: in apply
+    applied = getattr(b, f)(**kwargs)
+/usr/local/lib/python3.10/site-packages/pandas/core/internals/blocks.py:1258: in interpolate
+    missing.interpolate_array_2d(
+/usr/local/lib/python3.10/site-packages/pandas/core/missing.py:249: in interpolate_array_2d
+    _interpolate_2d_with_fill(
+/usr/local/lib/python3.10/site-packages/pandas/core/missing.py:342: in _interpolate_2d_with_fill
+    np.apply_along_axis(func, axis, data)  # type: ignore[arg-type]
+<__array_function__ internals>:200: in apply_along_axis
+    ???
+/usr/local/lib/python3.10/site-packages/numpy/lib/shape_base.py:379: in apply_along_axis
+    res = asanyarray(func1d(inarr_view[ind0], *args, **kwargs))
+/usr/local/lib/python3.10/site-packages/pandas/core/missing.py:324: in func
+    _interpolate_1d(
+/usr/local/lib/python3.10/site-packages/pandas/core/missing.py:453: in _interpolate_1d
+    yvalues[invalid] = _interpolate_scipy_wrapper(
+/usr/local/lib/python3.10/site-packages/pandas/core/missing.py:477: in _interpolate_scipy_wrapper
+    import_optional_dependency("scipy", extra=extra)
+/usr/local/lib/python3.10/site-packages/pandas/compat/_optional.py:144: in import_optional_dependency
+    raise ImportError(msg)
+E   ImportError: Missing optional dependency 'scipy'. polynomial interpolation requires SciPy. Use pip or conda to install scipy.
+_ TestMissingValueHandlerInterpolation.test_interpolate_missing_values_spline __
+/usr/local/lib/python3.10/site-packages/pandas/compat/_optional.py:141: in import_optional_dependency
+    module = importlib.import_module(name)
+/usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/importlib/__init__.py:126: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+E   ModuleNotFoundError: No module named 'scipy'
+
+During handling of the above exception, another exception occurred:
+tests/test_missing_values_enhanced.py:216: in test_interpolate_missing_values_spline
+    result = MissingValueHandler.interpolate_missing_values(
+src/data/transformers/missing_values.py:104: in interpolate_missing_values
+    MissingValueHandler._apply_interpolation_method(result_df, col, method)
+src/data/transformers/missing_values.py:123: in _apply_interpolation_method
+    result_df[col] = interpolation_methods[method](result_df, col)
+src/data/transformers/missing_values.py:114: in <lambda>
+    "spline": lambda df, col: MissingValueHandler._safe_interpolate(
+src/data/transformers/missing_values.py:139: in _safe_interpolate
+    return result_df[col].interpolate(method=method, **kwargs)
+/usr/local/lib/python3.10/site-packages/pandas/util/_decorators.py:331: in wrapper
+    return func(*args, **kwargs)
+/usr/local/lib/python3.10/site-packages/pandas/core/series.py:6063: in interpolate
+    return super().interpolate(
+/usr/local/lib/python3.10/site-packages/pandas/core/generic.py:7568: in interpolate
+    new_data = obj._mgr.interpolate(
+/usr/local/lib/python3.10/site-packages/pandas/core/internals/managers.py:424: in interpolate
+    return self.apply("interpolate", **kwargs)
+/usr/local/lib/python3.10/site-packages/pandas/core/internals/managers.py:352: in apply
+    applied = getattr(b, f)(**kwargs)
+/usr/local/lib/python3.10/site-packages/pandas/core/internals/blocks.py:1258: in interpolate
+    missing.interpolate_array_2d(
+/usr/local/lib/python3.10/site-packages/pandas/core/missing.py:249: in interpolate_array_2d
+    _interpolate_2d_with_fill(
+/usr/local/lib/python3.10/site-packages/pandas/core/missing.py:342: in _interpolate_2d_with_fill
+    np.apply_along_axis(func, axis, data)  # type: ignore[arg-type]
+<__array_function__ internals>:200: in apply_along_axis
+    ???
+/usr/local/lib/python3.10/site-packages/numpy/lib/shape_base.py:379: in apply_along_axis
+    res = asanyarray(func1d(inarr_view[ind0], *args, **kwargs))
+/usr/local/lib/python3.10/site-packages/pandas/core/missing.py:324: in func
+    _interpolate_1d(
+/usr/local/lib/python3.10/site-packages/pandas/core/missing.py:453: in _interpolate_1d
+    yvalues[invalid] = _interpolate_scipy_wrapper(
+/usr/local/lib/python3.10/site-packages/pandas/core/missing.py:477: in _interpolate_scipy_wrapper
+    import_optional_dependency("scipy", extra=extra)
+/usr/local/lib/python3.10/site-packages/pandas/compat/_optional.py:144: in import_optional_dependency
+    raise ImportError(msg)
+E   ImportError: Missing optional dependency 'scipy'. spline interpolation requires SciPy. Use pip or conda to install scipy.
+_____ TestMissingValueHandlerInterpolation.test_safe_interpolate_fallback ______
+/usr/local/lib/python3.10/site-packages/pandas/compat/_optional.py:141: in import_optional_dependency
+    module = importlib.import_module(name)
+/usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/importlib/__init__.py:126: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+E   ModuleNotFoundError: No module named 'scipy'
+
+During handling of the above exception, another exception occurred:
+tests/test_missing_values_enhanced.py:277: in test_safe_interpolate_fallback
+    result = MissingValueHandler.interpolate_missing_values(
+src/data/transformers/missing_values.py:104: in interpolate_missing_values
+    MissingValueHandler._apply_interpolation_method(result_df, col, method)
+src/data/transformers/missing_values.py:123: in _apply_interpolation_method
+    result_df[col] = interpolation_methods[method](result_df, col)
+src/data/transformers/missing_values.py:114: in <lambda>
+    "spline": lambda df, col: MissingValueHandler._safe_interpolate(
+src/data/transformers/missing_values.py:139: in _safe_interpolate
+    return result_df[col].interpolate(method=method, **kwargs)
+/usr/local/lib/python3.10/site-packages/pandas/util/_decorators.py:331: in wrapper
+    return func(*args, **kwargs)
+/usr/local/lib/python3.10/site-packages/pandas/core/series.py:6063: in interpolate
+    return super().interpolate(
+/usr/local/lib/python3.10/site-packages/pandas/core/generic.py:7568: in interpolate
+    new_data = obj._mgr.interpolate(
+/usr/local/lib/python3.10/site-packages/pandas/core/internals/managers.py:424: in interpolate
+    return self.apply("interpolate", **kwargs)
+/usr/local/lib/python3.10/site-packages/pandas/core/internals/managers.py:352: in apply
+    applied = getattr(b, f)(**kwargs)
+/usr/local/lib/python3.10/site-packages/pandas/core/internals/blocks.py:1258: in interpolate
+    missing.interpolate_array_2d(
+/usr/local/lib/python3.10/site-packages/pandas/core/missing.py:249: in interpolate_array_2d
+    _interpolate_2d_with_fill(
+/usr/local/lib/python3.10/site-packages/pandas/core/missing.py:342: in _interpolate_2d_with_fill
+    np.apply_along_axis(func, axis, data)  # type: ignore[arg-type]
+<__array_function__ internals>:200: in apply_along_axis
+    ???
+/usr/local/lib/python3.10/site-packages/numpy/lib/shape_base.py:379: in apply_along_axis
+    res = asanyarray(func1d(inarr_view[ind0], *args, **kwargs))
+/usr/local/lib/python3.10/site-packages/pandas/core/missing.py:324: in func
+    _interpolate_1d(
+/usr/local/lib/python3.10/site-packages/pandas/core/missing.py:453: in _interpolate_1d
+    yvalues[invalid] = _interpolate_scipy_wrapper(
+/usr/local/lib/python3.10/site-packages/pandas/core/missing.py:477: in _interpolate_scipy_wrapper
+    import_optional_dependency("scipy", extra=extra)
+/usr/local/lib/python3.10/site-packages/pandas/compat/_optional.py:144: in import_optional_dependency
+    raise ImportError(msg)
+E   ImportError: Missing optional dependency 'scipy'. spline interpolation requires SciPy. Use pip or conda to install scipy.
+____________ TestPrometheusImports.test_fallback_prometheus_classes ____________
+/usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/mock.py:1366: in patched
+    with self.decoration_helper(patched,
+/usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/contextlib.py:135: in __enter__
+    return next(self.gen)
+/usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/mock.py:1348: in decoration_helper
+    arg = exit_stack.enter_context(patching)
+/usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/contextlib.py:492: in enter_context
+    result = _cm_type.__enter__(cm)
+/usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/mock.py:1437: in __enter__
+    original, local = self.get_original()
+/usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/mock.py:1410: in get_original
+    raise AttributeError(
+E   AttributeError: <class 'src.monitoring.metrics_collector.TradingMetricsCollector'> does not have the attribute 'prometheus_client'
+_ TestTradingMetricsCollectorBasic.test_init_with_exporter_backward_compatibility _
+/usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/mock.py:1366: in patched
+    with self.decoration_helper(patched,
+/usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/contextlib.py:135: in __enter__
+    return next(self.gen)
+/usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/mock.py:1348: in decoration_helper
+    arg = exit_stack.enter_context(patching)
+/usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/contextlib.py:492: in enter_context
+    result = _cm_type.__enter__(cm)
+/usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/mock.py:1437: in __enter__
+    original, local = self.get_original()
+/usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/mock.py:1410: in get_original
+    raise AttributeError(
+E   AttributeError: <class 'src.monitoring.metrics_collector.TradingMetricsCollector'> does not have the attribute 'PrometheusExporter'
+___ TestTradingMetricsCollectorErrorSummary.test_get_error_summary_exception ___
+tests/test_monitoring_metrics_collector_enhanced.py:542: in test_get_error_summary_exception
+    with patch('src.monitoring.metrics_collector.REGISTRY', mock_registry):
+/usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/mock.py:1437: in __enter__
+    original, local = self.get_original()
+/usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/mock.py:1410: in get_original
+    raise AttributeError(
+E   AttributeError: <class 'src.monitoring.metrics_collector.TradingMetricsCollector'> does not have the attribute 'REGISTRY'
+____ TestTradingMetricsCollectorErrorSummary.test_get_error_summary_success ____
+/usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/mock.py:1366: in patched
+    with self.decoration_helper(patched,
+/usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/contextlib.py:135: in __enter__
+    return next(self.gen)
+/usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/mock.py:1348: in decoration_helper
+    arg = exit_stack.enter_context(patching)
+/usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/contextlib.py:492: in enter_context
+    result = _cm_type.__enter__(cm)
+/usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/mock.py:1437: in __enter__
+    original, local = self.get_original()
+/usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/mock.py:1410: in get_original
+    raise AttributeError(
+E   AttributeError: <class 'src.monitoring.metrics_collector.TradingMetricsCollector'> does not have the attribute 'REGISTRY'
+__________ TestGlobalFunctions.test_get_metrics_collector_env_config ___________
+tests/test_monitoring_metrics_collector_enhanced.py:616: in test_get_metrics_collector_env_config
+    self.assertFalse(collector.config.enabled)
+E   AssertionError: True is not false
+___________________ TestGlobalFunctions.test_init_monitoring ___________________
+tests/test_monitoring_metrics_collector_enhanced.py:628: in test_init_monitoring
+    mock_collector.start_server.assert_called_once()
+/usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/mock.py:898: in assert_called_once
+    raise AssertionError(msg)
+E   AssertionError: Expected 'start_server' to have been called once. Called 0 times.
+_________________ TestRetryManager.test_calculate_retry_delay __________________
+tests/test_network_modules.py:89: in test_calculate_retry_delay
+    delay = calculate_retry_delay(attempt=1, base_delay=1.0, exponential_base=2.0, max_delay=10.0)
+E   TypeError: calculate_retry_delay() got an unexpected keyword argument 'base_delay'
+_________________ TestRetryManager.test_retry_decorator_basic __________________
+tests/test_network_modules.py:115: in test_retry_decorator_basic
+    result = flaky_function()
+src/core/network/retry_manager.py:101: in wrapper
+    return simple_executor.execute(*args, **kwargs)
+src/core/network/retry_manager.py:131: in execute
+    return self._execute_attempt(attempt, args, kwargs)
+src/core/network/retry_manager.py:152: in _execute_attempt
+    return self.func(*args, **kwargs)
+tests/test_network_modules.py:111: in flaky_function
+    raise ValueError("模拟错误")
+E   ValueError: 模拟错误
+------------------------------ Captured log call -------------------------------
+ERROR    src.core.network.retry_manager:retry_manager.py:171 All 1 attempts failed, last error: 模拟错误
+______________ TestStateManager.test_state_manager_initialization ______________
+tests/test_network_modules.py:141: in test_state_manager_initialization
+    assert manager.state_dir == self.temp_dir
+E   AssertionError: assert PosixPath('/var/folders/7q/6qzph4cs7h75y6j7ll9dgb340000gn/T/tmpddw3mr86') == '/var/folders/7q/6qzph4cs7h75y6j7ll9dgb340000gn/T/tmpddw3mr86'
+E    +  where PosixPath('/var/folders/7q/6qzph4cs7h75y6j7ll9dgb340000gn/T/tmpddw3mr86') = <src.core.network.state_manager.StateManager object at 0x12400da20>.state_dir
+E    +  and   '/var/folders/7q/6qzph4cs7h75y6j7ll9dgb340000gn/T/tmpddw3mr86' = <tests.test_network_modules.TestStateManager object at 0x1240245b0>.temp_dir
+__________________ TestStateManager.test_save_and_load_state ___________________
+tests/test_network_modules.py:156: in test_save_and_load_state
+    assert loaded_state == test_state
+E   AssertionError: assert {} == {'number': 42... 'test_value'}
+E     
+E     Right contains 2 more items:
+E     {'number': 42, 'test_key': 'test_value'}
+E     Use -v to get more diff
+------------------------------ Captured log call -------------------------------
+ERROR    src.core.network.state_manager:state_manager.py:50 Failed to save state: 'str' object has no attribute 'parent'
+ERROR    src.core.network.state_manager:state_manager.py:78 Failed to load state: 'str' object has no attribute 'exists'
+_______________ TestNetworkDecorators.test_with_retry_decorator ________________
+tests/test_network_modules.py:224: in test_with_retry_decorator
+    @with_retry(max_retries=2, base_delay=0.001)
+E   TypeError: with_retry() got an unexpected keyword argument 'max_retries'
+_____________ TestNetworkDecorators.test_network_request_decorator _____________
+tests/test_network_modules.py:244: in test_network_request_decorator
+    result = mock_api_call()
+E   TypeError: with_comprehensive_retry.<locals>.decorator() missing 1 required positional argument: 'func'
+________________ TestNetworkDecorators.test_api_call_decorator _________________
+tests/test_network_modules.py:255: in test_api_call_decorator
+    result = mock_api_function()
+E   TypeError: with_comprehensive_retry.<locals>.decorator() missing 1 required positional argument: 'func'
+___________ TestNetworkDecorators.test_critical_operation_decorator ____________
+tests/test_network_modules.py:266: in test_critical_operation_decorator
+    result = critical_function()
+E   TypeError: with_comprehensive_retry.<locals>.decorator() missing 1 required positional argument: 'func'
+___________ TestIntegrationScenarios.test_stateful_client_with_retry ___________
+tests/test_network_modules.py:294: in test_stateful_client_with_retry
+    @with_retry(max_retries=2, base_delay=0.001)
+E   TypeError: with_retry() got an unexpected keyword argument 'max_retries'
+_____________ TestIntegrationScenarios.test_comprehensive_workflow _____________
+tests/test_network_modules.py:323: in test_comprehensive_workflow
+    assert loaded_state["client_id"] == "test"
+E   KeyError: 'client_id'
+------------------------------ Captured log call -------------------------------
+ERROR    src.core.network.state_manager:state_manager.py:50 Failed to save state: 'str' object has no attribute 'parent'
+ERROR    src.core.network.state_manager:state_manager.py:78 Failed to load state: 'str' object has no attribute 'exists'
+________________________ TestNotifier.test_notify_error ________________________
+tests/test_notify.py:108: in test_notify_error
+    mock_send.assert_called_once()
+/usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/mock.py:898: in assert_called_once
+    raise AssertionError(msg)
+E   AssertionError: Expected 'send_message' to have been called once. Called 0 times.
+----------------------------- Captured stdout call -----------------------------
+发送Telegram消息失败: 404 - {"ok":false,"error_code":404,"description":"Not Found"}
+_______________________ TestNotifier.test_notify_success _______________________
+tests/test_notify.py:76: in test_notify_success
+    mock_send.assert_called_once()
+/usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/mock.py:898: in assert_called_once
+    raise AssertionError(msg)
+E   AssertionError: Expected 'send_message' to have been called once. Called 0 times.
+----------------------------- Captured stdout call -----------------------------
+发送Telegram消息失败: 404 - {"ok":false,"error_code":404,"description":"Not Found"}
+________________________ TestNotifier.test_notify_trade ________________________
+tests/test_notify.py:90: in test_notify_trade
+    mock_send.assert_called_once()
+/usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/mock.py:898: in assert_called_once
+    raise AssertionError(msg)
+E   AssertionError: Expected 'send_message' to have been called once. Called 0 times.
+----------------------------- Captured stdout call -----------------------------
+发送Telegram消息失败: 404 - {"ok":false,"error_code":404,"description":"Not Found"}
+___________ TestNotifierIntegration.test_full_notification_workflow ____________
+tests/test_notify.py:162: in test_full_notification_workflow
+    self.assertEqual(mock_send.call_count, 3)
+E   AssertionError: 0 != 3
+----------------------------- Captured stdout call -----------------------------
+发送Telegram消息失败: 404 - {"ok":false,"error_code":404,"description":"Not Found"}
+发送Telegram消息失败: 404 - {"ok":false,"error_code":404,"description":"Not Found"}
+发送Telegram消息失败: 404 - {"ok":false,"error_code":404,"description":"Not Found"}
+______ TestDataSaverParametrized.test_save_data_formats[parquet-.parquet] ______
+tests/test_parametrized_examples.py:55: in test_save_data_formats
+    assert success is True
+E   assert False is True
+----------------------------- Captured stdout call -----------------------------
+❌ 保存格式 parquet 时出错: Unable to find a usable engine; tried using: 'pyarrow', 'fastparquet'.
+A suitable version of pyarrow or fastparquet is required for parquet support.
+Trying to import the above resulted in these errors:
+ - Missing optional dependency 'pyarrow'. pyarrow is required for parquet support. Use pip or conda to install pyarrow.
+ - Missing optional dependency 'fastparquet'. fastparquet is required for parquet support. Use pip or conda to install fastparquet.
+_______ TestDataSaverParametrized.test_cleanup_old_files_thresholds[1-1] _______
+tests/test_parametrized_examples.py:90: in test_cleanup_old_files_thresholds
+    assert len(remaining_files) == expected_files
+E   AssertionError: assert 5 == 1
+E    +  where 5 = len([PosixPath('/private/var/folders/7q/6qzph4cs7h75y6j7ll9dgb340000gn/T/pytest-of-liam/pytest-0/test_cleanup_old_files_th.../folders/7q/6qzph4cs7h75y6j7ll9dgb340000gn/T/pytest-of-liam/pytest-0/test_cleanup_old_files_thresho1/test_file_4.csv')])
+_______ TestDataSaverParametrized.test_cleanup_old_files_thresholds[3-3] _______
+tests/test_parametrized_examples.py:90: in test_cleanup_old_files_thresholds
+    assert len(remaining_files) == expected_files
+E   AssertionError: assert 5 == 3
+E    +  where 5 = len([PosixPath('/private/var/folders/7q/6qzph4cs7h75y6j7ll9dgb340000gn/T/pytest-of-liam/pytest-0/test_cleanup_old_files_th.../folders/7q/6qzph4cs7h75y6j7ll9dgb340000gn/T/pytest-of-liam/pytest-0/test_cleanup_old_files_thresho2/test_file_4.csv')])
+_________________________________ test_timeout _________________________________
+Expected None, but test returned <contextlib._GeneratorContextManager object at 0x1314d5090>. Did you mean to use `assert` instead of `return`?
+___________________ TestSafeRunner.test_async_sleep_mocking ____________________
+tests/test_safe_runner.py:148: in test_async_sleep_mocking
+    assert success is True
+E   assert False is True
+__________ TestSimpleCoverage.test_calculate_position_size_edge_cases __________
+tests/test_simple_coverage.py:37: in test_calculate_position_size_edge_cases
+    engine = TradingEngine()
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+____________ TestSimpleCoverage.test_process_buy_signal_edge_cases _____________
+tests/test_simple_coverage.py:75: in test_process_buy_signal_edge_cases
+    engine = TradingEngine()
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+____________ TestSimpleCoverage.test_process_sell_signal_edge_cases ____________
+tests/test_simple_coverage.py:120: in test_process_sell_signal_edge_cases
+    engine = TradingEngine()
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+______________ TestSimpleCoverage.test_send_status_update_timing _______________
+tests/test_simple_coverage.py:152: in test_send_status_update_timing
+    engine = TradingEngine()
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+________________ TestSimpleCoverage.test_update_positions_calls ________________
+tests/test_simple_coverage.py:184: in test_update_positions_calls
+    engine = TradingEngine()
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+___________ TestSimpleCoverage.test_execute_trading_cycle_empty_data ___________
+tests/test_simple_coverage.py:216: in test_execute_trading_cycle_empty_data
+    engine = TradingEngine()
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+_________ TestSimpleCoverage.test_execute_trading_cycle_invalid_signal _________
+tests/test_simple_coverage.py:260: in test_execute_trading_cycle_invalid_signal
+    engine = TradingEngine()
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+_______________ TestSimpleCoverage.test_start_trading_loop_basic _______________
+tests/test_simple_coverage.py:290: in test_start_trading_loop_basic
+    engine = TradingEngine()
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+______________ TestSimpleCoverage.test_monitoring_metrics_update _______________
+tests/test_simple_coverage.py:344: in test_monitoring_metrics_update
+    engine = TradingEngine()
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+___________ TestSimpleCoverage.test_execute_order_exception_handling ___________
+tests/test_simple_coverage.py:381: in test_execute_order_exception_handling
+    engine = TradingEngine()
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+_________ TestSimpleCoverage.test_status_update_with_position_details __________
+tests/test_simple_coverage.py:429: in test_status_update_with_position_details
+    engine = TradingEngine()
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+________________ TestNotifyModule.test_notifier_initialization _________________
+tests/test_simple_modules_coverage.py:320: in test_notifier_initialization
+    notifier = Notifier(None)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+____________________ TestNotifyModule.test_notifier_methods ____________________
+tests/test_simple_modules_coverage.py:335: in test_notifier_methods
+    notifier = Notifier(None)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+_____________________ TestMainBlock.test_main_block_basic ______________________
+tests/test_tools_reconcile.py:824: in test_main_block_basic
+    daily_reconciliation(
+src/tools/reconcile.py:302: in daily_reconciliation
+    local_trades = get_local_trades(symbol, date, date, trades_dir)
+src/tools/reconcile.py:69: in get_local_trades
+    broker = Broker("", "", trades_dir=trades_dir)
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+----------------------------- Captured stdout call -----------------------------
+开始对账: BTCUSDT (2025-06-07)
+从交易所获取BTCUSDT交易历史 (2025-06-07 至 2025-06-07)
+从本地CSV获取BTCUSDT交易历史 (2025-06-07 至 2025-06-07)
+_________ TestTradingEngineEnhanced.test_trading_engine_initialization _________
+tests/test_trading_engines_enhanced.py:68: in test_trading_engine_initialization
+    engine, _, _, _ = self.create_mock_engine()
+tests/test_trading_engines_enhanced.py:57: in create_mock_engine
+    engine = TradingEngine()
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+_______ TestTradingEngineEnhanced.test_analyze_market_conditions_success _______
+tests/test_trading_engines_enhanced.py:80: in test_analyze_market_conditions_success
+    engine, _, _, mock_signal_processor = self.create_mock_engine()
+tests/test_trading_engines_enhanced.py:57: in create_mock_engine
+    engine = TradingEngine()
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+________ TestTradingEngineEnhanced.test_analyze_market_conditions_error ________
+tests/test_trading_engines_enhanced.py:116: in test_analyze_market_conditions_error
+    engine, _, _, _ = self.create_mock_engine()
+tests/test_trading_engines_enhanced.py:57: in create_mock_engine
+    engine = TradingEngine()
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+____ TestTradingEngineEnhanced.test_validate_trading_conditions_weak_signal ____
+tests/test_trading_engines_enhanced.py:128: in test_validate_trading_conditions_weak_signal
+    engine, _, _, _ = self.create_mock_engine()
+tests/test_trading_engines_enhanced.py:57: in create_mock_engine
+    engine = TradingEngine()
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+____ TestTradingEngineEnhanced.test_validate_trading_conditions_force_trade ____
+tests/test_trading_engines_enhanced.py:144: in test_validate_trading_conditions_force_trade
+    engine, _, _, _ = self.create_mock_engine()
+tests/test_trading_engines_enhanced.py:57: in create_mock_engine
+    engine = TradingEngine()
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+_ TestTradingEngineEnhanced.test_validate_trading_conditions_insufficient_balance _
+tests/test_trading_engines_enhanced.py:159: in test_validate_trading_conditions_insufficient_balance
+    engine, mock_broker, _, _ = self.create_mock_engine()
+tests/test_trading_engines_enhanced.py:57: in create_mock_engine
+    engine = TradingEngine()
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+_______ TestTradingEngineEnhanced.test_calculate_position_size_with_atr ________
+tests/test_trading_engines_enhanced.py:182: in test_calculate_position_size_with_atr
+    engine, mock_broker, _, _ = self.create_mock_engine()
+tests/test_trading_engines_enhanced.py:57: in create_mock_engine
+    engine = TradingEngine()
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+_______ TestTradingEngineEnhanced.test_calculate_position_size_zero_atr ________
+tests/test_trading_engines_enhanced.py:199: in test_calculate_position_size_zero_atr
+    engine, mock_broker, _, _ = self.create_mock_engine()
+tests/test_trading_engines_enhanced.py:57: in create_mock_engine
+    engine = TradingEngine()
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+___________ TestTradingEngineEnhanced.test_execute_buy_trade_success ___________
+tests/test_trading_engines_enhanced.py:216: in test_execute_buy_trade_success
+    engine, mock_broker, _, _ = self.create_mock_engine()
+tests/test_trading_engines_enhanced.py:57: in create_mock_engine
+    engine = TradingEngine()
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+____ TestTradingEngineEnhanced.test_execute_sell_trade_sufficient_position _____
+tests/test_trading_engines_enhanced.py:237: in test_execute_sell_trade_sufficient_position
+    engine, mock_broker, _, _ = self.create_mock_engine()
+tests/test_trading_engines_enhanced.py:57: in create_mock_engine
+    engine = TradingEngine()
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+___ TestTradingEngineEnhanced.test_execute_sell_trade_insufficient_position ____
+tests/test_trading_engines_enhanced.py:257: in test_execute_sell_trade_insufficient_position
+    engine, mock_broker, _, _ = self.create_mock_engine()
+tests/test_trading_engines_enhanced.py:57: in create_mock_engine
+    engine = TradingEngine()
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+___________ TestTradingEngineEnhanced.test_execute_trading_logic_buy ___________
+tests/test_trading_engines_enhanced.py:273: in test_execute_trading_logic_buy
+    engine, _, _, _ = self.create_mock_engine()
+tests/test_trading_engines_enhanced.py:57: in create_mock_engine
+    engine = TradingEngine()
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+__________ TestTradingEngineEnhanced.test_execute_trading_logic_sell ___________
+tests/test_trading_engines_enhanced.py:293: in test_execute_trading_logic_sell
+    engine, _, _, _ = self.create_mock_engine()
+tests/test_trading_engines_enhanced.py:57: in create_mock_engine
+    engine = TradingEngine()
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+__________ TestTradingEngineEnhanced.test_execute_trading_logic_hold ___________
+tests/test_trading_engines_enhanced.py:313: in test_execute_trading_logic_hold
+    engine, _, _, _ = self.create_mock_engine()
+tests/test_trading_engines_enhanced.py:57: in create_mock_engine
+    engine = TradingEngine()
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+_____ TestTradingEngineEnhanced.test_execute_trade_decision_complete_flow ______
+tests/test_trading_engines_enhanced.py:333: in test_execute_trade_decision_complete_flow
+    engine, _, _, _ = self.create_mock_engine()
+tests/test_trading_engines_enhanced.py:57: in create_mock_engine
+    engine = TradingEngine()
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+_______________ TestTradingEngineEnhanced.test_get_engine_status _______________
+tests/test_trading_engines_enhanced.py:360: in test_get_engine_status
+    engine, mock_broker, _, _ = self.create_mock_engine()
+tests/test_trading_engines_enhanced.py:57: in create_mock_engine
+    engine = TradingEngine()
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+_________________ TestTradingEngineEnhanced.test_start_engine __________________
+tests/test_trading_engines_enhanced.py:385: in test_start_engine
+    engine, _, _, _ = self.create_mock_engine()
+tests/test_trading_engines_enhanced.py:57: in create_mock_engine
+    engine = TradingEngine()
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+__________________ TestTradingEngineEnhanced.test_stop_engine __________________
+tests/test_trading_engines_enhanced.py:397: in test_stop_engine
+    engine, _, _, _ = self.create_mock_engine()
+tests/test_trading_engines_enhanced.py:57: in create_mock_engine
+    engine = TradingEngine()
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+_________ TestTradingEngineEnhanced.test_process_buy_signal_simplified _________
+tests/test_trading_engines_enhanced.py:411: in test_process_buy_signal_simplified
+    engine, mock_broker, _, _ = self.create_mock_engine()
+tests/test_trading_engines_enhanced.py:57: in create_mock_engine
+    engine = TradingEngine()
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+________ TestTradingEngineEnhanced.test_process_sell_signal_simplified _________
+tests/test_trading_engines_enhanced.py:420: in test_process_sell_signal_simplified
+    engine, mock_broker, _, _ = self.create_mock_engine()
+tests/test_trading_engines_enhanced.py:57: in create_mock_engine
+    engine = TradingEngine()
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+_____________ TestTradingEngineEnhanced.test_execute_trading_cycle _____________
+tests/test_trading_engines_enhanced.py:429: in test_execute_trading_cycle
+    engine, _, _, _ = self.create_mock_engine()
+tests/test_trading_engines_enhanced.py:57: in create_mock_engine
+    engine = TradingEngine()
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+_______ TestTradingEngineEnhanced.test_error_handling_in_trade_execution _______
+tests/test_trading_engines_enhanced.py:460: in test_error_handling_in_trade_execution
+    engine, _, _, _ = self.create_mock_engine()
+tests/test_trading_engines_enhanced.py:57: in create_mock_engine
+    engine = TradingEngine()
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+________________ TestTradingEngineEnhanced.test_trend_analysis _________________
+tests/test_trading_engines_enhanced.py:472: in test_trend_analysis
+    engine, _, _, _ = self.create_mock_engine()
+tests/test_trading_engines_enhanced.py:57: in create_mock_engine
+    engine = TradingEngine()
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+______________ TestTradingEngineEnhanced.test_volatility_analysis ______________
+tests/test_trading_engines_enhanced.py:486: in test_volatility_analysis
+    engine, _, _, _ = self.create_mock_engine()
+tests/test_trading_engines_enhanced.py:57: in create_mock_engine
+    engine = TradingEngine()
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+____________ TestTradingEngineEnhanced.test_generate_recommendation ____________
+tests/test_trading_engines_enhanced.py:500: in test_generate_recommendation
+    engine, _, _, _ = self.create_mock_engine()
+tests/test_trading_engines_enhanced.py:57: in create_mock_engine
+    engine = TradingEngine()
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+____________ TestTradingEngineEnhanced.test_update_trade_statistics ____________
+tests/test_trading_engines_enhanced.py:524: in test_update_trade_statistics
+    engine, _, mock_metrics, _ = self.create_mock_engine()
+tests/test_trading_engines_enhanced.py:57: in create_mock_engine
+    engine = TradingEngine()
+src/core/trading_engine.py:51: in __init__
+    self.broker: Broker = Broker(
+src/brokers/broker.py:43: in __init__
+    self.notifier = Notifier(telegram_token)
+src/notify.py:26: in __init__
+    raise ValueError("Telegram chat ID not found in environment")
+E   ValueError: Telegram chat ID not found in environment
+________ TestTradingEngineWithMocks.test_trading_engine_status_methods _________
+tests/test_trading_engines_simplified.py:227: in test_trading_engine_status_methods
+    status = engine.get_engine_status()
+src/core/trading_engine.py:426: in get_engine_status
+    if current_balance > self.peak_balance:
+E   TypeError: '>' not supported between instances of 'Mock' and 'float'
+______ TestTradingEngineWithMocks.test_trading_engine_calculation_methods ______
+tests/test_trading_engines_simplified.py:274: in test_trading_engine_calculation_methods
+    internal_size = engine._calculate_position_size_internal(market_analysis)
+src/core/trading_engine.py:292: in _calculate_position_size_internal
+    risk_amount = available_balance * self.risk_percent
+E   TypeError: unsupported operand type(s) for *: 'Mock' and 'float'
+_______ TestTradingEngineWithMocks.test_trading_engine_response_creation _______
+tests/test_trading_engines_simplified.py:306: in test_trading_engine_response_creation
+    hold_response = engine._create_hold_response(market_analysis, 0.1, "测试持有")
+src/core/trading_engine.py:378: in _create_hold_response
+    "signal_strength": market_analysis["signal_strength"],
+E   KeyError: 'signal_strength'
+_______ TestTradingEngineWithMocks.test_trading_engine_signal_processing _______
+tests/test_trading_engines_simplified.py:345: in test_trading_engine_signal_processing
+    buy_result = engine.process_buy_signal("BTCUSDT", buy_signals, 1500.0)
+src/core/trading_engine.py:559: in process_buy_signal
+    if not signals["buy_signal"] or symbol in self.broker.positions:
+E   TypeError: argument of type 'Mock' is not iterable
+__________ TestTradingEngineWithMocks.test_trading_engine_monitoring ___________
+tests/test_trading_engines_simplified.py:388: in test_trading_engine_monitoring
+    engine.send_status_update("BTCUSDT", signals, 1500.0)
+src/core/trading_engine.py:652: in send_status_update
+    f"快线 (Fast MA): {signals['fast_ma']:.8f}\n"
+E   KeyError: 'fast_ma'
+
+During handling of the above exception, another exception occurred:
+tests/test_trading_engines_simplified.py:391: in test_trading_engine_monitoring
+    pytest.fail(f"send_status_update failed: {e}")
+E   Failed: send_status_update failed: 'fast_ma'
+________ TestTradingLoopBackwardCompatibility.test_calculate_atr_import ________
+tests/test_trading_loop.py:79: in test_calculate_atr_import
+    self.assertIs(trading_loop_module.calculate_atr, original_func)
+E   AssertionError: <function calculate_atr at 0x122052d40> is not <function calculate_atr at 0x12fce68c0>
+______ TestTradingLoopBackwardCompatibility.test_fetch_price_data_import _______
+tests/test_trading_loop.py:72: in test_fetch_price_data_import
+    self.assertIs(trading_loop_module.fetch_price_data, original_func)
+E   AssertionError: <function fetch_price_data at 0x121da2710> is not <function fetch_price_data at 0x130f8ab00>
+_____ TestTradingLoopBackwardCompatibility.test_get_trading_signals_import _____
+tests/test_trading_loop.py:86: in test_get_trading_signals_import
+    self.assertIs(trading_loop_module.get_trading_signals, original_func)
+E   AssertionError: <function get_trading_signals at 0x1224c7d90> is not <function get_trading_signals at 0x13110ab00>
+_______ TestTradingLoopBackwardCompatibility.test_trading_engine_import ________
+tests/test_trading_loop.py:100: in test_trading_engine_import
+    self.assertIs(trading_loop_module.TradingEngine, original_class)
+E   AssertionError: <class 'src.core.trading_engine.TradingEngine'> is not <class 'src.core.trading_engine.TradingEngine'>
+________ TestTradingLoopBackwardCompatibility.test_trading_loop_import _________
+tests/test_trading_loop.py:93: in test_trading_loop_import
+    self.assertIs(trading_loop_module.trading_loop, original_func)
+E   AssertionError: <function trading_loop at 0x1224da560> is not <function trading_loop at 0x13110a830>
+______ TestIntegrationWithOriginalModules.test_price_fetcher_integration _______
+tests/test_trading_loop.py:354: in test_price_fetcher_integration
+    self.assertEqual(
+E   AssertionError: <Sign[66 chars].client.ExchangeClient] = None) -> pandas.core.frame.DataFrame> != <Sign[66 chars].client.ExchangeClient] = None) -> pandas.core.frame.DataFrame>
+______________ TestGetTradesDir.test_get_trades_dir_year_handling ______________
+tests/test_utils.py:116: in test_get_trades_dir_year_handling
+    assert str(result) == expected_path
+E   AssertionError: assert '/home/user/trades/2025' == '/home/user/trades/2023'
+E     
+E     - /home/user/trades/2023
+E     ?                      ^
+E     + /home/user/trades/2025
+E     ?                      ^
+_________________ TestGetTradesFile.test_get_trades_file_basic _________________
+tests/test_utils.py:157: in test_get_trades_file_basic
+    mock_get_dir.assert_called_once_with(None)
+/usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/unittest/mock.py:930: in assert_called_once_with
+    raise AssertionError(msg)
+E   AssertionError: Expected 'get_trades_dir' to be called once. Called 0 times.
+_____________ TestGetTradesFile.test_get_trades_file_with_base_dir _____________
+/usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/pathlib.py:1175: in mkdir
+    self._accessor.mkdir(self, mode)
+E   FileNotFoundError: [Errno 2] No such file or directory: '/custom/base'
+
+During handling of the above exception, another exception occurred:
+tests/test_utils.py:173: in test_get_trades_file_with_base_dir
+    result = get_trades_file(symbol, base_dir=base_dir)
+src/utils.py:52: in get_trades_file
+    trades_dir = get_trades_dir(base_dir)
+src/utils.py:36: in get_trades_dir
+    trades_dir.mkdir(parents=True, exist_ok=True)
+/usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/pathlib.py:1179: in mkdir
+    self.parent.mkdir(parents=True, exist_ok=True)
+/usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/pathlib.py:1175: in mkdir
+    self._accessor.mkdir(self, mode)
+E   OSError: [Errno 30] Read-only file system: '/custom'
+______________ TestWSClientFunctionsSimple.test_create_ws_client _______________
+tests/test_ws_binance_client_simple.py:290: in test_create_ws_client
+    assert isinstance(client, BinanceWSClient)
+E   assert False
+E    +  where False = isinstance(<src.ws.binance_ws_client.BinanceWSClient object at 0x130eb40a0>, BinanceWSClient)
+=============================== warnings summary ===============================
+tests/test_config.py:26
+  /Users/liam/Python syntax core/tests/test_config.py:26: DeprecationWarning: src.config is deprecated. Please use the new configuration system.
+    from src.config import TradingConfig, get_config, setup_logging
+
+../../../usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/importlib/__init__.py:126
+  /usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/importlib/__init__.py:126: DeprecationWarning: 直接从 src.signals 导入已弃用。请使用 src.indicators 中的模块化导入。
+  例如: from src.indicators import crossover, moving_average
+    return _bootstrap._gcd_import(name[level:], package, level)
+
+scripts/monitoring/__init__.py:10
+  /Users/liam/Python syntax core/scripts/monitoring/__init__.py:10: DeprecationWarning: Importing from scripts.monitoring is deprecated. Please use 'from src.monitoring import PrometheusExporter' instead.
+    from .monitoring import PrometheusExporter
+
+tests/test_safe_runner.py:19
+  /Users/liam/Python syntax core/tests/test_safe_runner.py:19: PytestCollectionWarning: cannot collect test class 'TestTimeoutError' because it has a __init__ constructor (from: tests/test_safe_runner.py)
+    class TestTimeoutError(Exception):
+
+tests/test_brokers_live_broker_async.py::TestLiveBrokerAsync::test_place_order_async_with_mocked_request
+tests/test_brokers_live_broker_async.py::TestLiveBrokerAsync::test_place_order_async_market_success
+tests/test_brokers_live_broker_async.py::TestLiveBrokerAsync::test_place_order_async_limit_success
+tests/test_brokers_live_broker_async.py::TestLiveBrokerAsyncIntegration::test_full_order_workflow
+tests/test_brokers_live_broker_async.py::TestLiveBrokerAsyncIntegration::test_concurrent_orders
+  /Users/liam/Python syntax core/tests/conftest.py:234: RuntimeWarning: coroutine 'LiveBrokerAsync._monitor_order_status' was never awaited
+    gc.collect()
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+tests/test_brokers_live_broker_async.py::TestUtilityFunctions::test_main_function_success
+  /Users/liam/Python syntax core/tests/test_brokers_live_broker_async.py:434: RuntimeWarning: coroutine 'AsyncMockMixin._execute_mock_call' was never awaited
+    await main()
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+tests/test_core_async_trading_engine.py::TestAsyncTradingEngine::test_handle_market_data_limit_data_points
+  /Users/liam/Python syntax core/tests/conftest.py:229: RuntimeWarning: coroutine 'AsyncTradingEngine._process_trading_signal' was never awaited
+    gc.collect()
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+tests/test_core_async_trading_engine.py::TestAsyncTradingEngine::test_run_success
+tests/test_core_async_trading_engine.py::TestAsyncTradingEngine::test_run_keyboard_interrupt
+  /Users/liam/Python syntax core/tests/conftest.py:234: RuntimeWarning: coroutine 'AsyncMockMixin._execute_mock_call' was never awaited
+    gc.collect()
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+tests/test_core_async_trading_engine.py::TestAsyncTradingEngine::test_run_success
+tests/test_core_async_trading_engine.py::TestAsyncTradingEngine::test_run_keyboard_interrupt
+  /Users/liam/Python syntax core/tests/conftest.py:234: RuntimeWarning: coroutine 'AsyncTradingEngine._status_monitoring_loop' was never awaited
+    gc.collect()
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+tests/test_core_async_trading_engine.py::TestAsyncTradingEngine::test_run_success
+tests/test_core_async_trading_engine.py::TestAsyncTradingEngine::test_run_keyboard_interrupt
+  /Users/liam/Python syntax core/tests/conftest.py:234: RuntimeWarning: coroutine 'AsyncTradingEngine._performance_monitoring_loop' was never awaited
+    gc.collect()
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+tests/test_core_async_trading_engine.py::TestAsyncTradingEngineEdgeCases::test_concurrent_task_management
+  /Users/liam/Python syntax core/tests/conftest.py:234: RuntimeWarning: coroutine 'AsyncTradingEngine._process_trading_signal' was never awaited
+    gc.collect()
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+tests/test_core_risk_management.py::TestComputeATR::test_compute_atr_empty_series
+  /Users/liam/Python syntax core/tests/test_core_risk_management.py:88: FutureWarning: The default dtype for empty Series will be 'object' instead of 'float64' in a future version. Specify a dtype explicitly to silence this warning.
+    empty_series = pd.Series([])
+
+tests/test_core_signal_processor.py::TestSignalProcessorEdgeCases::test_get_trading_signals_empty_dataframe
+  /Users/liam/Python syntax core/tests/test_core_signal_processor.py:816: FutureWarning: The default dtype for empty Series will be 'object' instead of 'float64' in a future version. Specify a dtype explicitly to silence this warning.
+    mock_ma.side_effect = [pd.Series([]), pd.Series([])]
+
+tests/test_data_saver_final.py::TestProcessedDataExporterSignals::test_export_signals_data_empty_dataframe
+  /Users/liam/Python syntax core/src/data/validators/data_saver.py:189: FutureWarning: The default dtype for empty Series will be 'object' instead of 'float64' in a future version. Specify a dtype explicitly to silence this warning.
+    "memory_usage_mb": round(df.memory_usage(deep=True).sum() / (1024 * 1024), 2),
+
+tests/test_improved_strategy.py::TestHelperFunctions::test_validate_input_data_empty
+  /Users/liam/Python syntax core/tests/test_improved_strategy.py:369: FutureWarning: The default dtype for empty Series will be 'object' instead of 'float64' in a future version. Specify a dtype explicitly to silence this warning.
+    empty_data = pd.Series([])
+
+tests/test_low_coverage_improvements.py::TestBinanceWSClient::test_binance_ws_client_attributes
+tests/test_low_coverage_improvements.py::TestBinanceWSClient::test_binance_ws_client_connection
+tests/test_low_coverage_improvements.py::TestBinanceWSClient::test_binance_ws_client_initialization
+tests/test_low_coverage_improvements.py::TestBinanceWSClient::test_binance_ws_client_message_handling
+  /Users/liam/Python syntax core/tests/test_low_coverage_improvements.py:320: RuntimeWarning: coroutine 'BinanceWSClient.close' was never awaited
+    self.client.close()
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+tests/test_market_simulator_coverage.py::TestMarketSimulator::test_plot_results
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:355: UserWarning: Glyph 20215 (\N{CJK UNIFIED IDEOGRAPH-4EF7}) missing from current font.
+    plt.tight_layout()
+
+tests/test_market_simulator_coverage.py::TestMarketSimulator::test_plot_results
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:355: UserWarning: Glyph 26684 (\N{CJK UNIFIED IDEOGRAPH-683C}) missing from current font.
+    plt.tight_layout()
+
+tests/test_market_simulator_coverage.py::TestMarketSimulator::test_plot_results
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:355: UserWarning: Glyph 21644 (\N{CJK UNIFIED IDEOGRAPH-548C}) missing from current font.
+    plt.tight_layout()
+
+tests/test_market_simulator_coverage.py::TestMarketSimulator::test_plot_results
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:355: UserWarning: Glyph 20132 (\N{CJK UNIFIED IDEOGRAPH-4EA4}) missing from current font.
+    plt.tight_layout()
+
+tests/test_market_simulator_coverage.py::TestMarketSimulator::test_plot_results
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:355: UserWarning: Glyph 26131 (\N{CJK UNIFIED IDEOGRAPH-6613}) missing from current font.
+    plt.tight_layout()
+
+tests/test_market_simulator_coverage.py::TestMarketSimulator::test_plot_results
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:355: UserWarning: Glyph 20449 (\N{CJK UNIFIED IDEOGRAPH-4FE1}) missing from current font.
+    plt.tight_layout()
+
+tests/test_market_simulator_coverage.py::TestMarketSimulator::test_plot_results
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:355: UserWarning: Glyph 21495 (\N{CJK UNIFIED IDEOGRAPH-53F7}) missing from current font.
+    plt.tight_layout()
+
+tests/test_market_simulator_coverage.py::TestMarketSimulator::test_plot_results
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:355: UserWarning: Glyph 20080 (\N{CJK UNIFIED IDEOGRAPH-4E70}) missing from current font.
+    plt.tight_layout()
+
+tests/test_market_simulator_coverage.py::TestMarketSimulator::test_plot_results
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:355: UserWarning: Glyph 20837 (\N{CJK UNIFIED IDEOGRAPH-5165}) missing from current font.
+    plt.tight_layout()
+
+tests/test_market_simulator_coverage.py::TestMarketSimulator::test_plot_results
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:355: UserWarning: Glyph 21334 (\N{CJK UNIFIED IDEOGRAPH-5356}) missing from current font.
+    plt.tight_layout()
+
+tests/test_market_simulator_coverage.py::TestMarketSimulator::test_plot_results
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:355: UserWarning: Glyph 20986 (\N{CJK UNIFIED IDEOGRAPH-51FA}) missing from current font.
+    plt.tight_layout()
+
+tests/test_market_simulator_coverage.py::TestMarketSimulator::test_plot_results
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:355: UserWarning: Glyph 20540 (\N{CJK UNIFIED IDEOGRAPH-503C}) missing from current font.
+    plt.tight_layout()
+
+tests/test_market_simulator_coverage.py::TestMarketSimulator::test_plot_results
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:355: UserWarning: Glyph 36134 (\N{CJK UNIFIED IDEOGRAPH-8D26}) missing from current font.
+    plt.tight_layout()
+
+tests/test_market_simulator_coverage.py::TestMarketSimulator::test_plot_results
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:355: UserWarning: Glyph 25143 (\N{CJK UNIFIED IDEOGRAPH-6237}) missing from current font.
+    plt.tight_layout()
+
+tests/test_market_simulator_coverage.py::TestMarketSimulator::test_plot_results
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:355: UserWarning: Glyph 24635 (\N{CJK UNIFIED IDEOGRAPH-603B}) missing from current font.
+    plt.tight_layout()
+
+tests/test_market_simulator_coverage.py::TestMarketSimulator::test_plot_results
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:355: UserWarning: Glyph 36164 (\N{CJK UNIFIED IDEOGRAPH-8D44}) missing from current font.
+    plt.tight_layout()
+
+tests/test_market_simulator_coverage.py::TestMarketSimulator::test_plot_results
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:355: UserWarning: Glyph 20135 (\N{CJK UNIFIED IDEOGRAPH-4EA7}) missing from current font.
+    plt.tight_layout()
+
+tests/test_market_simulator_coverage.py::TestMarketSimulator::test_plot_results
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:355: UserWarning: Glyph 29616 (\N{CJK UNIFIED IDEOGRAPH-73B0}) missing from current font.
+    plt.tight_layout()
+
+tests/test_market_simulator_coverage.py::TestMarketSimulator::test_plot_results
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:355: UserWarning: Glyph 37329 (\N{CJK UNIFIED IDEOGRAPH-91D1}) missing from current font.
+    plt.tight_layout()
+
+tests/test_market_simulator_coverage.py::TestMarketSimulator::test_plot_results
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:355: UserWarning: Glyph 25910 (\N{CJK UNIFIED IDEOGRAPH-6536}) missing from current font.
+    plt.tight_layout()
+
+tests/test_market_simulator_coverage.py::TestMarketSimulator::test_plot_results
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:355: UserWarning: Glyph 30410 (\N{CJK UNIFIED IDEOGRAPH-76CA}) missing from current font.
+    plt.tight_layout()
+
+tests/test_market_simulator_coverage.py::TestMarketSimulator::test_plot_results
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:355: UserWarning: Glyph 29575 (\N{CJK UNIFIED IDEOGRAPH-7387}) missing from current font.
+    plt.tight_layout()
+
+tests/test_market_simulator_coverage.py::TestMarketSimulator::test_plot_results
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:355: UserWarning: Glyph 32047 (\N{CJK UNIFIED IDEOGRAPH-7D2F}) missing from current font.
+    plt.tight_layout()
+
+tests/test_market_simulator_coverage.py::TestMarketSimulator::test_plot_results
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:355: UserWarning: Glyph 35745 (\N{CJK UNIFIED IDEOGRAPH-8BA1}) missing from current font.
+    plt.tight_layout()
+
+tests/test_market_simulator_coverage.py::TestMarketSimulator::test_plot_results
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:355: UserWarning: Glyph 31574 (\N{CJK UNIFIED IDEOGRAPH-7B56}) missing from current font.
+    plt.tight_layout()
+
+tests/test_market_simulator_coverage.py::TestMarketSimulator::test_plot_results
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:355: UserWarning: Glyph 30053 (\N{CJK UNIFIED IDEOGRAPH-7565}) missing from current font.
+    plt.tight_layout()
+
+tests/test_market_simulator_coverage.py::TestMarketSimulator::test_plot_results
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:355: UserWarning: Glyph 25345 (\N{CJK UNIFIED IDEOGRAPH-6301}) missing from current font.
+    plt.tight_layout()
+
+tests/test_market_simulator_coverage.py::TestMarketSimulator::test_plot_results
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:355: UserWarning: Glyph 26377 (\N{CJK UNIFIED IDEOGRAPH-6709}) missing from current font.
+    plt.tight_layout()
+
+tests/test_market_simulator_coverage.py::TestMarketSimulator::test_plot_results
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:355: UserWarning: Glyph 22238 (\N{CJK UNIFIED IDEOGRAPH-56DE}) missing from current font.
+    plt.tight_layout()
+
+tests/test_market_simulator_coverage.py::TestMarketSimulator::test_plot_results
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:355: UserWarning: Glyph 27979 (\N{CJK UNIFIED IDEOGRAPH-6D4B}) missing from current font.
+    plt.tight_layout()
+
+tests/test_market_simulator_coverage.py::TestMarketSimulator::test_plot_results
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:355: UserWarning: Glyph 32467 (\N{CJK UNIFIED IDEOGRAPH-7ED3}) missing from current font.
+    plt.tight_layout()
+
+tests/test_market_simulator_coverage.py::TestMarketSimulator::test_plot_results
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:355: UserWarning: Glyph 26524 (\N{CJK UNIFIED IDEOGRAPH-679C}) missing from current font.
+    plt.tight_layout()
+
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:362: UserWarning: Glyph 20215 (\N{CJK UNIFIED IDEOGRAPH-4EF7}) missing from current font.
+    plt.savefig(save_path, dpi=300, bbox_inches="tight")
+
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:362: UserWarning: Glyph 26684 (\N{CJK UNIFIED IDEOGRAPH-683C}) missing from current font.
+    plt.savefig(save_path, dpi=300, bbox_inches="tight")
+
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:362: UserWarning: Glyph 21644 (\N{CJK UNIFIED IDEOGRAPH-548C}) missing from current font.
+    plt.savefig(save_path, dpi=300, bbox_inches="tight")
+
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:362: UserWarning: Glyph 20132 (\N{CJK UNIFIED IDEOGRAPH-4EA4}) missing from current font.
+    plt.savefig(save_path, dpi=300, bbox_inches="tight")
+
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:362: UserWarning: Glyph 26131 (\N{CJK UNIFIED IDEOGRAPH-6613}) missing from current font.
+    plt.savefig(save_path, dpi=300, bbox_inches="tight")
+
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:362: UserWarning: Glyph 20449 (\N{CJK UNIFIED IDEOGRAPH-4FE1}) missing from current font.
+    plt.savefig(save_path, dpi=300, bbox_inches="tight")
+
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:362: UserWarning: Glyph 21495 (\N{CJK UNIFIED IDEOGRAPH-53F7}) missing from current font.
+    plt.savefig(save_path, dpi=300, bbox_inches="tight")
+
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:362: UserWarning: Glyph 20080 (\N{CJK UNIFIED IDEOGRAPH-4E70}) missing from current font.
+    plt.savefig(save_path, dpi=300, bbox_inches="tight")
+
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:362: UserWarning: Glyph 20837 (\N{CJK UNIFIED IDEOGRAPH-5165}) missing from current font.
+    plt.savefig(save_path, dpi=300, bbox_inches="tight")
+
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:362: UserWarning: Glyph 21334 (\N{CJK UNIFIED IDEOGRAPH-5356}) missing from current font.
+    plt.savefig(save_path, dpi=300, bbox_inches="tight")
+
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:362: UserWarning: Glyph 20986 (\N{CJK UNIFIED IDEOGRAPH-51FA}) missing from current font.
+    plt.savefig(save_path, dpi=300, bbox_inches="tight")
+
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:362: UserWarning: Glyph 20540 (\N{CJK UNIFIED IDEOGRAPH-503C}) missing from current font.
+    plt.savefig(save_path, dpi=300, bbox_inches="tight")
+
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:362: UserWarning: Glyph 36134 (\N{CJK UNIFIED IDEOGRAPH-8D26}) missing from current font.
+    plt.savefig(save_path, dpi=300, bbox_inches="tight")
+
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:362: UserWarning: Glyph 25143 (\N{CJK UNIFIED IDEOGRAPH-6237}) missing from current font.
+    plt.savefig(save_path, dpi=300, bbox_inches="tight")
+
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:362: UserWarning: Glyph 24635 (\N{CJK UNIFIED IDEOGRAPH-603B}) missing from current font.
+    plt.savefig(save_path, dpi=300, bbox_inches="tight")
+
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:362: UserWarning: Glyph 36164 (\N{CJK UNIFIED IDEOGRAPH-8D44}) missing from current font.
+    plt.savefig(save_path, dpi=300, bbox_inches="tight")
+
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:362: UserWarning: Glyph 20135 (\N{CJK UNIFIED IDEOGRAPH-4EA7}) missing from current font.
+    plt.savefig(save_path, dpi=300, bbox_inches="tight")
+
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:362: UserWarning: Glyph 29616 (\N{CJK UNIFIED IDEOGRAPH-73B0}) missing from current font.
+    plt.savefig(save_path, dpi=300, bbox_inches="tight")
+
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:362: UserWarning: Glyph 37329 (\N{CJK UNIFIED IDEOGRAPH-91D1}) missing from current font.
+    plt.savefig(save_path, dpi=300, bbox_inches="tight")
+
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:362: UserWarning: Glyph 25910 (\N{CJK UNIFIED IDEOGRAPH-6536}) missing from current font.
+    plt.savefig(save_path, dpi=300, bbox_inches="tight")
+
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:362: UserWarning: Glyph 30410 (\N{CJK UNIFIED IDEOGRAPH-76CA}) missing from current font.
+    plt.savefig(save_path, dpi=300, bbox_inches="tight")
+
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:362: UserWarning: Glyph 29575 (\N{CJK UNIFIED IDEOGRAPH-7387}) missing from current font.
+    plt.savefig(save_path, dpi=300, bbox_inches="tight")
+
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:362: UserWarning: Glyph 32047 (\N{CJK UNIFIED IDEOGRAPH-7D2F}) missing from current font.
+    plt.savefig(save_path, dpi=300, bbox_inches="tight")
+
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:362: UserWarning: Glyph 35745 (\N{CJK UNIFIED IDEOGRAPH-8BA1}) missing from current font.
+    plt.savefig(save_path, dpi=300, bbox_inches="tight")
+
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:362: UserWarning: Glyph 31574 (\N{CJK UNIFIED IDEOGRAPH-7B56}) missing from current font.
+    plt.savefig(save_path, dpi=300, bbox_inches="tight")
+
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:362: UserWarning: Glyph 30053 (\N{CJK UNIFIED IDEOGRAPH-7565}) missing from current font.
+    plt.savefig(save_path, dpi=300, bbox_inches="tight")
+
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:362: UserWarning: Glyph 25345 (\N{CJK UNIFIED IDEOGRAPH-6301}) missing from current font.
+    plt.savefig(save_path, dpi=300, bbox_inches="tight")
+
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:362: UserWarning: Glyph 26377 (\N{CJK UNIFIED IDEOGRAPH-6709}) missing from current font.
+    plt.savefig(save_path, dpi=300, bbox_inches="tight")
+
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:362: UserWarning: Glyph 22238 (\N{CJK UNIFIED IDEOGRAPH-56DE}) missing from current font.
+    plt.savefig(save_path, dpi=300, bbox_inches="tight")
+
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:362: UserWarning: Glyph 27979 (\N{CJK UNIFIED IDEOGRAPH-6D4B}) missing from current font.
+    plt.savefig(save_path, dpi=300, bbox_inches="tight")
+
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:362: UserWarning: Glyph 32467 (\N{CJK UNIFIED IDEOGRAPH-7ED3}) missing from current font.
+    plt.savefig(save_path, dpi=300, bbox_inches="tight")
+
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:362: UserWarning: Glyph 26524 (\N{CJK UNIFIED IDEOGRAPH-679C}) missing from current font.
+    plt.savefig(save_path, dpi=300, bbox_inches="tight")
+
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:362: UserWarning: Glyph 27425 (\N{CJK UNIFIED IDEOGRAPH-6B21}) missing from current font.
+    plt.savefig(save_path, dpi=300, bbox_inches="tight")
+
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:362: UserWarning: Glyph 25968 (\N{CJK UNIFIED IDEOGRAPH-6570}) missing from current font.
+    plt.savefig(save_path, dpi=300, bbox_inches="tight")
+
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:362: UserWarning: Glyph 24180 (\N{CJK UNIFIED IDEOGRAPH-5E74}) missing from current font.
+    plt.savefig(save_path, dpi=300, bbox_inches="tight")
+
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:362: UserWarning: Glyph 21270 (\N{CJK UNIFIED IDEOGRAPH-5316}) missing from current font.
+    plt.savefig(save_path, dpi=300, bbox_inches="tight")
+
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:362: UserWarning: Glyph 27874 (\N{CJK UNIFIED IDEOGRAPH-6CE2}) missing from current font.
+    plt.savefig(save_path, dpi=300, bbox_inches="tight")
+
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:362: UserWarning: Glyph 21160 (\N{CJK UNIFIED IDEOGRAPH-52A8}) missing from current font.
+    plt.savefig(save_path, dpi=300, bbox_inches="tight")
+
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:362: UserWarning: Glyph 22799 (\N{CJK UNIFIED IDEOGRAPH-590F}) missing from current font.
+    plt.savefig(save_path, dpi=300, bbox_inches="tight")
+
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:362: UserWarning: Glyph 26222 (\N{CJK UNIFIED IDEOGRAPH-666E}) missing from current font.
+    plt.savefig(save_path, dpi=300, bbox_inches="tight")
+
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:362: UserWarning: Glyph 27604 (\N{CJK UNIFIED IDEOGRAPH-6BD4}) missing from current font.
+    plt.savefig(save_path, dpi=300, bbox_inches="tight")
+
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:362: UserWarning: Glyph 26368 (\N{CJK UNIFIED IDEOGRAPH-6700}) missing from current font.
+    plt.savefig(save_path, dpi=300, bbox_inches="tight")
+
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:362: UserWarning: Glyph 22823 (\N{CJK UNIFIED IDEOGRAPH-5927}) missing from current font.
+    plt.savefig(save_path, dpi=300, bbox_inches="tight")
+
+tests/test_market_simulator_coverage.py::TestRunSimpleBacktest::test_run_simple_backtest_with_plot
+  /Users/liam/Python syntax core/src/brokers/simulator/market_sim.py:362: UserWarning: Glyph 25764 (\N{CJK UNIFIED IDEOGRAPH-64A4}) missing from current font.
+    plt.savefig(save_path, dpi=300, bbox_inches="tight")
+
+tests/test_position_risk_management.py::TestRiskManagement::test_compute_atr
+  /Users/liam/Python syntax core/tests/test_position_risk_management.py:179: FutureWarning: The default dtype for empty Series will be 'object' instead of 'float64' in a future version. Specify a dtype explicitly to silence this warning.
+    empty_series = pd.Series([])
+
+tests/test_safe_runner.py::TestSafeRunner::test_async_sleep_mocking
+  /Users/liam/Python syntax core/tests/test_safe_runner.py:105: RuntimeWarning: coroutine 'TestSafeRunner.test_async_sleep_mocking.<locals>.async_sleep_test' was never awaited
+    return False, str(e)
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+tests/test_zero_coverage_modules.py: 10 warnings
+  /Users/liam/Python syntax core/tests/test_zero_coverage_modules.py:274: FutureWarning: The default dtype for empty Series will be 'object' instead of 'float64' in a future version. Specify a dtype explicitly to silence this warning.
+    self.empty_data = pd.Series([])
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_brokers_simulator_market_sim.py::TestMarketSimulator::test_plot_results_no_show_no_save
+FAILED tests/test_config_refactoring.py::TestConfigRefactoring::test_config_priority
+FAILED tests/test_config_refactoring.py::TestConfigRefactoring::test_yaml_config_loading
+FAILED tests/test_data_saver_coverage_boost.py::TestConvenienceFunctions::test_save_processed_data_parquet
+FAILED tests/test_data_saver_final.py::TestDataSaverBasicSaving::test_save_data_parquet_format
+FAILED tests/test_data_saver_final.py::TestDataSaverFormatHandling::test_execute_save_operation_hdf5
+FAILED tests/test_data_saver_final.py::TestDataSaverFormatHandling::test_execute_save_operation_hdf5_default_key
+FAILED tests/test_data_saver_final.py::TestDataSaverFormatHandling::test_execute_save_operation_parquet
+FAILED tests/test_data_saver_final.py::TestDataSaverAdvancedFeatures::test_save_multiple_formats
+FAILED tests/test_data_saver_final.py::TestSaveProcessedDataFunction::test_save_processed_data_parquet
+FAILED tests/test_data_transformers_coverage_boost.py::TestDataNormalizerWithoutSklearn::test_transform_untrained_scaler_error
+FAILED tests/test_data_transformers_coverage_boost.py::TestDataNormalizerWithoutSklearn::test_inverse_transform_untrained_scaler_error
+FAILED tests/test_data_transformers_coverage_boost.py::TestDataNormalizerRobustMethod::test_initialize_robust_scaler
+FAILED tests/test_data_transformers_coverage_boost.py::TestDataNormalizerRobustMethod::test_invalid_normalization_method
+FAILED tests/test_data_transformers_enhanced.py::TestDataNormalizerComprehensive::test_fit_transform_robust_with_sklearn
+FAILED tests/test_data_transformers_enhanced.py::TestDataNormalizerComprehensive::test_init_invalid_method_with_sklearn
+FAILED tests/test_data_transformers_enhanced.py::TestDataNormalizerComprehensive::test_inverse_transform_with_sklearn
+FAILED tests/test_data_transformers_enhanced.py::TestDataNormalizerComprehensive::test_transform_without_fit_with_sklearn
+FAILED tests/test_enhanced_async_trading_engine_coverage.py::TestAsyncTradingEngineEnhancedCoverage::test_process_market_data_success
+FAILED tests/test_enhanced_async_trading_engine_coverage.py::TestAsyncTradingEngineEnhancedCoverage::test_process_market_data_no_signal
+FAILED tests/test_enhanced_async_trading_engine_coverage.py::TestAsyncTradingEngineEnhancedCoverage::test_process_market_data_exception
+FAILED tests/test_enhanced_async_trading_engine_coverage.py::TestAsyncTradingEngineEnhancedCoverage::test_concurrent_processing
+FAILED tests/test_enhanced_async_trading_engine_coverage.py::TestAsyncTradingEngineEnhancedCoverage::test_cleanup_and_shutdown
+FAILED tests/test_enhanced_async_trading_engine_coverage.py::TestAsyncTradingEngineEnhancedCoverage::test_performance_monitoring
+FAILED tests/test_enhanced_trading_engine_coverage.py::TestTradingEngineEnhancedCoverage::test_analyze_market_conditions_success
+FAILED tests/test_enhanced_trading_engine_coverage.py::TestTradingEngineEnhancedCoverage::test_analyze_market_conditions_no_data
+FAILED tests/test_enhanced_trading_engine_coverage.py::TestTradingEngineEnhancedCoverage::test_analyze_market_conditions_empty_data
+FAILED tests/test_enhanced_trading_engine_coverage.py::TestTradingEngineEnhancedCoverage::test_init_without_env_vars
+FAILED tests/test_enhanced_trading_engine_coverage.py::TestTradingEngineEnhancedCoverage::test_broker_initialization
+FAILED tests/test_exchange_client_coverage_boost.py::TestMarketDataSync::test_sync_market_data_success
+FAILED tests/test_improved_strategy.py::TestMainFunction::test_main_function_success
+FAILED tests/test_improved_strategy.py::TestMainFunction::test_main_function_invalid_data
+FAILED tests/test_metrics_collector_coverage_boost.py::TestGlobalFunctions::test_environment_configuration
+FAILED tests/test_metrics_collector_coverage_boost.py::TestGlobalFunctions::test_init_monitoring
+FAILED tests/test_metrics_collector_enhanced_fixed.py::TestServerManagementFixed::test_start_server_failure
+FAILED tests/test_missing_values_enhanced.py::TestMissingValueHandlerInterpolation::test_interpolate_missing_values_polynomial
+FAILED tests/test_missing_values_enhanced.py::TestMissingValueHandlerInterpolation::test_interpolate_missing_values_spline
+FAILED tests/test_missing_values_enhanced.py::TestMissingValueHandlerInterpolation::test_safe_interpolate_fallback
+FAILED tests/test_monitoring_metrics_collector_enhanced.py::TestPrometheusImports::test_fallback_prometheus_classes
+FAILED tests/test_monitoring_metrics_collector_enhanced.py::TestTradingMetricsCollectorBasic::test_init_with_exporter_backward_compatibility
+FAILED tests/test_monitoring_metrics_collector_enhanced.py::TestTradingMetricsCollectorErrorSummary::test_get_error_summary_exception
+FAILED tests/test_monitoring_metrics_collector_enhanced.py::TestTradingMetricsCollectorErrorSummary::test_get_error_summary_success
+FAILED tests/test_monitoring_metrics_collector_enhanced.py::TestGlobalFunctions::test_get_metrics_collector_env_config
+FAILED tests/test_monitoring_metrics_collector_enhanced.py::TestGlobalFunctions::test_init_monitoring
+FAILED tests/test_network_modules.py::TestRetryManager::test_calculate_retry_delay
+FAILED tests/test_network_modules.py::TestRetryManager::test_retry_decorator_basic
+FAILED tests/test_network_modules.py::TestStateManager::test_state_manager_initialization
+FAILED tests/test_network_modules.py::TestStateManager::test_save_and_load_state
+FAILED tests/test_network_modules.py::TestNetworkDecorators::test_with_retry_decorator
+FAILED tests/test_network_modules.py::TestNetworkDecorators::test_network_request_decorator
+FAILED tests/test_network_modules.py::TestNetworkDecorators::test_api_call_decorator
+FAILED tests/test_network_modules.py::TestNetworkDecorators::test_critical_operation_decorator
+FAILED tests/test_network_modules.py::TestIntegrationScenarios::test_stateful_client_with_retry
+FAILED tests/test_network_modules.py::TestIntegrationScenarios::test_comprehensive_workflow
+FAILED tests/test_notify.py::TestNotifier::test_notify_error - AssertionError...
+FAILED tests/test_notify.py::TestNotifier::test_notify_success - AssertionErr...
+FAILED tests/test_notify.py::TestNotifier::test_notify_trade - AssertionError...
+FAILED tests/test_notify.py::TestNotifierIntegration::test_full_notification_workflow
+FAILED tests/test_parametrized_examples.py::TestDataSaverParametrized::test_save_data_formats[parquet-.parquet]
+FAILED tests/test_parametrized_examples.py::TestDataSaverParametrized::test_cleanup_old_files_thresholds[1-1]
+FAILED tests/test_parametrized_examples.py::TestDataSaverParametrized::test_cleanup_old_files_thresholds[3-3]
+FAILED tests/test_safe_runner.py::test_timeout - Failed: Expected None, but t...
+FAILED tests/test_safe_runner.py::TestSafeRunner::test_async_sleep_mocking - ...
+FAILED tests/test_simple_coverage.py::TestSimpleCoverage::test_calculate_position_size_edge_cases
+FAILED tests/test_simple_coverage.py::TestSimpleCoverage::test_process_buy_signal_edge_cases
+FAILED tests/test_simple_coverage.py::TestSimpleCoverage::test_process_sell_signal_edge_cases
+FAILED tests/test_simple_coverage.py::TestSimpleCoverage::test_send_status_update_timing
+FAILED tests/test_simple_coverage.py::TestSimpleCoverage::test_update_positions_calls
+FAILED tests/test_simple_coverage.py::TestSimpleCoverage::test_execute_trading_cycle_empty_data
+FAILED tests/test_simple_coverage.py::TestSimpleCoverage::test_execute_trading_cycle_invalid_signal
+FAILED tests/test_simple_coverage.py::TestSimpleCoverage::test_start_trading_loop_basic
+FAILED tests/test_simple_coverage.py::TestSimpleCoverage::test_monitoring_metrics_update
+FAILED tests/test_simple_coverage.py::TestSimpleCoverage::test_execute_order_exception_handling
+FAILED tests/test_simple_coverage.py::TestSimpleCoverage::test_status_update_with_position_details
+FAILED tests/test_simple_modules_coverage.py::TestNotifyModule::test_notifier_initialization
+FAILED tests/test_simple_modules_coverage.py::TestNotifyModule::test_notifier_methods
+FAILED tests/test_tools_reconcile.py::TestMainBlock::test_main_block_basic - ...
+FAILED tests/test_trading_engines_enhanced.py::TestTradingEngineEnhanced::test_trading_engine_initialization
+FAILED tests/test_trading_engines_enhanced.py::TestTradingEngineEnhanced::test_analyze_market_conditions_success
+FAILED tests/test_trading_engines_enhanced.py::TestTradingEngineEnhanced::test_analyze_market_conditions_error
+FAILED tests/test_trading_engines_enhanced.py::TestTradingEngineEnhanced::test_validate_trading_conditions_weak_signal
+FAILED tests/test_trading_engines_enhanced.py::TestTradingEngineEnhanced::test_validate_trading_conditions_force_trade
+FAILED tests/test_trading_engines_enhanced.py::TestTradingEngineEnhanced::test_validate_trading_conditions_insufficient_balance
+FAILED tests/test_trading_engines_enhanced.py::TestTradingEngineEnhanced::test_calculate_position_size_with_atr
+FAILED tests/test_trading_engines_enhanced.py::TestTradingEngineEnhanced::test_calculate_position_size_zero_atr
+FAILED tests/test_trading_engines_enhanced.py::TestTradingEngineEnhanced::test_execute_buy_trade_success
+FAILED tests/test_trading_engines_enhanced.py::TestTradingEngineEnhanced::test_execute_sell_trade_sufficient_position
+FAILED tests/test_trading_engines_enhanced.py::TestTradingEngineEnhanced::test_execute_sell_trade_insufficient_position
+FAILED tests/test_trading_engines_enhanced.py::TestTradingEngineEnhanced::test_execute_trading_logic_buy
+FAILED tests/test_trading_engines_enhanced.py::TestTradingEngineEnhanced::test_execute_trading_logic_sell
+FAILED tests/test_trading_engines_enhanced.py::TestTradingEngineEnhanced::test_execute_trading_logic_hold
+FAILED tests/test_trading_engines_enhanced.py::TestTradingEngineEnhanced::test_execute_trade_decision_complete_flow
+FAILED tests/test_trading_engines_enhanced.py::TestTradingEngineEnhanced::test_get_engine_status
+FAILED tests/test_trading_engines_enhanced.py::TestTradingEngineEnhanced::test_start_engine
+FAILED tests/test_trading_engines_enhanced.py::TestTradingEngineEnhanced::test_stop_engine
+FAILED tests/test_trading_engines_enhanced.py::TestTradingEngineEnhanced::test_process_buy_signal_simplified
+FAILED tests/test_trading_engines_enhanced.py::TestTradingEngineEnhanced::test_process_sell_signal_simplified
+FAILED tests/test_trading_engines_enhanced.py::TestTradingEngineEnhanced::test_execute_trading_cycle
+FAILED tests/test_trading_engines_enhanced.py::TestTradingEngineEnhanced::test_error_handling_in_trade_execution
+FAILED tests/test_trading_engines_enhanced.py::TestTradingEngineEnhanced::test_trend_analysis
+FAILED tests/test_trading_engines_enhanced.py::TestTradingEngineEnhanced::test_volatility_analysis
+FAILED tests/test_trading_engines_enhanced.py::TestTradingEngineEnhanced::test_generate_recommendation
+FAILED tests/test_trading_engines_enhanced.py::TestTradingEngineEnhanced::test_update_trade_statistics
+FAILED tests/test_trading_engines_simplified.py::TestTradingEngineWithMocks::test_trading_engine_status_methods
+FAILED tests/test_trading_engines_simplified.py::TestTradingEngineWithMocks::test_trading_engine_calculation_methods
+FAILED tests/test_trading_engines_simplified.py::TestTradingEngineWithMocks::test_trading_engine_response_creation
+FAILED tests/test_trading_engines_simplified.py::TestTradingEngineWithMocks::test_trading_engine_signal_processing
+FAILED tests/test_trading_engines_simplified.py::TestTradingEngineWithMocks::test_trading_engine_monitoring
+FAILED tests/test_trading_loop.py::TestTradingLoopBackwardCompatibility::test_calculate_atr_import
+FAILED tests/test_trading_loop.py::TestTradingLoopBackwardCompatibility::test_fetch_price_data_import
+FAILED tests/test_trading_loop.py::TestTradingLoopBackwardCompatibility::test_get_trading_signals_import
+FAILED tests/test_trading_loop.py::TestTradingLoopBackwardCompatibility::test_trading_engine_import
+FAILED tests/test_trading_loop.py::TestTradingLoopBackwardCompatibility::test_trading_loop_import
+FAILED tests/test_trading_loop.py::TestIntegrationWithOriginalModules::test_price_fetcher_integration
+FAILED tests/test_utils.py::TestGetTradesDir::test_get_trades_dir_year_handling
+FAILED tests/test_utils.py::TestGetTradesFile::test_get_trades_file_basic - A...
+FAILED tests/test_utils.py::TestGetTradesFile::test_get_trades_file_with_base_dir
+FAILED tests/test_ws_binance_client_simple.py::TestWSClientFunctionsSimple::test_create_ws_client
+ERROR tests/test_core_position_management.py::TestPositionManagerFileOperations::test_load_positions_file_not_exists
+ERROR tests/test_trading_engines.py::TestTradingEngine::test_trading_engine_initialization
+ERROR tests/test_trading_engines.py::TestTradingEngine::test_analyze_market_conditions_success
+ERROR tests/test_trading_engines.py::TestTradingEngine::test_analyze_market_conditions_no_data
+ERROR tests/test_trading_engines.py::TestTradingEngine::test_analyze_market_conditions_empty_data
+ERROR tests/test_trading_engines.py::TestTradingEngine::test_analyze_market_conditions_exception
+ERROR tests/test_trading_engines.py::TestTradingEngine::test_create_error_result
+ERROR tests/test_trading_engines.py::TestTradingEngine::test_analyze_trend - ...
+ERROR tests/test_trading_engines.py::TestTradingEngine::test_analyze_trend_bullish
+ERROR tests/test_trading_engines.py::TestTradingEngine::test_analyze_trend_bearish
+ERROR tests/test_trading_engines.py::TestTradingEngine::test_analyze_volatility
+ERROR tests/test_trading_engines.py::TestTradingEngine::test_generate_recommendation
+ERROR tests/test_trading_engines.py::TestTradingEngine::test_execute_trade_decision_with_error
+ERROR tests/test_trading_engines.py::TestTradingEngine::test_execute_trade_decision_success
+ERROR tests/test_trading_engines.py::TestTradingEngine::test_validate_trading_conditions_weak_signal
+ERROR tests/test_trading_engines.py::TestTradingEngine::test_validate_trading_conditions_force_trade
+ERROR tests/test_trading_engines.py::TestTradingEngine::test_calculate_position_size_internal
+ERROR tests/test_trading_engines.py::TestTradingEngine::test_create_hold_response
+ERROR tests/test_trading_engines.py::TestTradingEngine::test_create_error_response
+ERROR tests/test_trading_engines.py::TestTradingEngine::test_update_trade_statistics
+ERROR tests/test_trading_engines.py::TestTradingEngine::test_get_engine_status
+ERROR tests/test_trading_engines.py::TestTradingEngine::test_start_engine - V...
+ERROR tests/test_trading_engines.py::TestTradingEngine::test_stop_engine - Va...
+ERROR tests/test_trading_engines.py::TestTradingEngine::test_calculate_position_size
+ERROR tests/test_trading_engines.py::TestTradingEngine::test_process_buy_signal
+ERROR tests/test_trading_engines.py::TestTradingEngine::test_process_sell_signal
+ERROR tests/test_trading_engines.py::TestTradingEngine::test_update_positions
+ERROR tests/test_trading_engines.py::TestTradingEngine::test_send_status_update
+ERROR tests/test_trading_engines.py::TestTradingEngine::test_execute_trading_cycle
+ERROR tests/test_trading_engines.py::TestTradingEngine::test_update_monitoring_metrics
+ERROR tests/test_trading_engines.py::TestTradingEngine::test_start_trading_loop
+118 failed, 1967 passed, 9 skipped, 146 warnings, 31 errors in 455.49s (0:07:35)

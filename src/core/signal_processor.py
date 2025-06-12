@@ -12,7 +12,7 @@ from typing import Any, Dict
 
 import pandas as pd
 
-from src.signals import moving_average
+from src.indicators import moving_average
 
 
 def get_trading_signals(df: pd.DataFrame, fast_win: int = 7, slow_win: int = 25) -> Dict[str, Any]:

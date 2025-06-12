@@ -6,7 +6,6 @@
 
 import os
 import tempfile
-from unittest.mock import patch
 
 import numpy as np
 import pandas as pd
@@ -29,40 +28,34 @@ from src.data.validators.data_saver import DataSaver
 class TestDataProcessorFunctions:
     """测试数据处理器函数"""
 
-    def test_load_data_success(self):
+    def test_load_data_success(self, temp_manager):
         """测试成功加载数据"""
         # 创建临时CSV文件
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False) as temp_file:
-            temp_file.write("col1,col2,col3\n1,2,3\n4,5,6\n7,8,9\n")
-            temp_file_path = temp_file.name
+        temp_file_path = temp_manager.create_temp_file(suffix=".csv")
 
-        try:
-            df = load_data(temp_file_path)
+        with open(temp_file_path, "w") as f:
+            f.write("col1,col2,col3\n1,2,3\n4,5,6\n7,8,9\n")
 
-            assert not df.empty
-            assert len(df) == 3
-            assert list(df.columns) == ["col1", "col2", "col3"]
-            assert df.iloc[0]["col1"] == 1
+        df = load_data(temp_file_path)
 
-        finally:
-            os.unlink(temp_file_path)
+        assert not df.empty
+        assert len(df) == 3
+        assert list(df.columns) == ["col1", "col2", "col3"]
+        assert df.iloc[0]["col1"] == 1
 
-    def test_load_data_with_specific_columns(self):
+    def test_load_data_with_specific_columns(self, temp_manager):
         """测试加载指定列"""
         # 创建临时CSV文件
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False) as temp_file:
-            temp_file.write("col1,col2,col3\n1,2,3\n4,5,6\n")
-            temp_file_path = temp_file.name
+        temp_file_path = temp_manager.create_temp_file(suffix=".csv")
 
-        try:
-            df = load_data(temp_file_path, columns=["col1", "col3"])
+        with open(temp_file_path, "w") as f:
+            f.write("col1,col2,col3\n1,2,3\n4,5,6\n")
 
-            assert not df.empty
-            assert list(df.columns) == ["col1", "col3"]
-            assert "col2" not in df.columns
+        df = load_data(temp_file_path, columns=["col1", "col3"])
 
-        finally:
-            os.unlink(temp_file_path)
+        assert not df.empty
+        assert list(df.columns) == ["col1", "col3"]
+        assert "col2" not in df.columns
 
     def test_load_data_file_not_found(self):
         """测试加载不存在的文件"""
@@ -221,33 +214,27 @@ class TestDataProcessorFunctions:
         assert list(train_df.columns) == list(df.columns)
         assert list(test_df.columns) == list(df.columns)
 
-    def test_save_processed_data_csv(self):
+    def test_save_processed_data_csv(self, temp_manager):
         """测试保存处理后的数据为CSV"""
         df = pd.DataFrame({"col1": [1, 2, 3], "col2": [4, 5, 6]})
 
-        with tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as temp_file:
-            temp_file_path = temp_file.name
+        temp_file_path = temp_manager.create_temp_file(suffix=".csv")
 
-        try:
-            success = save_processed_data(df, temp_file_path, file_format="csv")
+        success = save_processed_data(df, temp_file_path, file_format="csv")
 
-            assert success is True
-            assert os.path.exists(temp_file_path)
+        assert success is True
+        assert os.path.exists(temp_file_path)
 
-            # 验证保存的数据可以重新加载
-            reloaded_df = pd.read_csv(temp_file_path)
-            assert len(reloaded_df) == len(df)
-
-        finally:
-            if os.path.exists(temp_file_path):
-                os.unlink(temp_file_path)
+        # 验证保存的数据可以重新加载
+        reloaded_df = pd.read_csv(temp_file_path)
+        assert len(reloaded_df) == len(df)
 
 
 class TestCSVDataLoader:
     """测试CSV加载器功能"""
 
     @pytest.fixture
-    def sample_csv_file(self):
+    def sample_csv_file(self, temp_manager):
         """创建示例CSV文件用于测试"""
         data = {
             "timestamp": ["2023-01-01", "2023-01-02", "2023-01-03"],
@@ -260,14 +247,10 @@ class TestCSVDataLoader:
         df = pd.DataFrame(data)
 
         # 创建临时文件
-        temp_file = tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False)
-        df.to_csv(temp_file.name, index=False)
-        temp_file.close()
+        temp_file_path = temp_manager.create_temp_file(suffix=".csv")
+        df.to_csv(temp_file_path, index=False)
 
-        yield temp_file.name
-
-        # 清理临时文件
-        os.unlink(temp_file.name)
+        yield temp_file_path
 
     def test_csv_loader_initialization(self):
         """测试CSV加载器初始化"""
@@ -453,7 +436,8 @@ class TestDataProcessingIntegration:
             normalized_data = normalize_data(enhanced_data[valid_cols])
             for col in normalized_data.columns:
                 assert normalized_data[col].min() >= 0
-                assert normalized_data[col].max() <= 1
+                # 使用np.isclose处理浮点精度问题
+                assert normalized_data[col].max() <= 1.0 + 1e-10  # 允许微小的浮点误差
 
         # 4. 计算波动率
         volatility = calculate_volatility(enhanced_data["close"], window=10)
@@ -461,7 +445,7 @@ class TestDataProcessingIntegration:
 
         print("✅ 完整数据处理流水线测试通过")
 
-    def test_csv_loader_processor_integration(self):
+    def test_csv_loader_processor_integration(self, temp_manager):
         """测试CSV加载器与数据处理器的集成"""
         # 创建临时CSV文件
         data = {
@@ -474,23 +458,18 @@ class TestDataProcessingIntegration:
         }
         df = pd.DataFrame(data)
 
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False) as temp_file:
-            df.to_csv(temp_file.name, index=False)
-            temp_file_path = temp_file.name
+        temp_file_path = temp_manager.create_temp_file(suffix=".csv")
+        df.to_csv(temp_file_path, index=False)
 
-        try:
-            # 使用CSV加载器加载数据
-            loader = CSVDataLoader()
-            loaded_df = loader.load_data(temp_file_path)
+        # 使用CSV加载器加载数据
+        loader = CSVDataLoader()
+        loaded_df = loader.load_data(temp_file_path)
 
-            # 使用数据处理器处理数据
-            processed_df = process_ohlcv_data(loaded_df, date_column="date")
-            enhanced_df = add_technical_indicators(processed_df, price_column="close")
+        # 使用数据处理器处理数据
+        processed_df = process_ohlcv_data(loaded_df, date_column="date")
+        enhanced_df = add_technical_indicators(processed_df, price_column="close")
 
-            # 验证集成结果
-            assert not enhanced_df.empty
-            assert len(enhanced_df.columns) > len(loaded_df.columns)
-            assert isinstance(enhanced_df.index, pd.DatetimeIndex)
-
-        finally:
-            os.unlink(temp_file_path)
+        # 验证集成结果
+        assert not enhanced_df.empty
+        assert len(enhanced_df.columns) > len(loaded_df.columns)
+        assert isinstance(enhanced_df.index, pd.DatetimeIndex)

@@ -16,6 +16,7 @@ import time
 from datetime import datetime
 from typing import Any, Dict
 
+import numpy as np
 import psutil
 
 from src.monitoring.metrics_collector import get_metrics_collector
@@ -200,16 +201,15 @@ class M4AsyncBenchmark:
             await asyncio.sleep(1)  # 1Hz频率
 
             # 异步信号处理
-            signals = processor.get_trading_signals_optimized(df)
-            atr = processor.compute_atr_optimized(df)
+            _signals = processor.get_trading_signals_optimized(df)
+            _atr = processor.compute_atr_optimized(df)
 
             # 验证计算结果
-            if signals and atr > 0:
+            if _signals and _atr > 0:
                 pass  # 计算成功
 
     def _generate_test_dataframe(self):
         """生成测试数据框"""
-        import numpy as np
         import pandas as pd
 
         np.random.seed(42)

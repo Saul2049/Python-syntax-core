@@ -362,8 +362,8 @@ def main():
         report = checker.run_comprehensive_health_check()
 
         # 保存报告
-        report_file = checker.save_report()
-        print(f"📄 Report saved to: {report_file}")
+        checker.save_report()
+        print(f"📄 Report saved to: {checker.save_report()}")
 
         # 打印摘要
         if not args.quiet:

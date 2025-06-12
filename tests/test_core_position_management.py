@@ -7,8 +7,7 @@ import json
 import os
 import tempfile
 from datetime import datetime
-from pathlib import Path
-from unittest.mock import Mock, mock_open, patch
+from unittest.mock import Mock, patch
 
 import pytest
 
@@ -49,10 +48,12 @@ class TestPositionManagerBasicOperations:
         """创建仓位管理器实例"""
         with tempfile.NamedTemporaryFile(suffix=".json", delete=False) as f:
             temp_file = f.name
-        yield PositionManager(positions_file=temp_file)
-        # 清理临时文件
-        if os.path.exists(temp_file):
-            os.unlink(temp_file)
+        try:
+            yield PositionManager(positions_file=temp_file)
+        finally:
+            # 确保文件被清理，即使文件可能已经被测试删除
+            if os.path.exists(temp_file):
+                os.unlink(temp_file)
 
     @patch("src.core.position_management.datetime")
     def test_add_position_basic(self, mock_datetime, position_manager):
@@ -391,10 +392,12 @@ class TestPositionManagerFileOperations:
         """创建仓位管理器实例"""
         with tempfile.NamedTemporaryFile(suffix=".json", delete=False) as f:
             temp_file = f.name
-        yield PositionManager(positions_file=temp_file)
-        # 清理临时文件
-        if os.path.exists(temp_file):
-            os.unlink(temp_file)
+        try:
+            yield PositionManager(positions_file=temp_file)
+        finally:
+            # 确保文件被清理，即使文件可能已经被测试删除
+            if os.path.exists(temp_file):
+                os.unlink(temp_file)
 
     def test_save_positions_success(self, position_manager):
         """测试成功保存仓位"""
@@ -593,10 +596,10 @@ class TestPositionManagerIntegration:
 
     def test_full_workflow(self):
         """测试完整工作流程"""
-        with tempfile.NamedTemporaryFile(suffix=".json", delete=False) as f:
+        # 🧹 使用自动清理的临时文件替代delete=False
+        with tempfile.NamedTemporaryFile(suffix=".json") as f:
             temp_file = f.name
 
-        try:
             pm = PositionManager(positions_file=temp_file)
 
             # 1. 添加仓位
@@ -637,8 +640,3 @@ class TestPositionManagerIntegration:
             pm2.load_from_file()
             assert pm2.has_position("ETHUSDT")
             assert not pm2.has_position("BTCUSDT")
-
-        finally:
-            # 清理临时文件
-            if os.path.exists(temp_file):
-                os.unlink(temp_file)

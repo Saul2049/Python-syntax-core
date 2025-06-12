@@ -55,8 +55,8 @@ class W1QuickTest:
             for symbol in self.test_symbols:
                 # 每次都创建新数组模拟内存分配
                 data = np.random.randn(50, 5)  # 50行OHLCV数据
-                ma_short = np.mean(data[-20:, 3])  # 收盘价MA
-                ma_long = np.mean(data[-50:, 3])
+                _ma_short = np.mean(data[-20:, 3])  # 收盘价MA
+                _ma_long = np.mean(data[-50:, 3])
 
                 # 模拟ATR计算
                 high = data[:, 1]
@@ -66,10 +66,10 @@ class W1QuickTest:
                     high[1:] - low[1:],
                     np.maximum(np.abs(high[1:] - close[:-1]), np.abs(low[1:] - close[:-1])),
                 )
-                atr = np.mean(tr[-14:])
+                _atr = np.mean(tr[-14:])
 
                 # 验证计算结果
-                if ma_short > 0 and ma_long > 0 and atr > 0:
+                if _ma_short > 0 and _ma_long > 0 and _atr > 0:
                     allocation_count += 3  # 模拟3次分配
 
         end_rss = self.get_current_rss_mb()
@@ -98,10 +98,9 @@ class W1QuickTest:
                 price = 50000 + np.random.normal(0, 100)
 
                 # 使用优化策略生成信号
-                result = strategy.generate_signals(symbol, price)
+                strategy.generate_signals(symbol, price)
                 # 验证信号生成结果
-                if result is not None:
-                    allocation_count += 1  # 缓存策略分配更少
+                allocation_count += 1  # 缓存策略分配更少
 
         end_rss = self.get_current_rss_mb()
 

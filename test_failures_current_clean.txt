@@ -1,0 +1,46 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.10.8, pytest-8.3.5, pluggy-1.5.0 -- /Users/liam/Python syntax core/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /Users/liam/Python syntax core
+configfile: pytest.ini
+plugins: xdist-3.7.0, timeout-2.4.0, cov-6.1.1, forked-1.6.0, asyncio-1.0.0
+asyncio: mode=strict, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 4741 items / 1 error / 4 skipped
+
+==================================== ERRORS ====================================
+_____________ ERROR collecting scripts/utilities/run_full_test.py ______________
+ImportError while importing test module '/Users/liam/Python syntax core/scripts/utilities/run_full_test.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/importlib/__init__.py:126: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+scripts/utilities/run_full_test.py:7: in <module>
+    from test_telegram import test_trade_notifications
+E   ModuleNotFoundError: No module named 'test_telegram'
+=============================== warnings summary ===============================
+scripts/monitoring/__init__.py:10
+  /Users/liam/Python syntax core/scripts/memory/../../scripts/monitoring/__init__.py:10: DeprecationWarning: Importing from scripts.monitoring is deprecated. Please use 'from src.monitoring import PrometheusExporter' instead.
+    from .monitoring import PrometheusExporter
+
+test_cleanup_analyzer.py:16
+  /Users/liam/Python syntax core/test_cleanup_analyzer.py:16: PytestCollectionWarning: cannot collect test class 'TestAnalyzer' because it has a __init__ constructor (from: test_cleanup_analyzer.py)
+    class TestAnalyzer:
+
+../../../usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/importlib/__init__.py:126
+  /usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/importlib/__init__.py:126: DeprecationWarning: 直接从 src.signals 导入已弃用。请使用 src.indicators 中的模块化导入。
+  例如: from src.indicators import crossover, moving_average
+    return _bootstrap._gcd_import(name[level:], package, level)
+
+tests/test_safe_runner.py:19
+  /Users/liam/Python syntax core/tests/test_safe_runner.py:19: PytestCollectionWarning: cannot collect test class 'TestTimeoutError' because it has a __init__ constructor (from: tests/test_safe_runner.py)
+    class TestTimeoutError(Exception):
+
+tests_backup_before_cleanup/test_safe_runner.py:19
+  /Users/liam/Python syntax core/tests_backup_before_cleanup/test_safe_runner.py:19: PytestCollectionWarning: cannot collect test class 'TestTimeoutError' because it has a __init__ constructor (from: tests_backup_before_cleanup/test_safe_runner.py)
+    class TestTimeoutError(Exception):
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+ERROR scripts/utilities/run_full_test.py
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+=================== 4 skipped, 5 warnings, 1 error in 6.06s ====================

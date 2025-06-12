@@ -113,6 +113,8 @@ class TestGetTradesDir:
             with patch("os.path.expanduser", return_value=expected_expanded):
                 result = get_trades_dir(base_dir=home_dir)
 
+                # 确保使用模拟的年份而不是实际年份
+                mock_datetime.now.assert_called()
                 assert str(result) == expected_path
                 mock_mkdir.assert_called_once_with(parents=True, exist_ok=True)
 
@@ -156,52 +158,57 @@ class TestGetTradesFile:
             # 验证调用了get_trades_dir
             mock_get_dir.assert_called_once_with(None)
 
-            # 验证结果 (实际实现：btc/usdt_trades.csv)
+            # 验证结果 (实际实现：{symbol.lower()}_trades.csv)
             assert isinstance(result, Path)
             assert result.name == "usdt_trades.csv"
             assert result.parent.name == "btc"
+            assert result.parent.parent == mock_dir
 
     def test_get_trades_file_with_base_dir(self):
         """测试指定基础目录的获取交易文件"""
         symbol = "ETH/USDT"
-        base_dir = "/custom/base"
 
-        with patch("src.utils.get_trades_dir") as mock_get_dir:
-            mock_dir = Path("/custom/base")
-            mock_get_dir.return_value = mock_dir
+        # 使用临时目录而不是固定路径，避免文件系统权限问题
+        with tempfile.TemporaryDirectory() as temp_dir:
+            base_dir = temp_dir
 
             result = get_trades_file(symbol, base_dir=base_dir)
-
-            # 验证调用了get_trades_dir并传递了base_dir
-            mock_get_dir.assert_called_once_with(base_dir)
 
             # 验证结果
             assert isinstance(result, Path)
             assert result.name == "usdt_trades.csv"
             assert result.parent.name == "eth"
 
+            # 验证目录结构
+            trades_dir = get_trades_dir(base_dir=base_dir)
+            assert result.parent.parent == trades_dir
+
     def test_get_trades_file_symbol_formatting(self):
         """测试不同交易对符号的格式化"""
         test_cases = [
-            ("BTC/USDT", "usdt_trades.csv", "btc"),
-            ("eth/usdt", "usdt_trades.csv", "eth"),
-            ("DOGE-USD", "doge-usd_trades.csv", ""),  # 没有/分隔符，不创建子目录
-            ("ADA_BTC", "ada_btc_trades.csv", ""),  # 没有/分隔符，不创建子目录
-            ("XRP.USDT", "xrp.usdt_trades.csv", ""),  # 没有/分隔符，不创建子目录
+            # (symbol, expected_name, expected_parent_name, has_subdirectory)
+            ("BTC/USDT", "usdt_trades.csv", "btc", True),
+            ("eth/usdt", "usdt_trades.csv", "eth", True),
+            ("DOGE-USD", "doge-usd_trades.csv", "trades", False),
+            ("ADA_BTC", "ada_btc_trades.csv", "trades", False),
+            ("XRP.USDT", "xrp.usdt_trades.csv", "trades", False),
         ]
 
         with patch("src.utils.get_trades_dir") as mock_get_dir:
             mock_dir = Path("/test/trades")
             mock_get_dir.return_value = mock_dir
 
-            for symbol, expected_filename, expected_parent in test_cases:
+            for symbol, expected_name, expected_parent_name, has_subdirectory in test_cases:
                 result = get_trades_file(symbol)
 
                 assert isinstance(result, Path)
-                # 修复：实际实现只对/分隔符创建子目录
-                assert result.name == expected_filename
-                if expected_parent:
-                    assert result.parent.name == expected_parent
+                assert result.name == expected_name
+                assert result.parent.name == expected_parent_name
+
+                if has_subdirectory:
+                    assert result.parent.parent == mock_dir
+                else:
+                    assert result.parent == mock_dir
 
     def test_get_trades_file_empty_symbol(self):
         """测试空交易对符号"""
@@ -216,6 +223,7 @@ class TestGetTradesFile:
 
             assert isinstance(result, Path)
             assert result.name == expected_filename
+            assert result.parent == mock_dir
 
     def test_get_trades_file_special_characters(self):
         """测试包含特殊字符的交易对符号"""
@@ -229,8 +237,9 @@ class TestGetTradesFile:
             result = get_trades_file(symbol)
 
             assert isinstance(result, Path)
-            # 修复：实际实现保留所有字符
+            # 实际实现保留所有字符并转换为小写
             assert result.name == expected_filename
+            assert result.parent == mock_dir
 
     def test_get_trades_file_integration(self):
         """测试与get_trades_dir的集成"""
@@ -243,7 +252,7 @@ class TestGetTradesFile:
             assert isinstance(result, Path)
             assert result.name == "usdt_trades.csv"
             assert result.parent.name == "btc"
-            # 修复：验证父目录的父目录是trades_dir
+            # 验证父目录的父目录是trades_dir
             trades_dir = get_trades_dir(base_dir=temp_dir)
             assert result.parent.parent == trades_dir
 
@@ -251,7 +260,7 @@ class TestGetTradesFile:
         """测试大小写不敏感处理"""
         symbols = ["BTC/USDT", "btc/usdt", "Btc/Usdt", "BtC/uSdT"]
         expected_filename = "usdt_trades.csv"
-        expected_parent = "btc"
+        expected_parent_name = "btc"
 
         with patch("src.utils.get_trades_dir") as mock_get_dir:
             mock_dir = Path("/test/trades")
@@ -260,7 +269,8 @@ class TestGetTradesFile:
             for symbol in symbols:
                 result = get_trades_file(symbol)
                 assert result.name == expected_filename
-                assert result.parent.name == expected_parent
+                assert result.parent.name == expected_parent_name
+                assert result.parent.parent == mock_dir
 
 
 class TestUtilsIntegration:
@@ -278,10 +288,12 @@ class TestUtilsIntegration:
             eth_file = get_trades_file("ETH/USDT", base_dir=temp_dir)
 
             # 3. 验证文件路径正确
-            assert btc_file.parent.parent == trades_dir  # btc目录的父目录是trades_dir
-            assert eth_file.parent.parent == trades_dir  # eth目录的父目录是trades_dir
+            assert btc_file.parent.parent == trades_dir  # 父目录的父目录是trades_dir
+            assert eth_file.parent.parent == trades_dir  # 父目录的父目录是trades_dir
             assert btc_file.name == "usdt_trades.csv"
             assert eth_file.name == "usdt_trades.csv"
+            assert btc_file.parent.name == "btc"
+            assert eth_file.parent.name == "eth"
 
     def test_environment_variable_integration(self):
         """测试环境变量集成"""

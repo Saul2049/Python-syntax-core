@@ -1,0 +1,21 @@
+
+=============================== warnings summary ===============================
+../../../usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/importlib/__init__.py:126
+  /usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/importlib/__init__.py:126: DeprecationWarning: 直接从 src.signals 导入已弃用。请使用 src.indicators 中的模块化导入。
+  例如: from src.indicators import crossover, moving_average
+    return _bootstrap._gcd_import(name[level:], package, level)
+
+scripts/monitoring/__init__.py:10
+  /Users/liam/Python syntax core/scripts/monitoring/__init__.py:10: DeprecationWarning: Importing from scripts.monitoring is deprecated. Please use 'from src.monitoring import PrometheusExporter' instead.
+    from .monitoring import PrometheusExporter
+
+tests/test_safe_runner.py:19
+  /Users/liam/Python syntax core/tests/test_safe_runner.py:19: PytestCollectionWarning: cannot collect test class 'TestTimeoutError' because it has a __init__ constructor (from: tests/test_safe_runner.py)
+    class TestTimeoutError(Exception):
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+ERROR tests/test_async_trading_engine_deep.py
+ERROR tests/test_trading_engines.py
+!!!!!!!!!!!!!!!!!!! Interrupted: 2 errors during collection !!!!!!!!!!!!!!!!!!!!
+2 skipped, 3 warnings, 2 errors in 4.49s

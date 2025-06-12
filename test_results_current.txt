@@ -1,0 +1,19 @@
+
+=============================== warnings summary ===============================
+archive_backup_20250106/root_scattered_tests/test_cleanup_analyzer.py:16
+  /Users/liam/Python syntax core/archive_backup_20250106/root_scattered_tests/test_cleanup_analyzer.py:16: PytestCollectionWarning: cannot collect test class 'TestAnalyzer' because it has a __init__ constructor (from: archive_backup_20250106/root_scattered_tests/test_cleanup_analyzer.py)
+    class TestAnalyzer:
+
+../../../usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/importlib/__init__.py:126
+  /usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/importlib/__init__.py:126: DeprecationWarning: Importing from src.improved_strategy is deprecated. Please use 'from src.strategies import <StrategyName>' instead.
+    return _bootstrap._gcd_import(name[level:], package, level)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+ERROR archive_backup_20250606/old_tests/test_improved_strategy_comprehensive.py
+ERROR archive_backup_20250606/old_tests/test_improved_strategy_enhanced.py
+ERROR archive_backup_20250606/old_tests/test_strategies_improved_strategy_coverage.py
+ERROR archive_backup_20250606/old_tests/test_strategies_improved_strategy_enhanced.py
+ERROR scripts/performance/performance_regression_test.py
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 5 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+2 warnings, 5 errors in 4.77s

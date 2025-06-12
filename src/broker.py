@@ -7,19 +7,45 @@
 """
 
 # 向后兼容导入
-from src.brokers.broker import Broker
-from src.core.risk_management import (
-    compute_atr,
-    compute_position_size,
-    compute_stop_price,
-    compute_trailing_stop,
-    trailing_stop,
-    update_trailing_stop_atr,
-)
-from src.strategies.backtest import (
-    backtest_portfolio,
-    backtest_single,
-)
+try:
+    from .brokers.broker import Broker
+except ImportError:
+    try:
+        from src.brokers.broker import Broker
+    except ImportError:
+        Broker = None
+
+try:
+    from .core.risk_management import (
+        compute_atr,
+        compute_position_size,
+        compute_stop_price,
+        compute_trailing_stop,
+        trailing_stop,
+        update_trailing_stop_atr,
+    )
+except ImportError:
+    try:
+        from src.core.risk_management import (
+            compute_atr,
+            compute_position_size,
+            compute_stop_price,
+            compute_trailing_stop,
+            trailing_stop,
+            update_trailing_stop_atr,
+        )
+    except ImportError:
+        # 提供默认的空实现
+        compute_atr = compute_position_size = compute_stop_price = None
+        compute_trailing_stop = trailing_stop = update_trailing_stop_atr = None
+
+try:
+    from .strategies.backtest import backtest_portfolio, backtest_single
+except ImportError:
+    try:
+        from src.strategies.backtest import backtest_portfolio, backtest_single
+    except ImportError:
+        backtest_portfolio = backtest_single = None
 
 # 保留原有的导入结构以维持兼容性
 __all__ = [

@@ -95,7 +95,7 @@ class DataNormalizer:
                 normalized * (self.feature_range[1] - self.feature_range[0]) + self.feature_range[0]
             )
         elif self.method == "standard":
-            return (data - data.mean()) / data.std()
+            return (data - data.mean()) / data.std(ddof=0)
         else:
             raise ValueError(f"简化实现不支持方法: {self.method}")
 

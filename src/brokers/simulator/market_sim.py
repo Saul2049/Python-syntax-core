@@ -221,7 +221,17 @@ class MarketSimulator:
         cum_returns = self.performance["total_value"]
         running_max = cum_returns.cummax()
         drawdown = (cum_returns / running_max) - 1
-        self.performance["max_drawdown"] = drawdown.min()
+
+        # 处理NaN值和空数据的情况
+        try:
+            min_drawdown = drawdown.min()
+            if pd.isna(min_drawdown):
+                self.performance["max_drawdown"] = 0.0
+            else:
+                self.performance["max_drawdown"] = min_drawdown
+        except (TypeError, ValueError):
+            # 如果计算失败，设置为0
+            self.performance["max_drawdown"] = 0.0
 
     def get_trade_statistics(self) -> Dict[str, Union[float, int]]:
         """

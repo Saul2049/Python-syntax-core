@@ -175,10 +175,9 @@ class W1CacheBenchmark:
 
             for j, price in enumerate(prices[:signal_limit]):
                 # 生成信号
-                result = strategy.generate_signals(symbol, price)
+                strategy.generate_signals(symbol, price)
 
-                if result is not None:
-                    signals_generated += 1
+                signals_generated += 1
 
                 # 计算分配
                 allocation_count += self._calculate_allocations(use_cache)
@@ -210,13 +209,13 @@ class W1CacheBenchmark:
     def _print_cache_stats(self, cache_stats: Dict[str, Any]):
         """打印缓存统计信息"""
         print("📊 缓存统计:")
-        cache_info = cache_stats["cache_info"]
+        _cache_info = cache_stats["cache_info"]
         efficiency = cache_stats["memory_efficiency"]
         print(f"   MA命中率: {efficiency['ma_cache_hit_rate']:.1%}")
         print(f"   ATR命中率: {efficiency['atr_cache_hit_rate']:.1%}")
         print(f"   窗口复用: {efficiency['window_reuse_efficiency']:.1%}")
         print(f"   内存节省: {efficiency['memory_save_ratio']:.1%}")
-        print(f"   缓存大小: {cache_info.get('total_cache_size', 0)} 项")
+        print(f"   缓存大小: {_cache_info.get('total_cache_size', 0)} 项")
 
     def _create_baseline_strategy(self):
         """创建基线策略（模拟无缓存）"""

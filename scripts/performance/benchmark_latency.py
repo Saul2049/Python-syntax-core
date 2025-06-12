@@ -69,12 +69,12 @@ class LatencyBenchmark:
 
             # 执行信号计算
             try:
-                signals = get_trading_signals(test_data, fast_win=7, slow_win=25)
-                atr = calculate_atr(test_data)
+                _signals = get_trading_signals(test_data, fast_win=7, slow_win=25)
+                _atr = calculate_atr(test_data)
 
                 # 验证计算结果
                 if i == 0:
-                    print(f"   信号数量: {len(signals) if signals else 0}, ATR值: {atr:.4f}")
+                    print(f"   信号数量: {len(_signals) if _signals else 0}, ATR值: {_atr:.4f}")
 
                 latency = time.time() - start_time
                 latencies.append(latency)
@@ -114,11 +114,11 @@ class LatencyBenchmark:
 
             try:
                 # 模拟数据获取 (使用生成的测试数据代替真实API调用)
-                test_data = self.generate_test_data(periods=200)
+                _test_data = self.generate_test_data(periods=200)
 
                 # 验证数据生成结果
                 if i == 0:
-                    print(f"   生成数据行数: {len(test_data)}")
+                    print(f"   生成数据行数: {len(_test_data)}")
 
                 latency = time.time() - start_time
                 latencies.append(latency)
@@ -158,10 +158,10 @@ class LatencyBenchmark:
         def calculate_signal_worker(data):
             """单个信号计算工作函数"""
             start_time = time.time()
-            signals = get_trading_signals(data, fast_win=7, slow_win=25)
-            atr = calculate_atr(data)
+            _signals = get_trading_signals(data, fast_win=7, slow_win=25)
+            _atr = calculate_atr(data)
             # 验证计算结果
-            if signals and atr > 0:
+            if _signals and _atr > 0:
                 return time.time() - start_time
             return time.time() - start_time
 
@@ -217,11 +217,11 @@ class LatencyBenchmark:
 
             # 执行优化版信号计算
             try:
-                signals = get_trading_signals_optimized(test_data, fast_win=7, slow_win=25)
+                _signals = get_trading_signals_optimized(test_data, fast_win=7, slow_win=25)
 
                 # 验证计算结果
                 if i == 0:
-                    print(f"   优化版信号数量: {len(signals) if signals else 0}")
+                    print(f"   优化版信号数量: {len(_signals) if _signals else 0}")
 
                 latency = time.time() - start_time
                 latencies.append(latency)
@@ -265,17 +265,17 @@ class LatencyBenchmark:
             try:
                 # 前一半使用相同数据，后一半使用不同数据
                 if i < iterations // 2:
-                    signals = get_trading_signals_optimized(test_data, fast_win=7, slow_win=25)
+                    _signals = get_trading_signals_optimized(test_data, fast_win=7, slow_win=25)
                     if i > 0:  # 第一次之后应该是缓存命中
                         cache_hits += 1
                 else:
                     # 使用新数据
                     new_data = self.generate_test_data()
-                    signals = get_trading_signals_optimized(new_data, fast_win=7, slow_win=25)
+                    _signals = get_trading_signals_optimized(new_data, fast_win=7, slow_win=25)
 
                 # 验证计算结果
                 if i == 0:
-                    print(f"   缓存测试信号数量: {len(signals) if signals else 0}")
+                    print(f"   缓存测试信号数量: {len(_signals) if _signals else 0}")
 
                 latency = time.time() - start_time
                 latencies.append(latency)

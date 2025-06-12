@@ -1,0 +1,179 @@
+name: 分层测试 Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    - cron: '0 2 * * *'  # 每天凌晨2点运行验收测试
+
+jobs:
+  # 第一层：快速测试 (单元测试)
+  fast_tests:
+    name: 🚀 快速测试 (单元测试)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: 设置 Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+        
+    - name: 安装依赖
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest pytest-cov pytest-mock
+        
+    - name: 运行快速测试
+      run: |
+        pytest tests/ \
+          -m "unit and not slow" \
+          --maxfail=5 \
+          --tb=short \
+          --durations=5 \
+          -v
+          
+    - name: 上传测试结果
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: fast-test-results
+        path: test-results/
+
+  # 第二层：核心功能测试
+  core_tests:
+    name: 🧠 核心功能测试  
+    runs-on: ubuntu-latest
+    needs: fast_tests
+    timeout-minutes: 20
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: 设置 Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+        
+    - name: 安装依赖
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest pytest-cov
+        
+    - name: 运行核心测试
+      run: |
+        pytest tests/ \
+          -m "core or smoke" \
+          --cov=src \
+          --cov-report=xml \
+          --cov-fail-under=75 \
+          -v
+          
+    - name: 上传覆盖率报告
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+
+  # 第三层：集成测试
+  integration_tests:
+    name: 🔗 集成测试
+    runs-on: ubuntu-latest
+    needs: core_tests
+    timeout-minutes: 30
+    
+    strategy:
+      matrix:
+        test_group: [trading, data, network, monitoring]
+        
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: 设置 Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+        
+    - name: 安装依赖
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest pytest-cov
+        
+    - name: 运行集成测试 - ${{ matrix.test_group }}
+      run: |
+        pytest tests/ \
+          -m "integration and ${{ matrix.test_group }}" \
+          --tb=short \
+          -v
+
+  # 第四层：慢速测试 (只在main分支运行)
+  slow_tests:
+    name: 🐌 慢速测试
+    runs-on: ubuntu-latest
+    needs: integration_tests
+    if: github.ref == 'refs/heads/main'
+    timeout-minutes: 60
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: 设置 Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+        
+    - name: 安装依赖
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest pytest-cov
+        
+    - name: 运行慢速测试
+      run: |
+        pytest tests/ \
+          -m "slow" \
+          --tb=short \
+          -v
+
+  # 验收测试 (每日定时运行)
+  acceptance_tests:
+    name: ✅ 验收测试
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule'
+    timeout-minutes: 90
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: 设置 Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+        
+    - name: 安装依赖
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest pytest-cov
+        
+    - name: 运行验收测试
+      run: |
+        pytest tests/ \
+          -m "acceptance" \
+          --cov=src \
+          --cov-report=html \
+          -v
+          
+    - name: 上传完整报告
+      uses: actions/upload-artifact@v3
+      with:
+        name: acceptance-test-report
+        path: htmlcov/
+
+# 定时运行验收测试已在上面的on部分配置 

@@ -60,23 +60,38 @@ class ConfigManager:
         """设置默认配置值"""
         # 定义默认配置结构
         default_config = {
-            "general": {
-                "symbols": "BTC/USDT,ETH/USDT",
-                "risk_percent": "0.5",
-                "check_interval": "60",
-                "test_mode": "true",
-            },
-            "data_sources": {
-                "use_binance_testnet": "true",
-                "auto_fallback": "true",
-                "min_switch_interval": "300",
-            },
+            "general": self._get_general_defaults(),
+            "data_sources": self._get_data_sources_defaults(),
             "binance_testnet": {},
-            "logging": {"level": "INFO", "log_dir": "logs/stability_test"},
+            "logging": self._get_logging_defaults(),
         }
 
         # 应用默认配置
         self._apply_default_config(default_config)
+
+    def _get_general_defaults(self) -> Dict[str, str]:
+        """获取通用配置默认值"""
+        return {
+            "symbols": "BTC/USDT,ETH/USDT",
+            "risk_percent": "0.5",
+            "check_interval": "60",
+            "test_mode": "true",
+        }
+
+    def _get_data_sources_defaults(self) -> Dict[str, str]:
+        """获取数据源配置默认值"""
+        return {
+            "use_binance_testnet": "true",
+            "auto_fallback": "true",
+            "min_switch_interval": "300",
+        }
+
+    def _get_logging_defaults(self) -> Dict[str, str]:
+        """获取日志配置默认值"""
+        return {
+            "level": "INFO",
+            "log_dir": "logs/stability_test",
+        }
 
     def _apply_default_config(self, default_config: dict):
         """应用默认配置"""

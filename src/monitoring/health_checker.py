@@ -40,8 +40,10 @@ class HealthChecker:
         # Health check configuration
         self._health_checks = {}
         self._last_check_results = {}
-        self._monitoring_thread = None
-        self._stop_monitoring = False
+
+        # Monitoring thread state (legacy tests expect _running & _health_thread)
+        self._running: bool = False
+        self._health_thread = None
 
         # Register default health checks
         self._register_default_checks()

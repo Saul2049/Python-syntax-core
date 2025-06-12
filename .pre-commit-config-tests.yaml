@@ -1,0 +1,55 @@
+repos:
+  # 1. 基础代码质量检查
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+        args: ['--maxkb=1000']
+
+  # 2. pytest风格检查 - 防止回潮
+  - repo: https://github.com/pycqa/flake8
+    rev: 6.0.0
+    hooks:
+      - id: flake8
+        files: ^tests/.*\.py$
+        additional_dependencies:
+          - flake8-pytest-style
+        args:
+          - --max-line-length=100
+          - --ignore=E203,W503
+
+  # 3. 测试收集检查 - 确保没有broken测试
+  - repo: local
+    hooks:
+      - id: pytest-collect-check
+        name: 检查测试收集
+        entry: pytest
+        language: python
+        files: ^tests/.*\.py$
+        args: ['--collect-only', '--tb=short']
+        pass_filenames: false
+
+  # 4. 检查测试文件命名规范
+  - repo: local
+    hooks:
+      - id: test-naming-convention
+        name: 检查测试文件命名
+        entry: python
+        language: python
+        files: ^tests/.*\.py$
+        args: ['-c', 'import sys, os; fname=os.path.basename(sys.argv[1]); exit(0) if fname.startswith("test_") or fname.endswith("_test.py") or fname=="conftest.py" else exit(1)']
+        pass_filenames: true
+
+  # 5. 禁止临时测试文件
+  - repo: local
+    hooks:
+      - id: no-temp-test-files
+        name: 禁止临时测试文件
+        entry: python
+        language: python
+        files: ^tests/.*\.py$
+        args: ['-c', 'import sys, os; fname=os.path.basename(sys.argv[1]); keywords=["temp", "tmp", "debug", "broken"]; exit(1) if any(k in fname.lower() for k in keywords) else exit(0)']
+        pass_filenames: true 

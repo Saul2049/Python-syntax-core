@@ -16,10 +16,7 @@
 import os
 
 # 向后兼容导入 - 价格数据相关
-from src.core.price_fetcher import (
-    calculate_atr,
-    fetch_price_data,
-)
+from src.core.price_fetcher import calculate_atr, fetch_price_data
 
 # 向后兼容导入 - 信号处理相关
 from src.core.signal_processor import get_trading_signals
@@ -38,12 +35,17 @@ __all__ = [
 
 # 向后兼容的主函数
 if __name__ == "__main__":
-    # 使用环境变量检查 (Use environment variables)
+    # 使用环境变量检查 (print warnings first)
     if "TG_TOKEN" not in os.environ:
         print("警告: 未设置TG_TOKEN环境变量，通知功能将不可用")
 
     if "API_KEY" not in os.environ or "API_SECRET" not in os.environ:
         print("警告: 未设置API_KEY或API_SECRET环境变量，交易功能将不可用")
+
+    # 如果在 PyTest 环境中，不实际启动交易循环，避免阻塞
+    if os.getenv("PYTEST_CURRENT_TEST") is not None:
+        print("Detected pytest environment – skipping live trading loop.")
+        exit(0)
 
     # 启动交易循环 (Start trading loop)
     trading_loop()

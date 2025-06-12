@@ -1,0 +1,149 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.10.8, pytest-8.3.5, pluggy-1.5.0 -- /Users/liam/Python syntax core/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /Users/liam/Python syntax core
+configfile: pytest.ini
+plugins: xdist-3.7.0, timeout-2.4.0, cov-6.1.1, forked-1.6.0, asyncio-1.0.0
+asyncio: mode=strict, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 1440 items / 2 skipped
+
+tests/test_advanced_coverage_boost.py::TestAdvancedCoverageBoost::test_calculate_position_size_comprehensive PASSED [  0%]
+tests/test_advanced_coverage_boost.py::TestAdvancedCoverageBoost::test_process_buy_signal_all_scenarios PASSED [  0%]
+tests/test_advanced_coverage_boost.py::TestAdvancedCoverageBoost::test_process_sell_signal_all_scenarios PASSED [  0%]
+tests/test_advanced_coverage_boost.py::TestAdvancedCoverageBoost::test_update_positions_comprehensive PASSED [  0%]
+tests/test_advanced_coverage_boost.py::TestAdvancedCoverageBoost::test_send_status_update_comprehensive PASSED [  0%]
+tests/test_advanced_coverage_boost.py::TestAdvancedCoverageBoost::test_execute_trading_cycle_comprehensive PASSED [  0%]
+tests/test_advanced_coverage_boost.py::TestAdvancedCoverageBoost::test_monitoring_metrics_update PASSED [  0%]
+tests/test_advanced_coverage_boost.py::TestAdvancedCoverageBoost::test_start_trading_loop_scenarios PASSED [  0%]
+tests/test_advanced_coverage_boost.py::TestAdvancedCoverageBoost::test_trading_loop_function PASSED [  0%]
+tests/test_advanced_coverage_boost.py::TestAdvancedCoverageBoost::test_async_execute_trade_decision_comprehensive FAILED [  0%]
+tests/test_advanced_coverage_boost.py::TestAdvancedCoverageBoost::test_handle_websocket_data_comprehensive FAILED [  0%]
+tests/test_advanced_coverage_boost.py::TestAdvancedCoverageBoost::test_process_concurrent_orders_comprehensive FAILED [  0%]
+tests/test_advanced_coverage_boost.py::TestAdvancedCoverageBoost::test_analyze_performance_metrics_comprehensive FAILED [  0%]
+tests/test_advanced_coverage_boost.py::TestAdvancedCoverageBoost::test_monitor_market_status_comprehensive FAILED [  0%]
+tests/test_advanced_coverage_boost.py::TestAdvancedCoverageBoost::test_websocket_connection_management FAILED [  1%]
+tests/test_advanced_coverage_boost.py::TestAdvancedCoverageBoost::test_cleanup_stale_orders FAILED [  1%]
+tests/test_advanced_coverage_boost.py::TestAdvancedCoverageBoost::test_batch_price_updates FAILED [  1%]
+tests/test_advanced_coverage_boost.py::TestAdvancedCoverageBoost::test_emergency_stop_async FAILED [  1%]
+tests/test_async_trading_engine.py::TestAsyncTradingEngine::test_init ERROR [  1%]
+
+==================================== ERRORS ====================================
+______________ ERROR at setup of TestAsyncTradingEngine.test_init ______________
+tests/test_async_trading_engine.py:43: in engine
+    return AsyncTradingEngine(
+src/core/async_trading_engine.py:89: in __init__
+    self.broker = _brokers_mod.Broker(api_key=api_key, api_secret=api_secret, testnet=testnet)
+E   TypeError: Broker.__init__() got an unexpected keyword argument 'testnet'
+=================================== FAILURES ===================================
+__ TestAdvancedCoverageBoost.test_async_execute_trade_decision_comprehensive ___
+tests/test_advanced_coverage_boost.py:497: in test_async_execute_trade_decision_comprehensive
+    engine, mock_broker, mock_metrics, _ = self.create_async_mock_engine()
+tests/test_advanced_coverage_boost.py:490: in create_async_mock_engine
+    engine = AsyncTradingEngine(api_key="test_key", api_secret="test_secret")
+src/core/async_trading_engine.py:89: in __init__
+    self.broker = _brokers_mod.Broker(api_key=api_key, api_secret=api_secret, testnet=testnet)
+E   TypeError: Broker.__init__() got an unexpected keyword argument 'testnet'
+______ TestAdvancedCoverageBoost.test_handle_websocket_data_comprehensive ______
+tests/test_advanced_coverage_boost.py:514: in test_handle_websocket_data_comprehensive
+    engine, mock_broker, mock_metrics, _ = self.create_async_mock_engine()
+tests/test_advanced_coverage_boost.py:490: in create_async_mock_engine
+    engine = AsyncTradingEngine(api_key="test_key", api_secret="test_secret")
+src/core/async_trading_engine.py:89: in __init__
+    self.broker = _brokers_mod.Broker(api_key=api_key, api_secret=api_secret, testnet=testnet)
+E   TypeError: Broker.__init__() got an unexpected keyword argument 'testnet'
+____ TestAdvancedCoverageBoost.test_process_concurrent_orders_comprehensive ____
+tests/test_advanced_coverage_boost.py:538: in test_process_concurrent_orders_comprehensive
+    engine, mock_broker, mock_metrics, _ = self.create_async_mock_engine()
+tests/test_advanced_coverage_boost.py:490: in create_async_mock_engine
+    engine = AsyncTradingEngine(api_key="test_key", api_secret="test_secret")
+src/core/async_trading_engine.py:89: in __init__
+    self.broker = _brokers_mod.Broker(api_key=api_key, api_secret=api_secret, testnet=testnet)
+E   TypeError: Broker.__init__() got an unexpected keyword argument 'testnet'
+___ TestAdvancedCoverageBoost.test_analyze_performance_metrics_comprehensive ___
+tests/test_advanced_coverage_boost.py:552: in test_analyze_performance_metrics_comprehensive
+    engine, _, _, _ = self.create_async_mock_engine()
+tests/test_advanced_coverage_boost.py:490: in create_async_mock_engine
+    engine = AsyncTradingEngine(api_key="test_key", api_secret="test_secret")
+src/core/async_trading_engine.py:89: in __init__
+    self.broker = _brokers_mod.Broker(api_key=api_key, api_secret=api_secret, testnet=testnet)
+E   TypeError: Broker.__init__() got an unexpected keyword argument 'testnet'
+______ TestAdvancedCoverageBoost.test_monitor_market_status_comprehensive ______
+tests/test_advanced_coverage_boost.py:565: in test_monitor_market_status_comprehensive
+    engine, mock_broker, mock_metrics, _ = self.create_async_mock_engine()
+tests/test_advanced_coverage_boost.py:490: in create_async_mock_engine
+    engine = AsyncTradingEngine(api_key="test_key", api_secret="test_secret")
+src/core/async_trading_engine.py:89: in __init__
+    self.broker = _brokers_mod.Broker(api_key=api_key, api_secret=api_secret, testnet=testnet)
+E   TypeError: Broker.__init__() got an unexpected keyword argument 'testnet'
+________ TestAdvancedCoverageBoost.test_websocket_connection_management ________
+tests/test_advanced_coverage_boost.py:576: in test_websocket_connection_management
+    engine, mock_broker, mock_metrics, _ = self.create_async_mock_engine()
+tests/test_advanced_coverage_boost.py:490: in create_async_mock_engine
+    engine = AsyncTradingEngine(api_key="test_key", api_secret="test_secret")
+src/core/async_trading_engine.py:89: in __init__
+    self.broker = _brokers_mod.Broker(api_key=api_key, api_secret=api_secret, testnet=testnet)
+E   TypeError: Broker.__init__() got an unexpected keyword argument 'testnet'
+_____________ TestAdvancedCoverageBoost.test_cleanup_stale_orders ______________
+tests/test_advanced_coverage_boost.py:586: in test_cleanup_stale_orders
+    engine, mock_broker, mock_metrics, _ = self.create_async_mock_engine()
+tests/test_advanced_coverage_boost.py:490: in create_async_mock_engine
+    engine = AsyncTradingEngine(api_key="test_key", api_secret="test_secret")
+src/core/async_trading_engine.py:89: in __init__
+    self.broker = _brokers_mod.Broker(api_key=api_key, api_secret=api_secret, testnet=testnet)
+E   TypeError: Broker.__init__() got an unexpected keyword argument 'testnet'
+______________ TestAdvancedCoverageBoost.test_batch_price_updates ______________
+tests/test_advanced_coverage_boost.py:597: in test_batch_price_updates
+    engine, mock_broker, mock_metrics, _ = self.create_async_mock_engine()
+tests/test_advanced_coverage_boost.py:490: in create_async_mock_engine
+    engine = AsyncTradingEngine(api_key="test_key", api_secret="test_secret")
+src/core/async_trading_engine.py:89: in __init__
+    self.broker = _brokers_mod.Broker(api_key=api_key, api_secret=api_secret, testnet=testnet)
+E   TypeError: Broker.__init__() got an unexpected keyword argument 'testnet'
+_____________ TestAdvancedCoverageBoost.test_emergency_stop_async ______________
+tests/test_advanced_coverage_boost.py:614: in test_emergency_stop_async
+    engine, mock_broker, mock_metrics, _ = self.create_async_mock_engine()
+tests/test_advanced_coverage_boost.py:490: in create_async_mock_engine
+    engine = AsyncTradingEngine(api_key="test_key", api_secret="test_secret")
+src/core/async_trading_engine.py:89: in __init__
+    self.broker = _brokers_mod.Broker(api_key=api_key, api_secret=api_secret, testnet=testnet)
+E   TypeError: Broker.__init__() got an unexpected keyword argument 'testnet'
+=============================== warnings summary ===============================
+tests/test_config_consolidated.py:28
+  /Users/liam/Python syntax core/tests/test_config_consolidated.py:28: DeprecationWarning: src.config is deprecated. Please use the new configuration system.
+    from src.config import TradingConfig, get_config, setup_logging
+
+../../../usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/importlib/__init__.py:126
+  /usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/importlib/__init__.py:126: DeprecationWarning: 直接从 src.signals 导入已弃用。请使用 src.indicators 中的模块化导入。
+  例如: from src.indicators import crossover, moving_average
+    return _bootstrap._gcd_import(name[level:], package, level)
+
+scripts/monitoring/__init__.py:10
+  /Users/liam/Python syntax core/scripts/monitoring/__init__.py:10: DeprecationWarning: Importing from scripts.monitoring is deprecated. Please use 'from src.monitoring import PrometheusExporter' instead.
+    from .monitoring import PrometheusExporter
+
+tests/test_safe_runner.py:19
+  /Users/liam/Python syntax core/tests/test_safe_runner.py:19: PytestCollectionWarning: cannot collect test class 'TestTimeoutError' because it has a __init__ constructor (from: tests/test_safe_runner.py)
+    class TestTimeoutError(Exception):
+
+conftest.py:40
+  /Users/liam/Python syntax core/conftest.py:40: PytestUnknownMarkWarning: Unknown pytest.mark.archive - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    archive_marker = pytest.mark.archive
+
+conftest.py:41
+  /Users/liam/Python syntax core/conftest.py:41: PytestUnknownMarkWarning: Unknown pytest.mark.slow - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    slow_marker = pytest.mark.slow
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_advanced_coverage_boost.py::TestAdvancedCoverageBoost::test_async_execute_trade_decision_comprehensive
+FAILED tests/test_advanced_coverage_boost.py::TestAdvancedCoverageBoost::test_handle_websocket_data_comprehensive
+FAILED tests/test_advanced_coverage_boost.py::TestAdvancedCoverageBoost::test_process_concurrent_orders_comprehensive
+FAILED tests/test_advanced_coverage_boost.py::TestAdvancedCoverageBoost::test_analyze_performance_metrics_comprehensive
+FAILED tests/test_advanced_coverage_boost.py::TestAdvancedCoverageBoost::test_monitor_market_status_comprehensive
+FAILED tests/test_advanced_coverage_boost.py::TestAdvancedCoverageBoost::test_websocket_connection_management
+FAILED tests/test_advanced_coverage_boost.py::TestAdvancedCoverageBoost::test_cleanup_stale_orders
+FAILED tests/test_advanced_coverage_boost.py::TestAdvancedCoverageBoost::test_batch_price_updates
+FAILED tests/test_advanced_coverage_boost.py::TestAdvancedCoverageBoost::test_emergency_stop_async
+ERROR tests/test_async_trading_engine.py::TestAsyncTradingEngine::test_init
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 10 failures !!!!!!!!!!!!!!!!!!!!!!!!!!
+========= 9 failed, 9 passed, 2 skipped, 6 warnings, 1 error in 7.26s ==========

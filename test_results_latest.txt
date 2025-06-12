@@ -1,0 +1,485 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.10.8, pytest-7.2.0, pluggy-1.0.0 -- /usr/local/opt/python@3.10/bin/python3.10
+cachedir: .pytest_cache
+rootdir: /Users/liam/Python syntax core, configfile: pytest.ini
+collecting ... collected 1249 items / 5 errors
+
+==================================== ERRORS ====================================
+___________ ERROR collecting tests/test_brokers_live_broker_async.py ___________
+ImportError while importing test module '/Users/liam/Python syntax core/tests/test_brokers_live_broker_async.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/importlib/__init__.py:126: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+tests/test_brokers_live_broker_async.py:21: in <module>
+    import aiohttp
+E   ModuleNotFoundError: No module named 'aiohttp'
+___________ ERROR collecting tests/test_core_async_trading_engine.py ___________
+ImportError while importing test module '/Users/liam/Python syntax core/tests/test_core_async_trading_engine.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/importlib/__init__.py:126: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+tests/test_core_async_trading_engine.py:15: in <module>
+    from src.core.async_trading_engine import AsyncTradingEngine, create_async_trading_engine
+src/core/async_trading_engine.py:21: in <module>
+    import websockets
+E   ModuleNotFoundError: No module named 'websockets'
+____ ERROR collecting tests/test_enhanced_async_trading_engine_coverage.py _____
+ImportError while importing test module '/Users/liam/Python syntax core/tests/test_enhanced_async_trading_engine_coverage.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/importlib/__init__.py:126: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+tests/test_enhanced_async_trading_engine_coverage.py:13: in <module>
+    from src.core.async_trading_engine import AsyncTradingEngine
+src/core/async_trading_engine.py:21: in <module>
+    import websockets
+E   ModuleNotFoundError: No module named 'websockets'
+___________ ERROR collecting tests/test_low_coverage_improvements.py ___________
+ImportError while importing test module '/Users/liam/Python syntax core/tests/test_low_coverage_improvements.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/importlib/__init__.py:126: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+tests/test_low_coverage_improvements.py:36: in <module>
+    from src.ws.binance_ws_client import BinanceWSClient
+src/ws/binance_ws_client.py:19: in <module>
+    import websockets
+E   ModuleNotFoundError: No module named 'websockets'
+___________ ERROR collecting tests/test_medium_priority_continued.py ___________
+ImportError while importing test module '/Users/liam/Python syntax core/tests/test_medium_priority_continued.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/importlib/__init__.py:126: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+tests/test_medium_priority_continued.py:16: in <module>
+    from prometheus_client import CollectorRegistry
+E   ModuleNotFoundError: No module named 'prometheus_client'
+=============================== warnings summary ===============================
+tests/test_advanced_coverage_boost.py:494
+  /Users/liam/Python syntax core/tests/test_advanced_coverage_boost.py:494: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_advanced_coverage_boost.py:511
+  /Users/liam/Python syntax core/tests/test_advanced_coverage_boost.py:511: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_advanced_coverage_boost.py:535
+  /Users/liam/Python syntax core/tests/test_advanced_coverage_boost.py:535: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_advanced_coverage_boost.py:549
+  /Users/liam/Python syntax core/tests/test_advanced_coverage_boost.py:549: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_advanced_coverage_boost.py:562
+  /Users/liam/Python syntax core/tests/test_advanced_coverage_boost.py:562: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_advanced_coverage_boost.py:573
+  /Users/liam/Python syntax core/tests/test_advanced_coverage_boost.py:573: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_advanced_coverage_boost.py:583
+  /Users/liam/Python syntax core/tests/test_advanced_coverage_boost.py:583: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_advanced_coverage_boost.py:594
+  /Users/liam/Python syntax core/tests/test_advanced_coverage_boost.py:594: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_advanced_coverage_boost.py:611
+  /Users/liam/Python syntax core/tests/test_advanced_coverage_boost.py:611: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_engine_boost.py:72
+  /Users/liam/Python syntax core/tests/test_async_engine_boost.py:72: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_engine_boost.py:92
+  /Users/liam/Python syntax core/tests/test_async_engine_boost.py:92: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_engine_boost.py:105
+  /Users/liam/Python syntax core/tests/test_async_engine_boost.py:105: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_engine_boost.py:120
+  /Users/liam/Python syntax core/tests/test_async_engine_boost.py:120: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_engine_boost.py:136
+  /Users/liam/Python syntax core/tests/test_async_engine_boost.py:136: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_engine_boost.py:147
+  /Users/liam/Python syntax core/tests/test_async_engine_boost.py:147: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_engine_boost.py:163
+  /Users/liam/Python syntax core/tests/test_async_engine_boost.py:163: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_engine_boost.py:185
+  /Users/liam/Python syntax core/tests/test_async_engine_boost.py:185: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_engine_boost.py:203
+  /Users/liam/Python syntax core/tests/test_async_engine_boost.py:203: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_engine_boost.py:216
+  /Users/liam/Python syntax core/tests/test_async_engine_boost.py:216: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_engine_boost.py:231
+  /Users/liam/Python syntax core/tests/test_async_engine_boost.py:231: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_engine_boost.py:244
+  /Users/liam/Python syntax core/tests/test_async_engine_boost.py:244: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_engine_boost.py:257
+  /Users/liam/Python syntax core/tests/test_async_engine_boost.py:257: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_engine_boost.py:266
+  /Users/liam/Python syntax core/tests/test_async_engine_boost.py:266: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_engine_boost.py:282
+  /Users/liam/Python syntax core/tests/test_async_engine_boost.py:282: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_engine_boost.py:297
+  /Users/liam/Python syntax core/tests/test_async_engine_boost.py:297: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_engine_boost.py:312
+  /Users/liam/Python syntax core/tests/test_async_engine_boost.py:312: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_engine_boost.py:322
+  /Users/liam/Python syntax core/tests/test_async_engine_boost.py:322: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_engine_boost.py:334
+  /Users/liam/Python syntax core/tests/test_async_engine_boost.py:334: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_engine_real.py:76
+  /Users/liam/Python syntax core/tests/test_async_engine_real.py:76: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_engine_real.py:101
+  /Users/liam/Python syntax core/tests/test_async_engine_real.py:101: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_engine_real.py:122
+  /Users/liam/Python syntax core/tests/test_async_engine_real.py:122: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_engine_real.py:149
+  /Users/liam/Python syntax core/tests/test_async_engine_real.py:149: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_engine_real.py:171
+  /Users/liam/Python syntax core/tests/test_async_engine_real.py:171: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_engine_real.py:188
+  /Users/liam/Python syntax core/tests/test_async_engine_real.py:188: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_engine_real.py:207
+  /Users/liam/Python syntax core/tests/test_async_engine_real.py:207: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_engine_real.py:231
+  /Users/liam/Python syntax core/tests/test_async_engine_real.py:231: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_engine_real.py:249
+  /Users/liam/Python syntax core/tests/test_async_engine_real.py:249: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_engine_real.py:267
+  /Users/liam/Python syntax core/tests/test_async_engine_real.py:267: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_engine_real.py:285
+  /Users/liam/Python syntax core/tests/test_async_engine_real.py:285: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_engine_real.py:303
+  /Users/liam/Python syntax core/tests/test_async_engine_real.py:303: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_engine_real.py:317
+  /Users/liam/Python syntax core/tests/test_async_engine_real.py:317: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_engine_real.py:330
+  /Users/liam/Python syntax core/tests/test_async_engine_real.py:330: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_engine_real.py:347
+  /Users/liam/Python syntax core/tests/test_async_engine_real.py:347: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_engine_real.py:363
+  /Users/liam/Python syntax core/tests/test_async_engine_real.py:363: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_engine_real.py:376
+  /Users/liam/Python syntax core/tests/test_async_engine_real.py:376: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_engine_real.py:393
+  /Users/liam/Python syntax core/tests/test_async_engine_real.py:393: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_engine_real.py:408
+  /Users/liam/Python syntax core/tests/test_async_engine_real.py:408: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_engine_real.py:426
+  /Users/liam/Python syntax core/tests/test_async_engine_real.py:426: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_trading_engine_complete.py:92
+  /Users/liam/Python syntax core/tests/test_async_trading_engine_complete.py:92: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_trading_engine_complete.py:112
+  /Users/liam/Python syntax core/tests/test_async_trading_engine_complete.py:112: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_trading_engine_complete.py:133
+  /Users/liam/Python syntax core/tests/test_async_trading_engine_complete.py:133: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_trading_engine_complete.py:146
+  /Users/liam/Python syntax core/tests/test_async_trading_engine_complete.py:146: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_trading_engine_complete.py:165
+  /Users/liam/Python syntax core/tests/test_async_trading_engine_complete.py:165: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_trading_engine_complete.py:185
+  /Users/liam/Python syntax core/tests/test_async_trading_engine_complete.py:185: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_trading_engine_complete.py:198
+  /Users/liam/Python syntax core/tests/test_async_trading_engine_complete.py:198: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_trading_engine_complete.py:222
+  /Users/liam/Python syntax core/tests/test_async_trading_engine_complete.py:222: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_trading_engine_complete.py:244
+  /Users/liam/Python syntax core/tests/test_async_trading_engine_complete.py:244: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_trading_engine_complete.py:265
+  /Users/liam/Python syntax core/tests/test_async_trading_engine_complete.py:265: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_trading_engine_complete.py:278
+  /Users/liam/Python syntax core/tests/test_async_trading_engine_complete.py:278: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_trading_engine_complete.py:297
+  /Users/liam/Python syntax core/tests/test_async_trading_engine_complete.py:297: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_trading_engine_complete.py:311
+  /Users/liam/Python syntax core/tests/test_async_trading_engine_complete.py:311: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_trading_engine_complete.py:324
+  /Users/liam/Python syntax core/tests/test_async_trading_engine_complete.py:324: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_trading_engine_complete.py:339
+  /Users/liam/Python syntax core/tests/test_async_trading_engine_complete.py:339: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_trading_engine_complete.py:350
+  /Users/liam/Python syntax core/tests/test_async_trading_engine_complete.py:350: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_trading_engine_complete.py:368
+  /Users/liam/Python syntax core/tests/test_async_trading_engine_complete.py:368: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_trading_engine_complete.py:387
+  /Users/liam/Python syntax core/tests/test_async_trading_engine_complete.py:387: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_trading_engine_complete.py:404
+  /Users/liam/Python syntax core/tests/test_async_trading_engine_complete.py:404: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_trading_engine_complete.py:416
+  /Users/liam/Python syntax core/tests/test_async_trading_engine_complete.py:416: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_trading_engine_deep.py:89
+  /Users/liam/Python syntax core/tests/test_async_trading_engine_deep.py:89: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_trading_engine_deep.py:100
+  /Users/liam/Python syntax core/tests/test_async_trading_engine_deep.py:100: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_trading_engine_deep.py:119
+  /Users/liam/Python syntax core/tests/test_async_trading_engine_deep.py:119: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_trading_engine_deep.py:136
+  /Users/liam/Python syntax core/tests/test_async_trading_engine_deep.py:136: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_trading_engine_deep.py:165
+  /Users/liam/Python syntax core/tests/test_async_trading_engine_deep.py:165: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_trading_engine_deep.py:187
+  /Users/liam/Python syntax core/tests/test_async_trading_engine_deep.py:187: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_trading_engine_deep.py:207
+  /Users/liam/Python syntax core/tests/test_async_trading_engine_deep.py:207: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_trading_engine_deep.py:238
+  /Users/liam/Python syntax core/tests/test_async_trading_engine_deep.py:238: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_trading_engine_deep.py:271
+  /Users/liam/Python syntax core/tests/test_async_trading_engine_deep.py:271: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_trading_engine_deep.py:290
+  /Users/liam/Python syntax core/tests/test_async_trading_engine_deep.py:290: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_trading_engine_deep.py:307
+  /Users/liam/Python syntax core/tests/test_async_trading_engine_deep.py:307: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_trading_engine_deep.py:325
+  /Users/liam/Python syntax core/tests/test_async_trading_engine_deep.py:325: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_trading_engine_deep.py:352
+  /Users/liam/Python syntax core/tests/test_async_trading_engine_deep.py:352: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_trading_engine_deep.py:372
+  /Users/liam/Python syntax core/tests/test_async_trading_engine_deep.py:372: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_trading_engine_deep.py:396
+  /Users/liam/Python syntax core/tests/test_async_trading_engine_deep.py:396: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_trading_engine_deep.py:412
+  /Users/liam/Python syntax core/tests/test_async_trading_engine_deep.py:412: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_trading_engine_deep.py:433
+  /Users/liam/Python syntax core/tests/test_async_trading_engine_deep.py:433: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_trading_engine_deep.py:458
+  /Users/liam/Python syntax core/tests/test_async_trading_engine_deep.py:458: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_async_trading_engine_deep.py:479
+  /Users/liam/Python syntax core/tests/test_async_trading_engine_deep.py:479: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_config.py:26
+  /Users/liam/Python syntax core/tests/test_config.py:26: DeprecationWarning: src.config is deprecated. Please use the new configuration system.
+    from src.config import TradingConfig, get_config, setup_logging
+
+tests/test_core_gc_optimizer.py:242
+  /Users/liam/Python syntax core/tests/test_core_gc_optimizer.py:242: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_core_gc_optimizer.py:302
+  /Users/liam/Python syntax core/tests/test_core_gc_optimizer.py:302: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_core_gc_optimizer.py:352
+  /Users/liam/Python syntax core/tests/test_core_gc_optimizer.py:352: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_core_gc_optimizer.py:377
+  /Users/liam/Python syntax core/tests/test_core_gc_optimizer.py:377: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_core_gc_optimizer.py:395
+  /Users/liam/Python syntax core/tests/test_core_gc_optimizer.py:395: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_core_gc_optimizer.py:407
+  /Users/liam/Python syntax core/tests/test_core_gc_optimizer.py:407: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_core_gc_optimizer.py:570
+  /Users/liam/Python syntax core/tests/test_core_gc_optimizer.py:570: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_coverage_final_push.py:364
+  /Users/liam/Python syntax core/tests/test_coverage_final_push.py:364: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_coverage_final_push.py:398
+  /Users/liam/Python syntax core/tests/test_coverage_final_push.py:398: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_coverage_final_push.py:479
+  /Users/liam/Python syntax core/tests/test_coverage_final_push.py:479: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_coverage_final_push.py:525
+  /Users/liam/Python syntax core/tests/test_coverage_final_push.py:525: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_coverage_final_push.py:567
+  /Users/liam/Python syntax core/tests/test_coverage_final_push.py:567: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_coverage_final_push.py:607
+  /Users/liam/Python syntax core/tests/test_coverage_final_push.py:607: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_coverage_final_push.py:644
+  /Users/liam/Python syntax core/tests/test_coverage_final_push.py:644: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+tests/test_coverage_final_push.py:695
+  /Users/liam/Python syntax core/tests/test_coverage_final_push.py:695: PytestUnknownMarkWarning: Unknown pytest.mark.asyncio - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.asyncio
+
+../../../usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/importlib/__init__.py:126
+  /usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/importlib/__init__.py:126: DeprecationWarning: 直接从 src.signals 导入已弃用。请使用 src.indicators 中的模块化导入。
+  例如: from src.indicators import crossover, moving_average
+    return _bootstrap._gcd_import(name[level:], package, level)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+ERROR tests/test_brokers_live_broker_async.py
+ERROR tests/test_core_async_trading_engine.py
+ERROR tests/test_enhanced_async_trading_engine_coverage.py
+ERROR tests/test_low_coverage_improvements.py
+ERROR tests/test_medium_priority_continued.py
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 5 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+======================= 104 warnings, 5 errors in 10.97s =======================

@@ -10,12 +10,12 @@
 
 import pandas as pd
 
-from src import signals
 from src.core.risk_management import (
     compute_position_size,
     compute_stop_price,
     compute_trailing_stop,
 )
+from src.indicators import bearish_cross_indices, bullish_cross_indices, moving_average
 
 
 def backtest_single(
@@ -134,8 +134,8 @@ class BacktestExecutor:
 
     def _calculate_indicators(self) -> dict:
         """计算技术指标"""
-        fast_ma = signals.moving_average(self.price, self.fast_win, kind="sma")
-        slow_ma = signals.moving_average(self.price, self.slow_win, kind="sma")
+        fast_ma = moving_average(self.price, self.fast_win, kind="sma")
+        slow_ma = moving_average(self.price, self.slow_win, kind="sma")
 
         # 计算ATR序列
         tr_series = self.price.diff().abs()  # 简化的TR计算
@@ -145,12 +145,8 @@ class BacktestExecutor:
 
     def _get_trading_signals(self, indicators: dict) -> dict:
         """获取交易信号"""
-        buy_signals = set(
-            signals.bullish_cross_indices(indicators["fast_ma"], indicators["slow_ma"])
-        )
-        sell_signals = set(
-            signals.bearish_cross_indices(indicators["fast_ma"], indicators["slow_ma"])
-        )
+        buy_signals = set(bullish_cross_indices(indicators["fast_ma"], indicators["slow_ma"]))
+        sell_signals = set(bearish_cross_indices(indicators["fast_ma"], indicators["slow_ma"]))
 
         return {"buy_signals": buy_signals, "sell_signals": sell_signals}
 

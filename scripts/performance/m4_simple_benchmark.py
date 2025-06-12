@@ -106,14 +106,14 @@ class M4SimpleBenchmark:
 
                     start_time = time.perf_counter()
 
-                    # 异步信号处理
-                    signals = self.signal_processor.get_trading_signals_optimized(data)
-                    atr = self.signal_processor.compute_atr_optimized(data)
+                    # 执行信号计算
+                    _signals = self.signal_processor.get_trading_signals_optimized(data)
+                    _atr = self.signal_processor.compute_atr_optimized(data)
 
                     # 验证计算结果
                     if i == 0:
                         print(
-                            f"   {symbol}信号数量: {len(signals) if signals else 0}, ATR: {atr:.4f}"
+                            f"   {symbol}信号数量: {len(_signals) if _signals else 0}, ATR: {_atr:.4f}"
                         )
 
                     end_time = time.perf_counter()

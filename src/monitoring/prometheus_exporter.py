@@ -45,6 +45,9 @@ class PrometheusExporter:
         self.heartbeat_thread = None
         self.stop_heartbeat = False
 
+        # Legacy alias for tests
+        self.server_started = False
+
         logger.info(f"Initialized Prometheus metrics exporter on port: {port}")
 
     def _initialize_metrics(self):
@@ -296,6 +299,7 @@ class PrometheusExporter:
             if start_http_server:
                 start_http_server(self.port, registry=self.registry)
                 self._server_started = True
+                self.server_started = True
                 self.logger.info(f"Prometheus exporter started on port {self.port}")
                 return True
             else:
@@ -319,7 +323,26 @@ class PrometheusExporter:
             self.heartbeat_thread.join(timeout=2)
         self.logger.info("Prometheus exporter stopped")
         self._server_started = False
+        self.server_started = False
         return True
+
+    # -------------------------------------------------------------------
+    # Legacy aliases expected by archived tests
+    # -------------------------------------------------------------------
+
+    def start(self):
+        """Alias to start_server for backward compatibility."""
+        ok = self.start_server()
+        if ok:
+            self.server_started = True
+        return ok
+
+    def stop(self):
+        """Alias to stop_server for backward compatibility."""
+        ok = self.stop_server()
+        if ok:
+            self.server_started = False
+        return ok
 
 
 # Convenience function for backward compatibility

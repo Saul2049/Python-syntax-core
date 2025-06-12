@@ -6,11 +6,7 @@ import pandas as pd
 
 from src.broker import compute_position_size, compute_stop_price
 from src.data import load_csv
-from src.signals import (
-    bearish_cross_indices,
-    bullish_cross_indices,
-    moving_average,
-)
+from src.indicators import bearish_cross_indices, bullish_cross_indices, moving_average
 
 
 def run_backtest(

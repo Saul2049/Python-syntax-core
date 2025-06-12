@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
+Backward Compatibility Configuration Module
+向后兼容配置模块
+
 Configuration Package (配置包)
 
 Unified configuration management with modular architecture
@@ -10,6 +13,7 @@ interfaces. Some legacy functions may be deprecated in future versions.
 """
 
 import logging
+import warnings
 from pathlib import Path
 from typing import Optional
 
@@ -17,6 +21,13 @@ from .defaults import DefaultConfig
 from .manager import TradingConfig
 from .sources import ConfigSourceLoader
 from .validators import ConfigSanitizer, ConfigValidator
+
+# Issue deprecation warning
+warnings.warn(
+    "src.config is deprecated. Please use the new configuration system.",
+    DeprecationWarning,
+    stacklevel=2,
+)
 
 # Module-level logger
 logger = logging.getLogger(__name__)

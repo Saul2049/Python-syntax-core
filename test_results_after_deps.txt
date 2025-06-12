@@ -1,0 +1,44 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.10.8, pytest-8.4.0, pluggy-1.6.0 -- /usr/local/opt/python@3.10/bin/python3.10
+cachedir: .pytest_cache
+rootdir: /Users/liam/Python syntax core
+configfile: pytest.ini
+plugins: asyncio-1.0.0
+asyncio: mode=strict, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 2119 items / 1 error / 2 skipped
+
+==================================== ERRORS ====================================
+___________________ ERROR collecting tests/test_optimize.py ____________________
+ImportError while importing test module '/Users/liam/Python syntax core/tests/test_optimize.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/importlib/__init__.py:126: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+tests/test_optimize.py:12: in <module>
+    from scripts.utilities.optimize_ma import run_optimization
+scripts/utilities/optimize_ma.py:9: in <module>
+    from tqdm import tqdm  # pip install tqdm
+E   ModuleNotFoundError: No module named 'tqdm'
+=============================== warnings summary ===============================
+tests/test_config.py:26
+  /Users/liam/Python syntax core/tests/test_config.py:26: DeprecationWarning: src.config is deprecated. Please use the new configuration system.
+    from src.config import TradingConfig, get_config, setup_logging
+
+../../../usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/importlib/__init__.py:126
+  /usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/3.10/lib/python3.10/importlib/__init__.py:126: DeprecationWarning: 直接从 src.signals 导入已弃用。请使用 src.indicators 中的模块化导入。
+  例如: from src.indicators import crossover, moving_average
+    return _bootstrap._gcd_import(name[level:], package, level)
+
+scripts/monitoring/__init__.py:10
+  /Users/liam/Python syntax core/scripts/monitoring/__init__.py:10: DeprecationWarning: Importing from scripts.monitoring is deprecated. Please use 'from src.monitoring import PrometheusExporter' instead.
+    from .monitoring import PrometheusExporter
+
+tests/test_safe_runner.py:19
+  /Users/liam/Python syntax core/tests/test_safe_runner.py:19: PytestCollectionWarning: cannot collect test class 'TestTimeoutError' because it has a __init__ constructor (from: tests/test_safe_runner.py)
+    class TestTimeoutError(Exception):
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+ERROR tests/test_optimize.py
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+=================== 2 skipped, 4 warnings, 1 error in 6.77s ====================

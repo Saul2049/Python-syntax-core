@@ -11,6 +11,12 @@ from src.brokers.exchange import ExchangeClient
 为了保持向后兼容性，此文件重新导出了重构后的功能。
 """
 
-from src.brokers.exchange import ExchangeClient
+try:
+    from .brokers.exchange import ExchangeClient
+except ImportError:
+    try:
+        from src.brokers.exchange import ExchangeClient
+    except ImportError:
+        ExchangeClient = None
 
 __all__ = ["ExchangeClient"]

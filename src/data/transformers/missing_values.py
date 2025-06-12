@@ -46,8 +46,8 @@ class MissingValueHandler:
         """应用填充方法到指定列"""
         # 定义填充方法映射表
         fill_methods = {
-            "forward": lambda df, col: df[col].fillna(method="ffill"),
-            "backward": lambda df, col: df[col].fillna(method="bfill"),
+            "forward": lambda df, col: df[col].ffill(),
+            "backward": lambda df, col: df[col].bfill(),
             "zero": lambda df, col: df[col].fillna(0),
         }
 

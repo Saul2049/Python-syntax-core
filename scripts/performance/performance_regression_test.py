@@ -15,7 +15,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, Optional
 
-from scripts.performance_profiler import PerformanceProfiler
+from scripts.performance.performance_profiler import PerformanceProfiler
 
 
 class PerformanceRegressionTest:

@@ -1,0 +1,192 @@
+
+=============================== warnings summary ===============================
+archive_backup_20250106/root_scattered_tests/test_cleanup_analyzer.py:16
+  /Users/liam/Python syntax core/archive_backup_20250106/root_scattered_tests/test_cleanup_analyzer.py:16: PytestCollectionWarning: cannot collect test class 'TestAnalyzer' because it has a __init__ constructor (from: archive_backup_20250106/root_scattered_tests/test_cleanup_analyzer.py)
+    class TestAnalyzer:
+
+tests/test_safe_runner.py:19
+  /Users/liam/Python syntax core/tests/test_safe_runner.py:19: PytestCollectionWarning: cannot collect test class 'TestTimeoutError' because it has a __init__ constructor (from: tests/test_safe_runner.py)
+    class TestTimeoutError(Exception):
+
+tests_backup_before_cleanup/test_safe_runner.py:19
+  /Users/liam/Python syntax core/tests_backup_before_cleanup/test_safe_runner.py:19: PytestCollectionWarning: cannot collect test class 'TestTimeoutError' because it has a __init__ constructor (from: tests_backup_before_cleanup/test_safe_runner.py)
+    class TestTimeoutError(Exception):
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+ERROR archive_backup_20250106/tests_internal_archive/broken_tests/test_trading_engine_comprehensive.py
+ERROR archive_backup_20250106/tests_internal_archive/deprecated/test_cursor_pro_demo.py
+ERROR archive_backup_20250106/tests_internal_archive/old_versions/test_data_saver_enhanced.py
+ERROR archive_backup_20250106/tests_internal_archive/old_versions/test_data_saver_enhanced_fixed.py
+ERROR archive_backup_20250106/tests_internal_archive/old_versions/test_data_saver_enhanced_part2.py
+ERROR archive_backup_20250106/tests_internal_archive/old_versions/test_metrics_collector_enhanced.py
+ERROR archive_backup_20250106/tests_internal_archive/old_versions/test_metrics_collector_enhanced_part2.py
+ERROR archive_backup_20250606/old_tests/test_breakout_strategies_coverage.py
+ERROR archive_backup_20250606/old_tests/test_brokers_comprehensive.py
+ERROR archive_backup_20250606/old_tests/test_config_defaults_comprehensive.py
+ERROR archive_backup_20250606/old_tests/test_config_utils_coverage.py
+ERROR archive_backup_20250606/old_tests/test_core_price_fetcher_coverage.py
+ERROR archive_backup_20250606/old_tests/test_core_trading_engine_coverage.py
+ERROR archive_backup_20250606/old_tests/test_data_saver_comprehensive.py
+ERROR archive_backup_20250606/old_tests/test_data_transformers_comprehensive.py
+ERROR archive_backup_20250606/old_tests/test_data_transformers_coverage.py
+ERROR archive_backup_20250606/old_tests/test_exchange_client_coverage.py
+ERROR archive_backup_20250606/old_tests/test_improved_strategy_comprehensive.py
+ERROR archive_backup_20250606/old_tests/test_improved_strategy_coverage.py
+ERROR archive_backup_20250606/old_tests/test_improved_strategy_enhanced.py
+ERROR archive_backup_20250606/old_tests/test_indicators_cross_signals_coverage.py
+ERROR archive_backup_20250606/old_tests/test_market_simulator_coverage.py
+ERROR archive_backup_20250606/old_tests/test_metrics_collector_coverage.py
+ERROR archive_backup_20250606/old_tests/test_missing_values_enhanced_coverage.py
+ERROR archive_backup_20250606/old_tests/test_momentum_indicators_comprehensive.py
+ERROR archive_backup_20250606/old_tests/test_monitoring_coverage.py
+ERROR archive_backup_20250606/old_tests/test_moving_average_coverage.py
+ERROR archive_backup_20250606/old_tests/test_simplified_coverage.py
+ERROR archive_backup_20250606/old_tests/test_strategies_comprehensive.py
+ERROR archive_backup_20250606/old_tests/test_strategies_improved_strategy_coverage.py
+ERROR archive_backup_20250606/old_tests/test_strategies_improved_strategy_enhanced.py
+ERROR archive_backup_20250606/old_tests/test_strategies_oscillator_coverage.py
+ERROR archive_backup_20250606/old_tests/test_trading_loop_enhanced_coverage.py
+ERROR archive_backup_20250606/old_tests/test_volatility_indicators_comprehensive.py
+ERROR scripts/memory/w1_quick_test.py
+ERROR scripts/performance/performance_regression_test.py
+ERROR scripts/testing/stability_test.py
+ERROR tests/test_async_trading_engine_deep.py
+ERROR tests/test_backtest.py
+ERROR tests/test_binance_client_coverage_boost.py
+ERROR tests/test_broker.py
+ERROR tests/test_broker_coverage_boost.py
+ERROR tests/test_broker_enhanced_coverage.py
+ERROR tests/test_broker_single.py
+ERROR tests/test_brokers_binance_client.py
+ERROR tests/test_brokers_live_broker_async.py
+ERROR tests/test_brokers_simulator_market_sim.py
+ERROR tests/test_config.py
+ERROR tests/test_config_init_coverage.py
+ERROR tests/test_config_manager_coverage_boost.py
+ERROR tests/test_config_refactoring.py
+ERROR tests/test_core_async_trading_engine.py
+ERROR tests/test_core_gc_optimizer.py
+ERROR tests/test_core_modules_comprehensive.py
+ERROR tests/test_core_network.py
+ERROR tests/test_core_network_client.py
+ERROR tests/test_core_network_decorators.py
+ERROR tests/test_core_network_retry_manager.py
+ERROR tests/test_core_signal_processor.py
+ERROR tests/test_core_signal_processor_optimized.py
+ERROR tests/test_core_trading_engine.py
+ERROR tests/test_data_processors.py
+ERROR tests/test_data_saver_coverage_boost.py
+ERROR tests/test_data_saver_final.py
+ERROR tests/test_data_splitters_comprehensive.py
+ERROR tests/test_data_transformers_coverage_boost.py
+ERROR tests/test_data_transformers_enhanced.py
+ERROR tests/test_enhanced_async_trading_engine_coverage.py
+ERROR tests/test_enhanced_strategies_coverage.py
+ERROR tests/test_enhanced_trading_engine_coverage.py
+ERROR tests/test_exchange_client.py
+ERROR tests/test_exchange_client_coverage_boost.py
+ERROR tests/test_improved_strategy.py
+ERROR tests/test_indicators.py
+ERROR tests/test_low_coverage_improvements.py
+ERROR tests/test_market_simulator_coverage.py
+ERROR tests/test_medium_priority_transformers.py
+ERROR tests/test_metrics.py
+ERROR tests/test_metrics_collector_coverage_boost.py
+ERROR tests/test_metrics_collector_enhanced_fixed.py
+ERROR tests/test_missing_values_enhanced.py
+ERROR tests/test_missing_values_simple.py
+ERROR tests/test_monitoring.py
+ERROR tests/test_monitoring_metrics_collector_enhanced.py
+ERROR tests/test_optimize.py
+ERROR tests/test_portfolio.py
+ERROR tests/test_price_fetcher.py
+ERROR tests/test_signal_processor_coverage.py
+ERROR tests/test_signal_processor_optimized.py
+ERROR tests/test_signal_processor_vectorized_comprehensive.py
+ERROR tests/test_signals.py
+ERROR tests/test_snapshots.py
+ERROR tests/test_strategies_cache_optimized_strategy.py
+ERROR tests/test_strategies_init.py
+ERROR tests/test_tools_reconcile.py
+ERROR tests/test_trading_engines.py
+ERROR tests/test_trading_loop.py
+ERROR tests/test_trading_loop_coverage.py
+ERROR tests/test_utils.py
+ERROR tests/test_vectorized_signal_cache.py
+ERROR tests/test_ws_binance_client_simple.py
+ERROR tests/test_zero_coverage_modules.py
+ERROR tests_backup_before_cleanup/test_backtest.py
+ERROR tests_backup_before_cleanup/test_binance_client_coverage_boost.py
+ERROR tests_backup_before_cleanup/test_broker.py
+ERROR tests_backup_before_cleanup/test_broker_coverage_boost.py
+ERROR tests_backup_before_cleanup/test_broker_enhanced_coverage.py
+ERROR tests_backup_before_cleanup/test_broker_single.py
+ERROR tests_backup_before_cleanup/test_brokers_binance_client.py
+ERROR tests_backup_before_cleanup/test_brokers_live_broker_async.py
+ERROR tests_backup_before_cleanup/test_brokers_simulator_market_sim.py
+ERROR tests_backup_before_cleanup/test_config.py
+ERROR tests_backup_before_cleanup/test_config_init_coverage.py
+ERROR tests_backup_before_cleanup/test_config_manager_coverage_boost.py
+ERROR tests_backup_before_cleanup/test_config_refactoring.py
+ERROR tests_backup_before_cleanup/test_core_async_trading_engine.py
+ERROR tests_backup_before_cleanup/test_core_gc_optimizer.py
+ERROR tests_backup_before_cleanup/test_core_modules_comprehensive.py
+ERROR tests_backup_before_cleanup/test_core_network.py
+ERROR tests_backup_before_cleanup/test_core_network_client.py
+ERROR tests_backup_before_cleanup/test_core_network_decorators.py
+ERROR tests_backup_before_cleanup/test_core_network_retry_manager.py
+ERROR tests_backup_before_cleanup/test_core_signal_processor.py
+ERROR tests_backup_before_cleanup/test_core_signal_processor_optimized.py
+ERROR tests_backup_before_cleanup/test_core_trading_engine.py
+ERROR tests_backup_before_cleanup/test_cursor_pro_demo.py
+ERROR tests_backup_before_cleanup/test_data_processors.py
+ERROR tests_backup_before_cleanup/test_data_saver_coverage_boost.py
+ERROR tests_backup_before_cleanup/test_data_saver_enhanced.py
+ERROR tests_backup_before_cleanup/test_data_saver_enhanced_fixed.py
+ERROR tests_backup_before_cleanup/test_data_saver_enhanced_part2.py
+ERROR tests_backup_before_cleanup/test_data_saver_final.py
+ERROR tests_backup_before_cleanup/test_data_splitters_comprehensive.py
+ERROR tests_backup_before_cleanup/test_data_transformers_coverage_boost.py
+ERROR tests_backup_before_cleanup/test_data_transformers_enhanced.py
+ERROR tests_backup_before_cleanup/test_enhanced_async_trading_engine_coverage.py
+ERROR tests_backup_before_cleanup/test_enhanced_strategies_coverage.py
+ERROR tests_backup_before_cleanup/test_enhanced_trading_engine_coverage.py
+ERROR tests_backup_before_cleanup/test_exchange_client.py
+ERROR tests_backup_before_cleanup/test_exchange_client_coverage_boost.py
+ERROR tests_backup_before_cleanup/test_improved_strategy.py
+ERROR tests_backup_before_cleanup/test_indicators.py
+ERROR tests_backup_before_cleanup/test_low_coverage_improvements.py
+ERROR tests_backup_before_cleanup/test_market_simulator_coverage.py
+ERROR tests_backup_before_cleanup/test_medium_priority_transformers.py
+ERROR tests_backup_before_cleanup/test_metrics.py
+ERROR tests_backup_before_cleanup/test_metrics_collector_coverage_boost.py
+ERROR tests_backup_before_cleanup/test_metrics_collector_enhanced.py
+ERROR tests_backup_before_cleanup/test_metrics_collector_enhanced_fixed.py
+ERROR tests_backup_before_cleanup/test_metrics_collector_enhanced_part2.py
+ERROR tests_backup_before_cleanup/test_missing_values_enhanced.py
+ERROR tests_backup_before_cleanup/test_missing_values_simple.py
+ERROR tests_backup_before_cleanup/test_monitoring.py
+ERROR tests_backup_before_cleanup/test_monitoring_metrics_collector_enhanced.py
+ERROR tests_backup_before_cleanup/test_optimize.py
+ERROR tests_backup_before_cleanup/test_portfolio.py
+ERROR tests_backup_before_cleanup/test_price_fetcher.py
+ERROR tests_backup_before_cleanup/test_signal_processor_coverage.py
+ERROR tests_backup_before_cleanup/test_signal_processor_optimized.py
+ERROR tests_backup_before_cleanup/test_signal_processor_vectorized_comprehensive.py
+ERROR tests_backup_before_cleanup/test_signals.py
+ERROR tests_backup_before_cleanup/test_snapshots.py
+ERROR tests_backup_before_cleanup/test_strategies_cache_optimized_strategy.py
+ERROR tests_backup_before_cleanup/test_strategies_init.py
+ERROR tests_backup_before_cleanup/test_tools_reconcile.py
+ERROR tests_backup_before_cleanup/test_trading_engine_comprehensive.py
+ERROR tests_backup_before_cleanup/test_trading_engines.py
+ERROR tests_backup_before_cleanup/test_trading_loop.py
+ERROR tests_backup_before_cleanup/test_trading_loop_coverage.py
+ERROR tests_backup_before_cleanup/test_trading_loop_coverage_BROKEN.py
+ERROR tests_backup_before_cleanup/test_utils.py
+ERROR tests_backup_before_cleanup/test_vectorized_signal_cache.py
+ERROR tests_backup_before_cleanup/test_ws_binance_client_simple.py
+ERROR tests_backup_before_cleanup/test_zero_coverage_modules.py
+!!!!!!!!!!!!!!!!!! Interrupted: 174 errors during collection !!!!!!!!!!!!!!!!!!!
+2 skipped, 3 warnings, 174 errors in 14.98s
