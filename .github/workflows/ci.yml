@@ -46,7 +46,22 @@ jobs:
         # 快速CI测试
         python scripts/ci_test.py
 
-    - name: Run test suite
+    - name: Run test suite with coverage
       run: |
         # 使用pip install -e .后不需要设置PYTHONPATH
-        python -m pytest --maxfail=1 --disable-warnings -v
+        # 运行测试并生成覆盖率报告，使用 .coveragerc 配置排除 legacy 目录
+        python -m pytest --maxfail=1 --disable-warnings -v \
+          --cov=src \
+          --cov-config=.coveragerc \
+          --cov-report=term-missing \
+          --cov-report=xml:coverage.xml \
+          --cov-report=html:htmlcov
+
+    - name: Upload coverage reports
+      uses: codecov/codecov-action@v4
+      if: always()
+      with:
+        file: coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: false

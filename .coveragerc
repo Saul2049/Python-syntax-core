@@ -1,0 +1,36 @@
+[run]
+source = src
+omit = 
+    */tests/*
+    */test_*
+    */legacy/*
+    legacy/*
+    *legacy*
+    */venv/*
+    */.venv/*
+    */site-packages/*
+    */dist-packages/*
+    */__pycache__/*
+    */build/*
+    */dist/*
+    setup.py
+
+[report]
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    if self.debug:
+    if settings.DEBUG
+    raise AssertionError
+    raise NotImplementedError
+    if 0:
+    if __name__ == .__main__.:
+    class .*\bProtocol\):
+    @(abc\.)?abstractmethod
+
+[html]
+directory = htmlcov
+skip_covered = False
+
+[xml]
+output = coverage.xml 
